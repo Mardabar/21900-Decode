@@ -102,12 +102,14 @@ public class TempCloseBlue extends OpMode{
 
     // TIMER VARS
     private ElapsedTime feedTimer;
-    private double ascendDur = 500;
+
 
     private double intakeDur = 700;
     private double feedDur = 500; // was 650
     private double retDur = 300; // was 300???
-    private double beltDur = 350; // was 450, 250 gets closer for shooting but not intake wise.
+    private double beltDur = 450; // was 450, 250 gets closer for shooting but not intake wise.
+    private double ascendDur = 500;
+
     private int fcount = 0;
 
 
@@ -331,12 +333,6 @@ public class TempCloseBlue extends OpMode{
 
             case 6:
                 if (!fol.isBusy()) {
-//                    intakeTimer.reset();
-//                    if (intakeTimer.milliseconds() > intakeDur && !fol.isBusy()){
-//                        runBelt(beltSpeed/2);
-//                    } else {
-//                        runBelt(0);
-//                    }
                     fol.setMaxPower(grabSpeed);
                     fol.followPath(pathGrabRow2);
                     runBelt(beltSpeed);
@@ -454,7 +450,7 @@ public class TempCloseBlue extends OpMode{
             shootTimerCount = 1;
         }
 
-        if (shootTimer.milliseconds() < 9000 && fcount <= 8 && shootTimerCount == 1){
+        if (shootTimer.milliseconds() < 10000 && fcount <= 8 && shootTimerCount == 1){
             feedLauncher();
         }
         else if (shootTimerCount == 1)
@@ -486,14 +482,18 @@ public class TempCloseBlue extends OpMode{
         else if (feedTimer.milliseconds() < retDur && feeding == 1){
             blocker.setPosition(1);
         }
-        else if (feedTimer.milliseconds() < beltDur && feeding == 2) {
-            blocker.setPosition(1);
+        else if (feedTimer.milliseconds() < ascendDur && feeding == 2){
+            blocker.setPosition(0);
+            ascension.setPower(1);
+        }
+        else if (feedTimer.milliseconds() < beltDur && feeding == 3) {
+            //blocker.setPosition(1);
             ascension.setPower(1);
             runBelt(beltSpeed);
         }
         else {
             if (ls.getVelocity() >= velToPow(shootVel) - 30 && rs.getVelocity() >= velToPow(shootVel) - 30) {
-                if (feeding == 2)
+                if (feeding == 3)
                     feeding = 0;
                 else
                     feeding++;
