@@ -23,7 +23,7 @@ import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 import org.firstinspires.ftc.vision.VisionPortal;
 import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
 
-@Autonomous(name = "TempCloseBlue", group = "autonomous")
+@Autonomous(name = "CloseBlue", group = "autonomous")
 public class TempCloseBlue extends OpMode{
 
     // PEDROPATHING VARS
@@ -52,12 +52,12 @@ public class TempCloseBlue extends OpMode{
     private final Pose startPose = new Pose(28, 131, Math.toRadians(144)); // STARTING POSITION was 23, 124 , 144
     private final Pose preScorePose = new Pose(60, 104, Math.toRadians(146)); // PRE-LOAD SCORING POSITION
     private final Pose row1Line = new Pose(44.5, 84, Math.toRadians(0)); // Position
-    private final Pose row1Line1CP = new Pose(91,84.5); // CONTROL POINT
-    private final Pose grabRow1 = new Pose(25, 84, Math.toRadians(0)); // Position
+    private final Pose row1Line1CP = new Pose(91,84); // CONTROL POINT
+    private final Pose grabRow1 = new Pose(30, 84, Math.toRadians(0)); // Position
     private final Pose scoreRow1 = new Pose(61, 78, Math.toRadians(132)); // Scoring
-    private final Pose row2Line = new Pose(44.5, 60, Math.toRadians(0)); // Position
-    //private final Pose row2LineCP = new Pose(85, 60);
-    private final Pose grabRow2 = new Pose(25, 60, Math.toRadians(0));
+    private final Pose row2Line = new Pose(47, 60, Math.toRadians(0)); // Position
+    private final Pose row2LineCP = new Pose(85, 60);
+    private final Pose grabRow2 = new Pose(30, 59.5, Math.toRadians(0));
     private final Pose scoreRow2 = new Pose(61, 78, Math.toRadians(132));
 
     private final Pose parkPose = new Pose(50, 72, Math.toRadians(132)); // PARKING POSITION
@@ -78,7 +78,7 @@ public class TempCloseBlue extends OpMode{
 
 
     // SHOOTING VARS
-    private final double OVERSHOOT_VEL_MULT = 1.68;
+    private final double OVERSHOOT_VEL_MULT = 1.68; // was 1.68
     private final double OVERSHOOT_ANG_MULT = 1;
     private final double ANGLE_CONST = 2.08833333;
     private final int ELBOW_GEAR_RATIO = 4;
@@ -101,8 +101,9 @@ public class TempCloseBlue extends OpMode{
     private ElapsedTime feedTimer;
     private double feedDur = 450; // was 400
     private double retDur = 600; // was 1000
-    private double beltDur = 500; // was 300
+    private double beltDur = 600; // was 500, 300
     private int feeding = 0;
+    private int fcount = 0;
 
 
     // PATH CHAINS
@@ -281,7 +282,7 @@ public class TempCloseBlue extends OpMode{
             case 0:
                 if (!fol.isBusy() && pathState == 0) {
                     fol.followPath(pathRow1Line);
-                    setShootPos(preScorePose.getX(), preScorePose.getY(), 9, 135);
+                    setShootPos(preScorePose.getX(), preScorePose.getY(), 10, 136.5); // was 9 , 135
                     setPathState(1);
                 }
                 break;
@@ -299,7 +300,7 @@ public class TempCloseBlue extends OpMode{
                 if (!fol.isBusy()){
                     fol.followPath(pathScoreRow1);
                     fol.setMaxPower(1);
-                    setShootPos(scoreRow1.getX(), scoreRow1.getY(), 9, 135);
+                    setShootPos(scoreRow1.getX(), scoreRow1.getY(), 10, 136.6); // was 9 135
                     //runBelt(beltSpeed);
                     setPathState(3);
                 }
@@ -324,7 +325,7 @@ public class TempCloseBlue extends OpMode{
                 if (!fol.isBusy() && pathState == 5){
                     fol.followPath(pathRow2Line);
                     runBelt(beltSpeed);
-                    setShootPos(scoreRow2.getX(), scoreRow2.getY(), 9, 135);
+                    setShootPos(scoreRow2.getX(), scoreRow2.getY(), 10, 136.5);
                     setPathState(6);
                 }
                 break;
@@ -343,7 +344,7 @@ public class TempCloseBlue extends OpMode{
                 if (!fol.isBusy()){
                     fol.setMaxPower(1);
                     fol.followPath(pathScoreRow2);
-                    setShootPos(scoreRow2.getX(), scoreRow2.getY(), 9, 135);
+                    setShootPos(scoreRow2.getX(), scoreRow2.getY(), 13, 138);
                     runBelt(0);
                     setPathState(8);
                 }
@@ -450,7 +451,7 @@ public class TempCloseBlue extends OpMode{
             shootTimerCount = 1;
         }
         // Changed the multiplier to 2 because we are grabbing 2 balls instead of 3
-        if (shootTimer.milliseconds() < (feedDur + beltDur + retDur) * ballNum && shootTimerCount == 1){
+        if (shootTimer.milliseconds() < 13000 && fcount <= 6 && shootTimerCount == 1){
             feedLauncher();
         }
         else if (shootTimerCount == 1)
@@ -459,7 +460,8 @@ public class TempCloseBlue extends OpMode{
         if (shootTimerCount == 2){
             ls.setVelocity(0);
             rs.setVelocity(0);
-            feeding = 0;
+            feeding = 2;
+            fcount = 0;
             ascension.setPower(0);
             runBelt(0);
             blocker.setPosition(1);
@@ -492,6 +494,7 @@ public class TempCloseBlue extends OpMode{
                     feeding = 0;
                 else
                     feeding++;
+                fcount++;
             }
             feedTimer.reset();
         }

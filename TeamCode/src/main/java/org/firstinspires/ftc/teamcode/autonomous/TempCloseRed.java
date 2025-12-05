@@ -10,7 +10,6 @@ import com.qualcomm.hardware.limelightvision.LLResultTypes;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -24,14 +23,10 @@ import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 import org.firstinspires.ftc.vision.VisionPortal;
 import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
 
-@Disabled
-@Autonomous(name = "TempCloseBlueV2", group = "autonomous")
-public class TempCloseBlueV2 extends OpMode{
+@Autonomous(name = "CloseRed", group = "autonomous")
+public class TempCloseRed extends OpMode{
 
     // PEDROPATHING VARS
-
-    private double normSpeed = 1.0;
-    private double grabSpeed = 0.3;
 
     private Follower fol;
 
@@ -54,19 +49,18 @@ public class TempCloseBlueV2 extends OpMode{
 
     // POSITIONS
 
-    private final Pose startPose = new Pose(28, 131, Math.toRadians(144)); // STARTING POSITION was 23, 124 , 144
-    private final Pose preScorePose = new Pose(60, 104, Math.toRadians(146)); // PRE-LOAD SCORING POSITION
-    private final Pose row1Line = new Pose(44.5, 84, Math.toRadians(0)); // Position
-    private final Pose row1Line1CP = new Pose(91,84.5); // CONTROL POINT
+    private final Pose startPose = new Pose(28, 131, Math.toRadians(144)).mirror(); // STARTING POSITION was 23, 124 , 144
+    private final Pose preScorePose = new Pose(60, 104, Math.toRadians(145.5)).mirror(); // PRE-LOAD SCORING POSITION
+    private final Pose row1Line = new Pose(44.5, 84, Math.toRadians(0)).mirror(); // Position
+    private final Pose row1Line1CP = new Pose(91,84).mirror(); // CONTROL POINT
+    private final Pose grabRow1 = new Pose(30, 84, Math.toRadians(0)).mirror(); // Position
+    private final Pose scoreRow1 = new Pose(61, 78, Math.toRadians(132)).mirror(); // Scoring
+    private final Pose row2Line = new Pose(47, 60, Math.toRadians(0)).mirror(); // Position
+    private final Pose row2LineCP = new Pose(85, 60).mirror();
+    private final Pose grabRow2 = new Pose(30, 59.5, Math.toRadians(0)).mirror();
+    private final Pose scoreRow2 = new Pose(61, 78, Math.toRadians(132)).mirror();
 
-    private final Pose grabRow1 = new Pose(22.5, 84, Math.toRadians(0)); // Position
-    private final Pose scoreRow1 = new Pose(61, 78, Math.toRadians(132)); // Scoring
-    private final Pose row2Line = new Pose(44.5, 60, Math.toRadians(0)); // Position
-    private final Pose row2LineCP = new Pose(85, 60);
-    private final Pose grabRow2 = new Pose(22.5, 60, Math.toRadians(0));
-    private final Pose scoreRow2 = new Pose(61, 78, Math.toRadians(132));
-
-    private final Pose parkPose = new Pose(50, 72, Math.toRadians(132)); // PARKING POSITION
+    private final Pose parkPose = new Pose(50, 72, Math.toRadians(132)).mirror(); // PARKING POSITION
 
 
 
@@ -84,7 +78,7 @@ public class TempCloseBlueV2 extends OpMode{
 
 
     // SHOOTING VARS
-    private final double OVERSHOOT_VEL_MULT = 1.68;
+    private final double OVERSHOOT_VEL_MULT = 1.68; // was 1.68
     private final double OVERSHOOT_ANG_MULT = 1;
     private final double ANGLE_CONST = 2.08833333;
     private final int ELBOW_GEAR_RATIO = 4;
@@ -105,16 +99,11 @@ public class TempCloseBlueV2 extends OpMode{
 
     // TIMER VARS
     private ElapsedTime feedTimer;
-    private double ascendDur = 500;
-
-    private double intakeDur = 700;
-    private double feedDur = 650; // was 650
-    private double retDur = 300; // was 300???
-    private double beltDur = 300; // was 450, 250 gets closer for shooting but not intake wise.
-    private int fcount = 0;
-
-
+    private double feedDur = 450; // was 400
+    private double retDur = 600; // was 1000
+    private double beltDur = 600; // was 500, 300
     private int feeding = 0;
+    private int fcount = 0;
 
 
     // PATH CHAINS
@@ -123,8 +112,7 @@ public class TempCloseBlueV2 extends OpMode{
 
     // OTHER VARS
     private ElapsedTime timer;
-
-    private ElapsedTime intakeTimer;
+    private double dur;
 
     private ElapsedTime shootTimer;
     private int shootTimerCount = -1;
@@ -176,7 +164,6 @@ public class TempCloseBlueV2 extends OpMode{
         timer = new ElapsedTime();
         shootTimer = new ElapsedTime();
         feedTimer = new ElapsedTime();
-        intakeTimer = new ElapsedTime();
 
         // PATH INIT
 
@@ -197,13 +184,19 @@ public class TempCloseBlueV2 extends OpMode{
         // The magic begins
         buildPaths(0);
         setPathState(-1);
-        telemetry.addData("current pos", fol.getClosestPose());
-        telemetry.update();
+
     }
 
     public void loop(){
         fol.update();
         autonomousPathUpdate();
+
+        // This stores the ending position of the bot at the end of auto
+        Pose finalPose = fol.getPose();
+
+        // Not sure if this is in the right spot :skull:
+        // Its either inside the loop or outside but outside prolly wouldnt make sense
+        updatePos();
     }
 
     public void buildPaths(int obNum){
@@ -235,7 +228,7 @@ public class TempCloseBlueV2 extends OpMode{
                 .build();
 
         pathGrabRow2 = fol.pathBuilder()
-                .addPath(new BezierCurve(row2Line, row2LineCP, grabRow2))
+                .addPath(new BezierLine(row2Line, grabRow2))
                 .setLinearHeadingInterpolation(row2Line.getHeading(), grabRow2.getHeading())
                 .build();
 
@@ -289,7 +282,7 @@ public class TempCloseBlueV2 extends OpMode{
             case 0:
                 if (!fol.isBusy() && pathState == 0) {
                     fol.followPath(pathRow1Line);
-                    setShootPos(preScorePose.getX(), preScorePose.getY(), 9, 135);
+                    setShootPos(preScorePose.getX(), preScorePose.getY(), 10, 136.5); // was 9 , 135
                     setPathState(1);
                 }
                 break;
@@ -297,7 +290,7 @@ public class TempCloseBlueV2 extends OpMode{
             case 1:
                 if (!fol.isBusy()) {
                     fol.followPath(pathGrabRow1);
-                    fol.setMaxPower(grabSpeed);
+                    fol.setMaxPower(.4);
                     runBelt(beltSpeed);
                     setPathState(2);
                 }
@@ -305,23 +298,16 @@ public class TempCloseBlueV2 extends OpMode{
 
             case 2:
                 if (!fol.isBusy()){
-                    intakeTimer.reset();
-                    if (intakeTimer.milliseconds() > intakeDur && !fol.isBusy()){
-                        runBelt(beltSpeed/2);
-                    } else {
-                        runBelt(0);
-                    }
-
-                    fol.setMaxPower(normSpeed);
                     fol.followPath(pathScoreRow1);
-                    setShootPos(scoreRow1.getX(), scoreRow1.getY(), 9, 135);
+                    fol.setMaxPower(1);
+                    setShootPos(scoreRow1.getX(), scoreRow1.getY(), 10, 136.6); // was 9 135
+                    //runBelt(beltSpeed);
                     setPathState(3);
                 }
                 break;
 
             case 3:
                 if (!fol.isBusy()){
-                    runBelt(0);
                     setPathState(4);
                 }
                 break;
@@ -339,31 +325,26 @@ public class TempCloseBlueV2 extends OpMode{
                 if (!fol.isBusy() && pathState == 5){
                     fol.followPath(pathRow2Line);
                     runBelt(beltSpeed);
-                    setShootPos(scoreRow2.getX(), scoreRow2.getY(), 9, 135);
+                    setShootPos(scoreRow2.getX(), scoreRow2.getY(), 10, 136.5);
                     setPathState(6);
                 }
                 break;
 
             case 6:
                 if (!fol.isBusy()) {
-//                    intakeTimer.reset();
-//                    if (intakeTimer.milliseconds() > intakeDur && !fol.isBusy()){
-//                        runBelt(beltSpeed/2);
-//                    } else {
-//                        runBelt(0);
-//                    }
-                    fol.setMaxPower(grabSpeed);
+                    fol.setMaxPower(.25);
                     fol.followPath(pathGrabRow2);
                     runBelt(beltSpeed);
+                    //ballNum = 3;
                     setPathState(7);
                 }
                 break;
 
             case 7:
                 if (!fol.isBusy()){
-                    fol.setMaxPower(normSpeed);
+                    fol.setMaxPower(1);
                     fol.followPath(pathScoreRow2);
-                    setShootPos(scoreRow2.getX(), scoreRow2.getY(), 9, 135);
+                    setShootPos(scoreRow2.getX(), scoreRow2.getY(), 13, 138);
                     runBelt(0);
                     setPathState(8);
                 }
@@ -453,13 +434,14 @@ public class TempCloseBlueV2 extends OpMode{
         elbow.setMode(DcMotor.RunMode.RUN_TO_POSITION);
     }
 
+    // shootTimerCount has to = -1 for it to reset to 0 here to move on in the function
     private void shoot(){
         if (shootTimerCount == -1) {
             shootTimer.reset();
             shootTimerCount = 0;
         }
 
-        if (shootTimer.milliseconds() < 1200 && shootTimerCount == 0){
+        if (shootTimer.milliseconds() < 1200 && shootTimerCount == 0 /* && shootPos == 1*/){
             ls.setVelocity(velToPow(shootVel));
             rs.setVelocity(velToPow(shootVel));
         }
@@ -468,8 +450,8 @@ public class TempCloseBlueV2 extends OpMode{
             feedTimer.reset();
             shootTimerCount = 1;
         }
-
-        if (shootTimer.milliseconds() < 17000 && fcount <= 8 && shootTimerCount == 1){
+        // Changed the multiplier to 2 because we are grabbing 2 balls instead of 3
+        if (shootTimer.milliseconds() < 13000 && fcount <= 6 && shootTimerCount == 1){
             feedLauncher();
         }
         else if (shootTimerCount == 1)
@@ -515,20 +497,6 @@ public class TempCloseBlueV2 extends OpMode{
                 fcount++;
             }
             feedTimer.reset();
-        }
-    }
-
-//    private double ascendDur = 500;
-//    private double feedDur = 400; // was 50
-//    private double retDur = 1000;
-//    private int feeding = 0;
-
-    public void feedLauncher2(){
-        if (feedTimer.milliseconds() < 400 && feeding == 0){
-            ascension.setPower(1);
-        }
-        if (feedTimer.milliseconds()< 500){
-            ascension.setPower(0);
         }
     }
 
