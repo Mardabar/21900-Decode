@@ -59,7 +59,7 @@ public class StraferMain extends LinearOpMode{
     private double elbowSpeed = 0.4;
 
     private double openPos = 0.53;
-    private double feedPos = 0.02;
+    private double feedPos = 0.22;
     private ElapsedTime feedTimer;
     private double feedDur = 200;
     private double ascendDur = 900;

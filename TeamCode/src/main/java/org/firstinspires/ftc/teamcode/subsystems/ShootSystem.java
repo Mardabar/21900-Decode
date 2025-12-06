@@ -41,12 +41,12 @@ public class ShootSystem {
     // FEEDING VARS
 
     private double openPos = 0.53;
-    private double feedPos = 0.35; // 0.02
+    private double feedPos = 0.22; // 0.02
     private ElapsedTime blockTimer;
     private ElapsedTime feedTimer;
-    private double feedDur = 750;
-    private double retDur = 300;
     private double beltDur = 550;
+    private double retDur = 300;
+    private double feedDur = 750;
     private int feeding = 2;
     private int fcount;
     private boolean flysSpeedy;
@@ -157,18 +157,21 @@ public class ShootSystem {
     }
 
     private void feedLauncher(){
-        if (feedTimer.milliseconds() < feedDur && feeding == 0){
+        if (feedTimer.milliseconds() < beltDur && feeding == 0){
+
+            blocker.setPosition(1);
+            ascension.setPower(1);
+            runBelt(-1);
+        }
+        else if (feedTimer.milliseconds() < retDur && feeding == 1){
             blocker.setPosition(0);
             ascension.setPower(1);
             runBelt(0);
         }
-        else if (feedTimer.milliseconds() < retDur && feeding == 1){
-            blocker.setPosition(1);
-        }
-        else if (feedTimer.milliseconds() < beltDur && feeding == 2) {
+        else if (feedTimer.milliseconds() < feedDur && feeding == 2) {
             blocker.setPosition(1);
             ascension.setPower(1);
-            runBelt(-1);
+            runBelt(0);
         }
         else {
             if (ls.getVelocity() >= getShootVel() - 30 && rs.getVelocity() >= getShootVel() - 30) {
