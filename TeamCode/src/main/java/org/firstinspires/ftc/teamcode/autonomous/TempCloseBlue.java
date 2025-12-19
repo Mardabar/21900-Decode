@@ -101,7 +101,7 @@ public class TempCloseBlue extends OpMode{
     // SHOOTING VARS
     /** IGNORE THIS FOR RIGHT NOW THIS IS SPECIFIC TO OUR ROBOT FOR ITS SHOOTING FUNCTIONS
      * JUMP TO LINE 121 */
-    private final double OVERSHOOT_VEL_MULT = 1.665; // was 1.68
+    private final double OVERSHOOT_VEL_MULT = 1.66; // was 1.68
     private final double OVERSHOOT_ANG_MULT = 1;
     private final double ANGLE_CONST = 2.08833333;
     private final int ELBOW_GEAR_RATIO = 4;
@@ -124,7 +124,7 @@ public class TempCloseBlue extends OpMode{
     private ElapsedTime feedTimer;
     private double feedDur = 450; // was 400
     private double retDur = 600; // was 1000
-    private double beltDur = 600; // was 500, 300
+    private double beltDur = 500; // was 500, 300
     private ElapsedTime shootTimer;
     private int shootTimerCount = -1;
     private int feeding = 0;

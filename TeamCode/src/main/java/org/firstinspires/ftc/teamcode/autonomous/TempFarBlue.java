@@ -42,7 +42,7 @@ public class TempFarBlue extends OpMode{
     private final Pose row1Score = new Pose(60, 75, Math.toRadians(131)); // POSITION
     private final Pose row1ScoreCP = new Pose(60, 34.4, Math.toRadians(131)); // CONTROL POINT
     private final Pose row2Line = new Pose(45, 60, Math.toRadians(0)); // POSITION
-    private final Pose row2Grab = new Pose(31, 60, Math.toRadians(0)); // POSITION
+    private final Pose row2Grab = new Pose(25, 60, Math.toRadians(0)); // POSITION
     private final Pose row2Score = new Pose(60, 75, Math.toRadians(139)); // POSITION
     private final Pose Grab3Set = new Pose(45, 84, Math.toRadians(0)); // POSITION
     private final Pose Grab3 = new Pose(31, 84, Math.toRadians(0)); // POSITION
@@ -313,7 +313,7 @@ public class TempFarBlue extends OpMode{
 
             case 52:
                 if (shootTimerCount != 2)
-                    shoot();
+                    shoot3();
                 else {
                     shootTimerCount = -1;
                     setPathState(9);
@@ -424,6 +424,8 @@ public class TempFarBlue extends OpMode{
         }
     }
 
+
+
     private void runBelt(double speed){
         belt.setPower(speed);
         br.setPower(speed);
@@ -439,7 +441,7 @@ public class TempFarBlue extends OpMode{
         else if (feedTimer.milliseconds() < retDur && feeding == 1){
             blocker.setPosition(1);
         }
-        else if (feedTimer.milliseconds() < beltDur && feeding == 2) {
+        else if (feedTimer.milliseconds() < beltDur  && feeding == 2) {
             blocker.setPosition(1);
             ascension.setPower(1);
             runBelt(-beltSpeed);
@@ -455,6 +457,42 @@ public class TempFarBlue extends OpMode{
             feedTimer.reset();
         }
     }
+
+
+    // Cheeks naming here but uh just go w it
+    private void shoot3(){
+        if (shootTimerCount == -1) {
+            shootTimer.reset();
+            shootTimerCount = 0;
+        }
+
+        if (shootTimer.milliseconds() < 1200 && shootTimerCount == 0){
+            ls.setVelocity(velToPow(shootVel));
+            rs.setVelocity(velToPow(shootVel));
+        }
+        else if (shootTimerCount == 0){
+            shootTimer.reset();
+            feedTimer.reset();
+            shootTimerCount = 1;
+        }
+        // Changed the multiplier to 2 because we are grabbing 2 balls instead of 3
+        if (shootTimer.milliseconds() < 12000 && fcount <= 9 ){
+            feedLauncher();
+        }
+        else if (shootTimerCount == 1)
+            shootTimerCount = 2;
+
+        if (shootTimerCount == 2){
+            ls.setVelocity(0);
+            rs.setVelocity(0);
+            feeding = 2;
+            fcount = 0;
+            ascension.setPower(0);
+            runBelt(0);
+            blocker.setPosition(1);
+        }
+    }
+
 
     // Updates the pos to the station
     public void updatePos(){
