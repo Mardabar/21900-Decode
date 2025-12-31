@@ -1,3 +1,4 @@
+/*
 package org.firstinspires.ftc.teamcode.teleop;
 
 import org.firstinspires.ftc.teamcode.subsystems.ShootSystem;
@@ -96,6 +97,9 @@ public class StraferMain extends LinearOpMode{
     private int color = 0;
     private boolean modeSelected = false;
 
+    private double lks = 0.01;
+    private double rks = 0.01;
+
     @Override
     public void runOpMode(){
         // Motors are set to each of its variables
@@ -155,7 +159,7 @@ public class StraferMain extends LinearOpMode{
 
         // Other Vars
 
-        shooter = new ShootSystem(hardwareMap, "teleop");
+        shooter = new ShootSystem(hardwareMap);
 
         speed = mainSpeed;
         shootReady = false;
@@ -191,8 +195,8 @@ public class StraferMain extends LinearOpMode{
                 }
                 else if (gamepad1.dpad_right){
                     if (robotMode == 3){
-                        ls.setMotorDisable();
-                        rs.setMotorDisable();
+                        ls.setMotorEnable();
+                        rs.setMotorEnable();
                         elbow.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
                         elbow.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
                         setElbowTarget(0);
@@ -304,8 +308,22 @@ public class StraferMain extends LinearOpMode{
                         break;
 
                     case 1: // Auto mode, the robot has very complex presets with minimal control to the drivers
+                        if (gamepad1.yWasPressed())
+                            lks += 0.0005;
+                        else if (gamepad1.xWasPressed())
+                            lks -= 0.0005;
 
+                        if (gamepad1.bWasPressed())
+                            rks += 0.0005;
+                        else if (gamepad1.aWasPressed())
+                            rks -= 0.0005;
 
+                        telemetry.addData("lks: ", lks);
+                        telemetry.addData("rks: ", rks);
+
+                        shooter.valTuner(lks, rks);
+
+                        telemetry.update();
                         break;
 
                     case 2: // Single player mode, only one controller is required
@@ -566,10 +584,12 @@ public class StraferMain extends LinearOpMode{
     }
 
     public void setShootPos(double dist){
-        /* dist is the total distance the ball will travel until it hits the ground
+        */
+/* dist is the total distance the ball will travel until it hits the ground
            it's multiplied by 1.3 because the ball will hit the goal first, so using the
            equation, it'll be about 1 meter high (the height of the goal) when it hit our requested distance
-         */
+         *//*
+
         dist *= 1.3;
 
         // The angle and velocity are both calculated using the distance we found
@@ -633,4 +653,4 @@ public class StraferMain extends LinearOpMode{
             feedTimer.reset();
         }
     }
-}
+}*/

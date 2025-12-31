@@ -31,6 +31,14 @@ public class ShootSystem {
     private final int ELBOW_GEAR_RATIO = 28;
     private final double MAX_HEIGHT = 1.4;
 
+        // PID
+
+    private final double lks = 0.0004;
+    private final double rks = 0.0004;
+    private final double kv = 2800;
+    private final double lkp = 0.002;
+    private final double rkp = 0.002;
+
     // SHOOT VARS
 
     public boolean shootPrep;
@@ -38,100 +46,41 @@ public class ShootSystem {
     private double shootAngle;
     private double shootVel;
 
-    // FEEDING VARS
-
-    private double openPos = 0.53;
-    private double feedPos = 0.03; // 0.02
-    private ElapsedTime blockTimer;
-    private ElapsedTime feedTimer;
-    private double beltDur = 550;
-    private double retDur = 300;
-    private double feedDur = 750;
-    private int feeding = 2;
-    private int fcount;
-    private boolean flysSpeedy;
+    public void valTuner(double lks, double rks){
+        ls.setPower(lks);
+        rs.setPower(rks);
+    }
 
     // INIT
 
-    public ShootSystem(HardwareMap hardwareMap, String mode){
-        ls = hardwareMap.get(DcMotorEx.class, "ls");
-        rs = hardwareMap.get(DcMotorEx.class, "rs");
-        belt = hardwareMap.get(DcMotorEx.class, "belt");
-        elbow = hardwareMap.get(DcMotorEx.class, "elbow");
-        ls.setDirection(DcMotorEx.Direction.FORWARD);
-        rs.setDirection(DcMotorEx.Direction.REVERSE);
-        belt.setDirection(DcMotorEx.Direction.FORWARD);
-        elbow.setDirection(DcMotorEx.Direction.REVERSE);
+    public ShootSystem(HardwareMap hardwareMap){
 
-        br = hardwareMap.get(CRServo.class, "br");
-        bl = hardwareMap.get(CRServo.class, "bl");
-        blocker = hardwareMap.get(Servo.class, "blocker");
-        ascension = hardwareMap.get(CRServo.class, "ascension");
+    }
 
-        blocker.scaleRange(feedPos, openPos);
-        blocker.setPosition(1);
-
-        blockTimer = new ElapsedTime();
-        feedTimer = new ElapsedTime();
-
-        this.mode = mode;
+    public void Shoot(){
+        //InitShooting();
     }
 
     // MAIN METHODS
 
-    public void initShooting(LLResult pic){
-        for (LLResultTypes.FiducialResult res : pic.getFiducialResults()) {
-            int id = res.getFiducialId();
-            if (id == 20 || id == 24) {
-                double angle = 25.2 + res.getTargetYDegrees(); // 25.2
-                double tagDist = (0.646 / Math.tan(Math.toRadians(angle)));
-                if (tagDist - 2 < 0)
-                    tagDist += (tagDist - 2) * 0.28;
-                else
-                    tagDist += (tagDist - 2) * 0.19;
-
-                setShootPos(tagDist);
-                feeding = 2;
-                blocker.setPosition(1);
-                blockTimer.reset();
-
-                ls.setMotorEnable();
-                rs.setMotorEnable();
-
-                shootPrep = true;
-            }
-        }
+    public void InitShooting(LLResult pic){
+        for (LLResultTypes.FiducialResult res : pic.getFiducialResults())
+            CheckID(res.getFiducialId());
     }
 
-    public void shoot(){
-        double shootRot = velToRot(shootVel);
+    private void CheckID(int id){
+        /*boolean idCheck = id == 20 || id == 24;
+        if (idCheck) {
+            double angle = 25.2 + res.getTargetYDegrees();
+            double tagDist = (0.646 / Math.tan(Math.toRadians(angle)));
+            if (tagDist - 2 < 0)
+                tagDist += (tagDist - 2) * 0.28;
+            else
+                tagDist += (tagDist - 2) * 0.19;
 
-        if (ls.getVelocity() < shootRot + 15 && rs.getVelocity() < shootRot + 15)
-            setElbowTarget(getAngleEnc());
-        ls.setVelocity(shootRot + 250);
-        rs.setVelocity(shootRot - 100);
-
-        if (!flysSpeedy && ls.getVelocity() >= (shootRot + 250) && rs.getVelocity() >= (shootRot - 100))
-            flysSpeedy = true;
-        if (flysSpeedy) {
-            feedLauncher();
-        }
-    }
-
-    public void resetBack(){
-        feeding = 2;
-        fcount = 0;
-        blocker.setPosition(1);
-        ascension.setPower(0);
-        runBelt(0);
-        ls.setPower(0);
-        rs.setPower(0);
-        ls.setMotorDisable();
-        rs.setMotorDisable();
-
-        flysSpeedy = false;
-        shootPrep = false;
-        shootReady = false;
+            setShootPos(tagDist);
+            shootPrep = true;
+        }*/
     }
 
     private void setShootPos(double dist){
@@ -159,35 +108,6 @@ public class ShootSystem {
         // The angle and velocity are both calculated using the distance we found
         shootAngle = ((distToAngle(dist) * OVERSHOOT_ANG_MULT) - 56);
         shootVel = angleToVel(distToAngle(dist)) * OVERSHOOT_VEL_MULT;
-    }
-
-    private void feedLauncher(){
-        if (feedTimer.milliseconds() < beltDur && feeding == 0){
-
-            blocker.setPosition(1);
-            ascension.setPower(1);
-            runBelt(-1);
-        }
-        else if (feedTimer.milliseconds() < retDur && feeding == 1){
-            blocker.setPosition(0);
-            ascension.setPower(1);
-            runBelt(0);
-        }
-        else if (feedTimer.milliseconds() < feedDur && feeding == 2) {
-            blocker.setPosition(1);
-            ascension.setPower(1);
-            runBelt(0);
-        }
-        else {
-            if (ls.getVelocity() >= (getShootVel() + 250) - 30 && rs.getVelocity() >= (getShootVel() - 100) - 30) {
-                if (feeding == 2)
-                    feeding = 0;
-                else
-                    feeding++;
-                fcount++;
-            }
-            feedTimer.reset();
-        }
     }
 
     private void setElbowTarget(double angle){
@@ -228,7 +148,7 @@ public class ShootSystem {
 
     // This function translates velocity to motor power specifically for 6000 RPM motors combined with 72 mm Gecko Wheels
     public double velToRot(double vel){
-        return (vel / (7.2 * Math.PI)) * 2800;
+        return vel / (7.2 * Math.PI);
     }
 
     // This function translates an angle in degrees to an encoder value on 223 RPM motors
