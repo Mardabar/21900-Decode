@@ -12,12 +12,6 @@ import org.firstinspires.ftc.teamcode.subsystems.ShootSystem;
 
 @TeleOp(name = "TeleMain")
 public class TeleMain extends LinearOpMode {
-    private DcMotorEx belt;
-    private DcMotorEx flywheel;
-    private DcMotorEx turretMotor;
-    private Servo angleAdjuster;
-    private CRServo feeder;
-
     private ShootSystem shooter;
 
     // Drive Vars
@@ -47,7 +41,10 @@ public class TeleMain extends LinearOpMode {
         waitForStart();
         while (opModeIsActive()){
             Drive();
+
             if (gamepad2.a) shooter.Shoot();
+            if (gamepad2.dpad_up) shooter.UseFeeder();
+            if (gamepad2.aWasReleased()) shooter.StopMotors();
         }
     }
 
