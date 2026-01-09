@@ -31,7 +31,7 @@ public class ShootSystem {
     private final double MAX_HEIGHT = 1.4;
 
     private final double REST_POS = 0;
-    private final double FEED_POS = 0.3;
+    private final double FEED_POS = 0.2;
 
     // SHOOT VARS
 
