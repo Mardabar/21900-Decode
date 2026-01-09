@@ -5,22 +5,27 @@ import com.qualcomm.hardware.limelightvision.LLResultTypes;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.Servo;
-import com.qualcomm.robotcore.hardware.CRServo;
-import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
-import com.qualcomm.hardware.limelightvision.LLResult;
-import com.qualcomm.hardware.limelightvision.LLResultTypes;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
 
-public class ShootSystem {
-    private Limelight3A cam;
+import org.firstinspires.ftc.robotcore.external.Telemetry;
 
-    private DcMotorEx belt;
-    private DcMotorEx flywheel;
+public class ShootSystem {
+
+
+    private boolean isFeederUp = false;
+    private final double feedDown = 0.0;
+    private final double feedUp = 0.3;
+    private double anglePos = 0.5;
+    private final Telemetry telemetry;
+    public Limelight3A cam;
+
+    public DcMotorEx belt;
+    public DcMotorEx flywheel;
     private DcMotorEx turretMotor;
-    private Servo angleAdjuster;
-    private Servo feeder;
+    public final Servo angleAdjuster;
+    public Servo feeder;
 
     // CONSTANTS
 
@@ -42,17 +47,25 @@ public class ShootSystem {
 
     // INIT
 
-    public ShootSystem(HardwareMap hardwareMap){
+    public ShootSystem(HardwareMap hardwareMap, Telemetry telemetry){
+        this.telemetry = telemetry;
+
         belt = hardwareMap.get(DcMotorEx.class, "belt");
         flywheel = hardwareMap.get(DcMotorEx.class, "cannon");
         angleAdjuster = hardwareMap.get(Servo.class, "angleServo");
         feeder = hardwareMap.get(Servo.class, "feeder");
 
+        flywheel.setDirection(DcMotorEx.Direction.FORWARD);
+        belt.setDirection(DcMotorEx.Direction.FORWARD);
+
         belt.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
         flywheel.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
-        angleAdjuster.scaleRange(0, 1);
-        feeder.scaleRange(REST_POS, FEED_POS);
+        //angleAdjuster.scaleRange(0, 1);
+        //feeder.scaleRange(REST_POS, FEED_POS);
+
+        angleAdjuster.setPosition(0.5);
+        feeder.setPosition(0.0);
 
         cam = hardwareMap.get(Limelight3A.class, "limelight");
         cam.pipelineSwitch(0);
@@ -62,7 +75,7 @@ public class ShootSystem {
 
     public void StopMotors(){
         flywheel.setVelocity(0);
-        runBelt(0);
+        RunBelt(0);
     }
 
     public void Shoot(){
@@ -71,29 +84,98 @@ public class ShootSystem {
         flywheel.setVelocity(velocity);
         setShootAngle(shootAngle);
 
+
         boolean deltaConditions = flywheel.getVelocity() > velDelta(velocity, -1) && flywheel.getVelocity() < velDelta(velocity, 1);
         if (deltaConditions)
-            runBelt(1);
+            RunBelt(1);
         else
-            runBelt(0);
+            RunBelt(0);
     }
 
     private double velDelta(double vel, double sign){
         return vel + (sign * 15);
     }
 
-    public void UseFeeder(){
-        if (feeder.getPosition() < 0.99 && !flipped)
-            feeder.setPosition(1);
-        else if (!flipped){
-            flipped = true;
-            feeder.setPosition(0);
+    public void UseFeeder() {
+//        if (feeder.getPosition() < 0.99 && !flipped)
+//            feeder.setPosition(1);
+//        else if (!flipped){
+//            flipped = true;
+//            feeder.setPosition(0);
+//        }
+//        else if (feeder.getPosition() < 0.01 && flipped)
+//            flipped = false;
+
+
+        if (feeder.getPosition() < 0.1) {
+            feeder.setPosition(feedUp);
+        } else {
+            feeder.setPosition(feedDown);
         }
-        else if (feeder.getPosition() < 0.01 && flipped)
-            flipped = false;
+
+        //feeder.setPosition(1);
+
+    }
+
+
+
+    /// BLAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAT BIM BAM BOOM BOOM FLIPPER MANUEL CONTROL
+    public void toggleFeeder() {
+        if (isFeederUp) {
+            feeder.setPosition(feedDown); // Go to 0.0
+            isFeederUp = false;
+        } else {
+            feeder.setPosition(feedUp);   // Go to 0.6
+            isFeederUp = true;
+        }
+
+    }
+
+    /// uhhhhh manual stick input for servo cause fuck me
+    public void moveAngleManual(double joystickInput) {
+
+        double speed = 0.001;
+
+        anglePos += (joystickInput * speed);
+
+        // makes sure the value stays in between 0 and 1, maybe
+        //  ¯\_(ツ)_/¯
+        anglePos = Math.clamp(anglePos, 0, 1);
+
+        angleAdjuster.setPosition(anglePos);
+
+        telemetry.addData("Angle Manual Pos", anglePos);
     }
 
     // MAIN METHODS
+
+
+    public void blatFuck(double anglePower, boolean runFeeder) {
+
+        angleAdjuster.setPosition(anglePower);
+
+        if (runFeeder) {
+            feeder.setPosition(feedUp);
+        } else {
+            feeder.setPosition(feedDown);
+        }
+
+        telemetry.addData("Target Angle Pos", anglePower);
+
+    }
+
+
+    public void fuckServos(){
+
+        if (feeder.getPosition() < 0.1) {
+            feeder.setPosition(feedUp);
+        } else {
+            feeder.setPosition(feedDown);
+        }
+    }
+
+
+
 
     private void UpdatePositions(LLResult pic){
         for (LLResultTypes.FiducialResult res : pic.getFiducialResults())
@@ -134,7 +216,7 @@ public class ShootSystem {
         angleAdjuster.setPosition(Math.clamp(angle / 300, 0, 1));
     }
 
-    private void runBelt(double speed) {
+    public void RunBelt(double speed) {
         belt.setPower(speed);
     }
 

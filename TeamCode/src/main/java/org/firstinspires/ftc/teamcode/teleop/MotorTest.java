@@ -35,9 +35,9 @@ public class MotorTest extends OpMode {
 
         updateTele();
 
-        if(gamepad1.x)
+        if(gamepad2.x)
             runBelt(1);
-        else if(gamepad1.b)
+        else if(gamepad2.b)
             runBelt(-1);
         else
             stopBelt();
@@ -47,7 +47,7 @@ public class MotorTest extends OpMode {
         else if(gamepad1.dpadDownWasPressed())
             decreaseLaunchPow();
 
-
+        
         if(gamepad1.aWasPressed())
             cannon.setPower(launchPow);
 

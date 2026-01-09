@@ -5,6 +5,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 
@@ -25,6 +26,7 @@ public class TeleMain extends LinearOpMode {
     private final double acceleration = 4;
     private final double turnAccel = 3;
 
+
     private double lStickPosX;
     private double lStickPosY;
     private double rStickPosX;
@@ -36,24 +38,61 @@ public class TeleMain extends LinearOpMode {
         InitMotors();
         SetDriveDirection("forward");
         SetBrakes();
-        shooter = new ShootSystem(hardwareMap);
+        shooter = new ShootSystem(hardwareMap, telemetry);
 
         waitForStart();
         while (opModeIsActive()){
             Drive();
 
-            if (gamepad2.a) shooter.Shoot();
-            if (gamepad2.dpad_up) shooter.UseFeeder();
-            if (gamepad2.aWasReleased()) shooter.StopMotors();
+
+
+
+
+            if (gamepad1.dpadUpWasPressed())
+                shooter.UseFeeder();
+
+
+
+
+
+            if (gamepad2.a)
+                shooter.Shoot();
+
+            else {
+                shooter.StopMotors();
+
+                if (gamepad2.right_bumper)
+                    shooter.RunBelt(1);
+                else if (gamepad2.left_bumper)
+                    shooter.RunBelt(-1);
+                else
+                    shooter.RunBelt(0);
+
+            }
+
+
+
+            // manual stick shi, minus makes it up for some reason
+            // again  ¯\_(ツ)_/¯
+            shooter.moveAngleManual(-gamepad2.left_stick_y);
+
+
+            //BLEAYTTTT FUCK MY ASSS
+            if (gamepad2.yWasPressed()) {
+                shooter.toggleFeeder();
+
+            }
+
+
         }
     }
 
     private void Drive(){
         ClampSpeed();
-        lb.setPower((rStickPosX * -driveSpeed) + (driveSpeed * lStickPosX) + (driveSpeed * lStickPosY));
-        rb.setPower((rStickPosX * driveSpeed) + (-driveSpeed * lStickPosX) + (driveSpeed * lStickPosY));
-        lf.setPower((rStickPosX * -driveSpeed) + (-driveSpeed * lStickPosX) + (driveSpeed * lStickPosY));
-        rf.setPower((rStickPosX * driveSpeed) + (driveSpeed * lStickPosX) + (driveSpeed * lStickPosY));
+        lb.setPower((rStickPosX * -driveSpeed) + (-driveSpeed * gamepad1.left_stick_x) + (driveSpeed * gamepad1.left_stick_y));
+        rb.setPower((rStickPosX * driveSpeed) + (driveSpeed * gamepad1.left_stick_x) + (driveSpeed * gamepad1.left_stick_y));
+        lf.setPower((rStickPosX * -driveSpeed) + (driveSpeed * gamepad1.left_stick_x) + (driveSpeed * gamepad1.left_stick_y));
+        rf.setPower((rStickPosX * driveSpeed) + (-driveSpeed * gamepad1.left_stick_x) + (driveSpeed * gamepad1.left_stick_y));
     }
 
     private void ClampSpeed(){
@@ -79,11 +118,12 @@ public class TeleMain extends LinearOpMode {
 
     private void SetDriveDirection(String direction){
         if (direction.equals("forward")){
-            lb.setDirection(DcMotorEx.Direction.FORWARD);
-            rb.setDirection(DcMotorEx.Direction.REVERSE);
-            lf.setDirection(DcMotorEx.Direction.FORWARD);
-            rf.setDirection(DcMotorEx.Direction.REVERSE);
+            lb.setDirection(DcMotorEx.Direction.REVERSE);
+            rb.setDirection(DcMotorEx.Direction.FORWARD);
+            lf.setDirection(DcMotorEx.Direction.REVERSE);
+            rf.setDirection(DcMotorEx.Direction.FORWARD);
             return;
+
         }
 
         lb.setDirection(DcMotorEx.Direction.REVERSE);
@@ -97,5 +137,15 @@ public class TeleMain extends LinearOpMode {
         rb.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         lf.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         rf.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+    }
+
+
+
+
+
+    //EYAAA EYA YAAAA
+    private void updateVals(){
+        telemetry.addData( "Servo pos %d \n help me im dying inside",shooter.feeder.getPosition());
+        telemetry.update();
     }
 }
