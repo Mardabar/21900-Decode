@@ -12,14 +12,10 @@ import com.qualcomm.hardware.limelightvision.Limelight3A;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 
-import com.qualcomm.robotcore.util.ElapsedTime;
-
 public class ShootSystem {
 
 
     private boolean isFeederUp = false;
-
-    private final ElapsedTime stabilityTimer = new ElapsedTime();
 
     private double anglePos = 0.5;
     private final Telemetry telemetry;
@@ -97,18 +93,13 @@ public class ShootSystem {
         flywheel.setVelocity(velocity);
         setShootAngle(shootAngle);
 
-        ///  fuck bruh
-        boolean atVelocity = Math.abs(flywheel.getVelocity() - velocity) < 120;
-
-        if (!atVelocity) {
-            stabilityTimer.reset();
-            RunBelt(0);
-        } else if (stabilityTimer.milliseconds() > 250) {
+        // Only run the belt if the flywheel is at least 95% of the way to the target
+        if (flywheel.getVelocity() > velocity * 0.95) {
             RunBelt(.8);
+        } else {
+            RunBelt(0);
         }
-    }
-    private double velDelta(double vel, double sign){
-        return vel + (sign * 120);
+
     }
 
 
