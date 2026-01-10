@@ -15,15 +15,19 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 
+
+        // Length is 15.5
+        // Width 15.75
 @Configurable
 public class Constants {
     public static FollowerConstants followerConstants = new FollowerConstants()
             .forwardZeroPowerAcceleration(-47.521)
             .lateralZeroPowerAcceleration(-75.435)
             .mass(9.2)
-            .translationalPIDFCoefficients(new PIDFCoefficients(0.2, 0, 0.022, 0.005))
-            .headingPIDFCoefficients(new PIDFCoefficients(1,0,0.04,0.02))
-            .drivePIDFCoefficients(new FilteredPIDFCoefficients(0.005,0,0.0001,0.6,0.05))
+            .translationalPIDFCoefficients(new PIDFCoefficients(0.2, 0, 0.0062, 0.022))
+            .headingPIDFCoefficients(new PIDFCoefficients(1,0,0.01,0.01))
+            .drivePIDFCoefficients(new FilteredPIDFCoefficients(0.04
+                    ,0,0.0025,0.6,0.05))
 
             .centripetalScaling(0.0005);
 
@@ -53,8 +57,8 @@ public class Constants {
                 .build();
     }
     public static PinpointConstants localizerConstants = new PinpointConstants()
-            .forwardPodY(3.125) // 3.125   5.500
-            .strafePodX(-5.25) // 0.375  -3.700
+            .forwardPodY(5.375) // 4.3125
+            .strafePodX(-4.3125) // 0.375  -3.700 -5.375
             .distanceUnit(DistanceUnit.INCH)
             .hardwareMapName("pinpoint")
             .encoderResolution(GoBildaPinpointDriver.GoBildaOdometryPods.goBILDA_4_BAR_POD)

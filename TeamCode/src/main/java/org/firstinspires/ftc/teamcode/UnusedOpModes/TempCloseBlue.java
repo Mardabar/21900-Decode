@@ -48,6 +48,8 @@ public class TempCloseBlue extends OpMode{
 
     // IGNORE THESE
     private Timer pathTimer, opmodeTimer; // Game timer
+
+
 //    private int chainNum;
 //    private int ballNum = 2;
 //    private int shootPos = 1;

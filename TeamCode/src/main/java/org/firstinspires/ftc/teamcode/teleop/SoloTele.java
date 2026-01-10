@@ -3,21 +3,16 @@ package org.firstinspires.ftc.teamcode.teleop;
 import static org.firstinspires.ftc.teamcode.subsystems.ShootSystem.openPos;
 import static org.firstinspires.ftc.teamcode.subsystems.ShootSystem.closePos;
 
-import com.qualcomm.hardware.limelightvision.LLResult;
 import com.qualcomm.hardware.limelightvision.LLResultTypes;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
-import com.qualcomm.robotcore.hardware.HardwareMap;
-import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.teamcode.subsystems.ShootSystem;
 
-@TeleOp(name = "TeleMain")
-public class TeleMain extends LinearOpMode {
+@TeleOp(name = "SoloTele")
+public class SoloTele extends LinearOpMode {
     private ShootSystem shooter;
     private boolean isShooting;
 
@@ -55,21 +50,21 @@ public class TeleMain extends LinearOpMode {
             if (!isShooting || gamepad1.left_bumper)
                 Drive();
 
-            if (gamepad2.yWasPressed()){
+            if (gamepad1.yWasPressed()){
                 shooter.feeder.setPosition(closePos);
-            } else if (gamepad2.yWasReleased())
+            } else if (gamepad1.yWasReleased())
                 shooter.feeder.setPosition(openPos);
 
-            if (gamepad2.a)
+            if (gamepad1.a)
                 Shooting();
             else {
                 isShooting = false;
                 iSum = 0;
                 shooter.StopMotors();
 
-                if (gamepad2.x)
+                if (gamepad1.x)
                     shooter.RunBelt(1);
-                else if (gamepad2.b)
+                else if (gamepad1.b)
                     shooter.RunBelt(-1);
                 else
                     shooter.RunBelt(0);

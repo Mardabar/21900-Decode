@@ -4,6 +4,7 @@ import com.qualcomm.hardware.limelightvision.LLResult;
 import com.qualcomm.hardware.limelightvision.LLResultTypes;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
@@ -11,12 +12,15 @@ import com.qualcomm.hardware.limelightvision.Limelight3A;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 
+import com.qualcomm.robotcore.util.ElapsedTime;
+
 public class ShootSystem {
 
 
     private boolean isFeederUp = false;
-    private final double feedDown = 0.0;
-    private final double feedUp = 0.3;
+
+    private final ElapsedTime stabilityTimer = new ElapsedTime();
+
     private double anglePos = 0.5;
     private final Telemetry telemetry;
     public Limelight3A cam;
@@ -26,10 +30,12 @@ public class ShootSystem {
     private DcMotorEx turretMotor;
     public final Servo angleAdjuster;
     public Servo feeder;
+    public static double openPos = .35;
+    public static double closePos = 0;
 
     // CONSTANTS
 
-    private final double OVERSHOOT_VEL_MULT = 1.618;
+    private final double OVERSHOOT_VEL_MULT = 2.6;
     private final double OVERSHOOT_ANG_MULT = 1;
     private final double ANGLE_CONST = 2.08833333;
     private final int ELBOW_GEAR_RATIO = 28;
@@ -41,7 +47,7 @@ public class ShootSystem {
     // SHOOT VARS
 
     private double shootAngle;
-    private double shootVel;
+    public static double shootVel;
 
     private boolean flipped;
 
@@ -55,23 +61,30 @@ public class ShootSystem {
         angleAdjuster = hardwareMap.get(Servo.class, "angleServo");
         feeder = hardwareMap.get(Servo.class, "feeder");
 
-        flywheel.setDirection(DcMotorEx.Direction.FORWARD);
-        belt.setDirection(DcMotorEx.Direction.FORWARD);
+        flywheel.setDirection(DcMotorEx.Direction.REVERSE);
+        belt.setDirection(DcMotorEx.Direction.REVERSE);
 
         belt.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
         flywheel.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
-        //angleAdjuster.scaleRange(0, 1);
-        //feeder.scaleRange(REST_POS, FEED_POS);
+        flywheel.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
 
-        angleAdjuster.setPosition(0.5);
-        feeder.setPosition(0.0);
+        angleAdjuster.scaleRange(0, 1);
+
+        angleAdjuster.setPosition(0.15);
+        feeder.setPosition(openPos);
 
         cam = hardwareMap.get(Limelight3A.class, "limelight");
         cam.pipelineSwitch(0);
+        cam.start();
+
     }
 
     // PUBLIC METHODS
+
+    public LLResult GetImage(){
+        return cam.getLatestResult();
+    }
 
     public void StopMotors(){
         flywheel.setVelocity(0);
@@ -84,52 +97,27 @@ public class ShootSystem {
         flywheel.setVelocity(velocity);
         setShootAngle(shootAngle);
 
+        ///  fuck bruh
+        boolean atVelocity = Math.abs(flywheel.getVelocity() - velocity) < 120;
 
-        boolean deltaConditions = flywheel.getVelocity() > velDelta(velocity, -1) && flywheel.getVelocity() < velDelta(velocity, 1);
-        if (deltaConditions)
-            RunBelt(1);
-        else
+        if (!atVelocity) {
+            stabilityTimer.reset();
             RunBelt(0);
-    }
-
-    private double velDelta(double vel, double sign){
-        return vel + (sign * 15);
-    }
-
-    public void UseFeeder() {
-//        if (feeder.getPosition() < 0.99 && !flipped)
-//            feeder.setPosition(1);
-//        else if (!flipped){
-//            flipped = true;
-//            feeder.setPosition(0);
-//        }
-//        else if (feeder.getPosition() < 0.01 && flipped)
-//            flipped = false;
-
-
-        if (feeder.getPosition() < 0.1) {
-            feeder.setPosition(feedUp);
-        } else {
-            feeder.setPosition(feedDown);
+        } else if (stabilityTimer.milliseconds() > 250) {
+            RunBelt(.8);
         }
-
-        //feeder.setPosition(1);
-
     }
+    private double velDelta(double vel, double sign){
+        return vel + (sign * 120);
+    }
+
+
+
 
 
 
     /// BLAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAT BIM BAM BOOM BOOM FLIPPER MANUEL CONTROL
-    public void toggleFeeder() {
-        if (isFeederUp) {
-            feeder.setPosition(feedDown); // Go to 0.0
-            isFeederUp = false;
-        } else {
-            feeder.setPosition(feedUp);   // Go to 0.6
-            isFeederUp = true;
-        }
 
-    }
 
     /// uhhhhh manual stick input for servo cause fuck me
     public void moveAngleManual(double joystickInput) {
@@ -150,32 +138,6 @@ public class ShootSystem {
     // MAIN METHODS
 
 
-    public void blatFuck(double anglePower, boolean runFeeder) {
-
-        angleAdjuster.setPosition(anglePower);
-
-        if (runFeeder) {
-            feeder.setPosition(feedUp);
-        } else {
-            feeder.setPosition(feedDown);
-        }
-
-        telemetry.addData("Target Angle Pos", anglePower);
-
-    }
-
-
-    public void fuckServos(){
-
-        if (feeder.getPosition() < 0.1) {
-            feeder.setPosition(feedUp);
-        } else {
-            feeder.setPosition(feedDown);
-        }
-    }
-
-
-
 
     private void UpdatePositions(LLResult pic){
         for (LLResultTypes.FiducialResult res : pic.getFiducialResults())
@@ -183,6 +145,8 @@ public class ShootSystem {
     }
 
     private void CheckID(LLResultTypes.FiducialResult res, int id){
+        telemetry.addData("id", id);
+        telemetry.update();
         boolean idCheck = id == 20 || id == 24;
         if (idCheck)
             UpdateVars(res);
@@ -190,12 +154,12 @@ public class ShootSystem {
 
     private void UpdateVars(LLResultTypes.FiducialResult res){
         double angle = 25.2 + res.getTargetYDegrees();
-        double tagDist = (0.646 / Math.tan(Math.toRadians(angle)));
+        double tagDist = (0.646 / Math.tan(Math.toRadians(angle))) + 0.2;
 
         if (tagDist - 2 < 0)
-            tagDist += (tagDist - 2) * 0.28;
+            tagDist += (tagDist - 2) * 0.8;
         else
-            tagDist += (tagDist - 2) * 0.19;
+            tagDist += (tagDist - 2) * 0.6;
 
         setShootPos(tagDist);
     }
