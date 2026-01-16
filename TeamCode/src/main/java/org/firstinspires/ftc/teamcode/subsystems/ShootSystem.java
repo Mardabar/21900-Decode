@@ -11,9 +11,10 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.teamcode.teleop.FlyWheelShooter;
 
 public class ShootSystem {
-
+    private FlyWheelShooter fws;
 
     private boolean isFeederUp = false;
 
@@ -74,6 +75,7 @@ public class ShootSystem {
         cam.pipelineSwitch(0);
         cam.start();
 
+        fws = new FlyWheelShooter();
     }
 
     // PUBLIC METHODS
@@ -89,45 +91,26 @@ public class ShootSystem {
 
     public void Shoot(){
         UpdatePositions(cam.getLatestResult());
-        double velocity = velToPow(shootVel);
-        flywheel.setVelocity(velocity);
+        double power = fws.GetCalculatedPower(velToTPS(shootVel), flywheel.getVelocity());
+        flywheel.setPower(power);
         setShootAngle(shootAngle);
 
         // Only run the belt if the flywheel is at least 95% of the way to the target
-        if (flywheel.getVelocity() > velocity * 0.95) {
-            RunBelt(.8);
+        if (flywheel.getVelocity() > velToTPS(shootVel) * 0.95) {
+            RunBelt(1);
         } else {
             RunBelt(0);
         }
-
     }
 
-
-
-
-
-
-    /// BLAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAT BIM BAM BOOM BOOM FLIPPER MANUEL CONTROL
-
-
-    /// uhhhhh manual stick input for servo cause fuck me
     public void moveAngleManual(double joystickInput) {
-
         double speed = 0.001;
-
         anglePos += (joystickInput * speed);
-
-        // makes sure the value stays in between 0 and 1, maybe
-        //  ¯\_(ツ)_/¯
         anglePos = Math.clamp(anglePos, 0, 1);
-
         angleAdjuster.setPosition(anglePos);
-
     }
 
     // MAIN METHODS
-
-
 
     private void UpdatePositions(LLResult pic){
         for (LLResultTypes.FiducialResult res : pic.getFiducialResults())
@@ -186,7 +169,7 @@ public class ShootSystem {
     }
 
     // This function translates velocity to motor power specifically for 6000 RPM motors combined with 72 mm Gecko Wheels
-    public double velToPow(double vel) {
+    public double velToTPS(double vel) {
         return (vel / (9.6 * Math.PI)) * 2800;
     }
 
@@ -195,10 +178,5 @@ public class ShootSystem {
         flywheel.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         flywheel.setPower(flywheelPower);
         angleAdjuster.setPosition(anglePos);
-
     }
-
-
-
-
 }

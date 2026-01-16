@@ -7,12 +7,8 @@ import com.qualcomm.hardware.limelightvision.LLResult;
 import com.qualcomm.hardware.limelightvision.LLResultTypes;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
-import com.qualcomm.robotcore.hardware.HardwareMap;
-import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.teamcode.subsystems.ShootSystem;
 
@@ -75,26 +71,15 @@ public class TeleMain extends LinearOpMode {
                 else
                     shooter.RunBelt(0);
             }
-
-
-
-            // manual stick shi, minus makes it up for some reason
-            // again  ¯\_(ツ)_/¯
-            //shooter.moveAngleManual(-gamepad2.left_stick_y);
-
-
-
-
-
         }
     }
 
     private void Drive(){
         ClampSpeed();
-        lb.setPower((rStickPosX * -driveSpeed) + (driveSpeed * gamepad1.left_stick_x) + (driveSpeed * gamepad1.left_stick_y));
-        rb.setPower((rStickPosX * driveSpeed) + (-driveSpeed * gamepad1.left_stick_x) + (driveSpeed * gamepad1.left_stick_y));
-        lf.setPower((rStickPosX * -driveSpeed) + (-driveSpeed * gamepad1.left_stick_x) + (driveSpeed * gamepad1.left_stick_y));
-        rf.setPower((rStickPosX * driveSpeed) + (driveSpeed * gamepad1.left_stick_x) + (driveSpeed * gamepad1.left_stick_y));
+        lb.setPower((rStickPosX * -driveSpeed) + (driveSpeed * lStickPosX) + (driveSpeed * lStickPosY));
+        rb.setPower((rStickPosX * driveSpeed) + (-driveSpeed * lStickPosX) + (driveSpeed * lStickPosY));
+        lf.setPower((rStickPosX * -driveSpeed) + (-driveSpeed * lStickPosX) + (driveSpeed * lStickPosY));
+        rf.setPower((rStickPosX * driveSpeed) + (driveSpeed * lStickPosX) + (driveSpeed * lStickPosY));
     }
 
     private void Shooting(){
@@ -129,9 +114,9 @@ public class TeleMain extends LinearOpMode {
     }
 
     private void SmoothSpeed(double posX, double posY, double accelExp, double turnExp){
-        lStickPosX = Math.pow(posX, accelExp);
-        lStickPosY = Math.pow(posY, accelExp);
-        rStickPosX = Math.pow(gamepad1.right_stick_x, turnExp);
+        lStickPosX = Math.pow(posX, accelExp) * Math.signum(gamepad1.left_stick_x);
+        lStickPosY = Math.pow(posY, accelExp) * Math.signum(gamepad1.left_stick_y);
+        rStickPosX = Math.pow(gamepad1.right_stick_x, turnExp) * Math.signum(gamepad1.right_stick_x);
     }
 
     private void InitMotors(){
@@ -164,11 +149,6 @@ public class TeleMain extends LinearOpMode {
         rf.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
     }
 
-
-
-
-
-    //EYAAA EYA YAAAA
     private void updateVals(){
         telemetry.addData( "Servo pos %d \n help me im dying inside",shooter.feeder.getPosition());
         telemetry.update();
