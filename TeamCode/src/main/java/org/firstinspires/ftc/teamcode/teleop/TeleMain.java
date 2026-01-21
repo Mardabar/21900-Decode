@@ -10,11 +10,11 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 
-import org.firstinspires.ftc.teamcode.subsystems.ShootSystem;
+import org.firstinspires.ftc.teamcode.subsystems.FeedBackShootSystem;
 
 @TeleOp(name = "TeleMain")
 public class TeleMain extends LinearOpMode {
-    private ShootSystem shooter;
+    private FeedBackShootSystem shooter;
     private boolean isShooting;
 
     // Drive Vars
@@ -26,7 +26,7 @@ public class TeleMain extends LinearOpMode {
 
     private final double driveSpeed = 1;
     private final double acceleration = 4;
-    private final double turnAccel = 3;
+    private final double turnAccel = 4;
 
     private final double p = 0.021, i = 0.00001, d = 0.00011;
     private double lastError;
@@ -44,33 +44,37 @@ public class TeleMain extends LinearOpMode {
         InitMotors();
         SetDriveDirection("forward");
         SetBrakes();
-        shooter = new ShootSystem(hardwareMap, telemetry);
+        shooter = new FeedBackShootSystem(hardwareMap, telemetry);
 
         waitForStart();
-        while (opModeIsActive()){
-            if (!isShooting || gamepad1.left_bumper)
-                Drive();
+        while (opModeIsActive())
+            Running();
+    }
 
-            if (gamepad2.yWasPressed()){
-                shooter.feeder.setPosition(closePos);
-            } else if (gamepad2.yWasReleased())
-                shooter.feeder.setPosition(openPos);
+    private void Running(){
+        if (!isShooting || gamepad1.left_bumper)
+            Drive();
 
-            if (gamepad2.a)
-                Shooting();
+        if (gamepad2.dpadUpWasPressed()){
+            shooter.feeder.setPosition(closePos);
+        } else if (gamepad2.dpadUpWasReleased())
+            shooter.feeder.setPosition(openPos);
 
-            else {
-                isShooting = false;
-                iSum = 0;
-                shooter.StopMotors();
+        if (gamepad2.a)
+            Shooting();
+        else if (gamepad2.aWasReleased()) {
+            isShooting = false;
+            iSum = 0;
+            shooter.StopMotors();
+        } else {
+            if (gamepad2.right_bumper)
+                shooter.RunBelt(1);
+            else if (gamepad2.left_bumper)
+                shooter.RunBelt(-1);
+            else
+                shooter.RunBelt(0);
 
-                if (gamepad2.x)
-                    shooter.RunBelt(1);
-                else if (gamepad2.b)
-                    shooter.RunBelt(-1);
-                else
-                    shooter.RunBelt(0);
-            }
+            shooter.spinUpWhileDriving();
         }
     }
 
@@ -97,10 +101,10 @@ public class TeleMain extends LinearOpMode {
         iSum += error;
         double derError = lastError - error;
 
-        lb.setPower(-((error * p) + (iSum * i) + (derError * d)));
-        rb.setPower((error * p) + (iSum * i) + (derError * d));
-        lf.setPower(-((error * p) + (iSum * i) + (derError * d)));
-        rf.setPower((error * p) + (iSum * i) + (derError * d));
+        lb.setPower((error * p) + (iSum * i) + (derError * d));
+        rb.setPower(-((error * p) + (iSum * i) + (derError * d)));
+        lf.setPower((error * p) + (iSum * i) + (derError * d));
+        rf.setPower(-((error * p) + (iSum * i) + (derError * d)));
 
         lastError = error;
     }
@@ -133,7 +137,6 @@ public class TeleMain extends LinearOpMode {
             lf.setDirection(DcMotorEx.Direction.REVERSE);
             rf.setDirection(DcMotorEx.Direction.FORWARD);
             return;
-
         }
 
         lb.setDirection(DcMotorEx.Direction.REVERSE);
@@ -147,10 +150,5 @@ public class TeleMain extends LinearOpMode {
         rb.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         lf.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         rf.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-    }
-
-    private void updateVals(){
-        telemetry.addData( "Servo pos %d \n help me im dying inside",shooter.feeder.getPosition());
-        telemetry.update();
     }
 }
