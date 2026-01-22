@@ -90,7 +90,7 @@ public class TeleV2 extends OpMode {
 
 
         // prints data
-        telemetry.addData("Target TPS", ShootSystem.shootVel);
+        //telemetry.addData("Target TPS", );
         telemetry.addData("Actual TPS", shooter.flywheel.getVelocity());
         //telemetry.addData("Bot Pose in space", shooter.cam.getLatestResult());
         telemetry.update();

@@ -20,7 +20,7 @@ public class FeedBackShootSystem {
     // Feedback constants and battery declaring
     public static double kP = 0.001;
     public static double kS = 0.02;
-    public static double kV = 0.00043;
+    public static double kV = 0.00039;
     private VoltageSensor battery;
 
     private Follower fol;
@@ -44,10 +44,10 @@ public class FeedBackShootSystem {
     // CONSTANTS
 
     public final double OVERSHOOT_VEL_MULT = 2.21;
-    public final double OVERSHOOT_ANG_MULT = 1;
+    public final double OVERSHOOT_ANG_MULT = .8;
 
     private final double MAX_HEIGHT = 1.4;
-    public static double IDLE_VELO = 800;
+    public static double IDLE_VELO = 100;
 
 
     // SHOOT VARS
@@ -88,10 +88,10 @@ public class FeedBackShootSystem {
     // PUBLIC METHODS
 
     public void Shoot(){
-        setShootAngle(shootAngle);
         UpdatePositions(cam.getLatestResult());
         updateFlywheelControl(shootVel);
-        RunBelt(1);
+        setShootAngle(shootAngle);
+        //RunBelt(1);
 
         fol.update();
     }
@@ -115,7 +115,7 @@ public class FeedBackShootSystem {
             int id = res.getFiducialId();
             // Only updates if its one of the two april tag values
             if (id == 20 || id == 24)
-                UpdateVars(res);
+                UpdatePods(res);
         }
     }
 
@@ -148,7 +148,7 @@ public class FeedBackShootSystem {
     }
 
     public void UpdateVars(LLResultTypes.FiducialResult res){
-        double angle = 25.2 + res.getTargetYDegrees();
+        double angle = 25.2 + res.getTargetYDegrees(); // was 25.2
         double tagDist = (0.646 / Math.tan(Math.toRadians(angle))) + 0.2;
 
         if (tagDist - 2 < 0)
@@ -159,7 +159,7 @@ public class FeedBackShootSystem {
         setShootPos(tagDist);
 
         // adds data about last snapshot cam took
-        telemetry.addData("Last Tag Dist", tagDist);
+        //telemetry.addData("Last Tag Dist", tagDist);
     }
 
     // NEW SET SHOOT POS METHOD
