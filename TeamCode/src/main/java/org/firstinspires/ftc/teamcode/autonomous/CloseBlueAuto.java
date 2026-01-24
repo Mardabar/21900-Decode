@@ -1,23 +1,19 @@
 package org.firstinspires.ftc.teamcode.autonomous;
 
 
-import static org.firstinspires.ftc.teamcode.subsystems.ShootSystem.closePos;
-import static org.firstinspires.ftc.teamcode.subsystems.ShootSystem.openPos;
-import static org.firstinspires.ftc.teamcode.subsystems.ShootSystem.shootVel;
 
 import com.pedropathing.follower.Follower;
+import com.pedropathing.geometry.BezierCurve;
 import com.pedropathing.geometry.BezierLine;
 import com.pedropathing.geometry.Pose;
 import com.pedropathing.paths.PathChain;
-import com.pedropathing.util.Timer;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 
 import com.qualcomm.robotcore.util.ElapsedTime;
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
-import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 import org.firstinspires.ftc.teamcode.subsystems.FeedBackShootSystem;
-import org.firstinspires.ftc.teamcode.subsystems.ShootSystem;
+
 
 
 @Autonomous(name = "CloseBlue")
@@ -27,13 +23,14 @@ public class CloseBlueAuto extends OpMode{
     private final Pose startPose = new Pose(27.3, 132.7, Math.toRadians(143));
     private final Pose preScorePose = new Pose(50, 115, Math.toRadians(146));
     private final Pose row1Line = new Pose(48, 84, Math.toRadians(180));
-    private final Pose row1Grab = new Pose(18.5, 84, Math.toRadians(180));
+    private final Pose row1Grab = new Pose(17.5, 84, Math.toRadians(180));
     private final Pose row1Score = new Pose(39.5, 102, Math.toRadians(135));
-    private final Pose row2Line = new Pose(48, 59.5, Math.toRadians(180));
-    private final Pose row2Grab = new Pose(18.5, 59.5, Math.toRadians(180));
+    private final Pose row2Line = new Pose(48, 60.5, Math.toRadians(180));
+    private final Pose row2Grab = new Pose(10, 60.5, Math.toRadians(180));
     private final Pose row2Score = new Pose(50, 93, Math.toRadians(135)); // was 52, 88.5, 135
-    private final Pose row3Line = new Pose (48, 35.5, Math.toRadians(180));
-    private final Pose row3Grab = new Pose (18.5, 35.5, Math.toRadians(180));
+    private final Pose row2ScoreCP = new Pose(53, 58);
+    private final Pose row3Line = new Pose (48, 36, Math.toRadians(180));
+    private final Pose row3Grab = new Pose (10, 36, Math.toRadians(180));
 
     /// Row 3 score and park close
     private final Pose row3ScoreClose = new Pose (50, 93, Math.toRadians(134));
@@ -53,27 +50,18 @@ public class CloseBlueAuto extends OpMode{
 
 
 
+    // Subsystem
     private FeedBackShootSystem shooter;
-
-
-    private double shootDur = 5000;
-    private double flipperDelay = 3000;
-
 
 
     // Time
     private ElapsedTime shootTimer, beltTimer;
-
-
-
-
 
     @Override
     public void init(){
 
 
         // Fol init
-        //paths = new CloseBluePaths(fol);
 
         shooter = new FeedBackShootSystem(hardwareMap, telemetry);
 
@@ -141,8 +129,8 @@ public class CloseBlueAuto extends OpMode{
             // Bot moves and grabs row 1
             case 3:
                 if (!fol.isBusy()){
-                    fol.setMaxPower(.45);
-                    shooter.RunBelt(.4);
+                    fol.setMaxPower(1);
+                    shooter.RunBelt(.3);
                     fol.followPath(pathRow1Grab);
                     beltTimer.reset();
                     setPathState(4); // back to 4
@@ -152,7 +140,7 @@ public class CloseBlueAuto extends OpMode{
             case 4:
 
                 while (beltTimer.milliseconds() > 3000) {
-                    shooter.RunBelt(0.4);
+                    shooter.RunBelt(0.3);
                 }
 
                 if(!fol.isBusy()){
@@ -184,9 +172,9 @@ public class CloseBlueAuto extends OpMode{
             // Bot grabs the balls in row 2
             case 7:
                 if(!fol.isBusy()){
-                    fol.setMaxPower(.45);
+                    fol.setMaxPower(1);
                     fol.followPath(pathRow2Grab);
-                    shooter.RunBelt(.45);
+                    shooter.RunBelt(.3);
                     setPathState(8);
                 } break;
 
@@ -221,8 +209,8 @@ public class CloseBlueAuto extends OpMode{
             case 11:
                 if(!fol.isBusy()){
                     fol.followPath(pathRow3Grab);
-                    fol.setMaxPower(.45);
-                    shooter.RunBelt(.4);
+                    fol.setMaxPower(1);
+                    shooter.RunBelt(.3);
                     beltTimer.reset();
                     setPathState(12);
                 } break;
@@ -304,7 +292,7 @@ public class CloseBlueAuto extends OpMode{
                 .build();
 
         pathRow2Score = fol.pathBuilder()
-                .addPath(new BezierLine(row2Grab, row2Score))
+                .addPath(new BezierCurve(row2Grab, row2ScoreCP, row2Score))
                 .setLinearHeadingInterpolation(row2Grab.getHeading(), row2Score.getHeading())
                 .build();
 

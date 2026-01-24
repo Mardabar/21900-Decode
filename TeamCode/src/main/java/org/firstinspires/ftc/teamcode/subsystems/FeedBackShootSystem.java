@@ -45,7 +45,7 @@ public class FeedBackShootSystem {
     // CONSTANTS
 
     public final double OVERSHOOT_VEL_MULT = 2.21;
-    public final double OVERSHOOT_ANG_MULT = .8;
+    public final double OVERSHOOT_ANG_MULT = .5; // was .8
 
     private final double MAX_HEIGHT = 1.4;
     public static double IDLE_VELO = 550;

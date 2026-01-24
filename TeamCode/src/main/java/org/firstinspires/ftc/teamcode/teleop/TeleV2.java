@@ -9,6 +9,7 @@ import com.pedropathing.geometry.Pose;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 import org.firstinspires.ftc.teamcode.subsystems.FeedBackShootSystem;
@@ -25,7 +26,15 @@ public class TeleV2 extends OpMode {
     // Calls new feedbakc shoot system
     FeedBackShootSystem shooter;
 
+    // shoot enums
+    private enum ShootState {
+        IDLE,
+        SPIN_UP,
+        FIRING
+    }
 
+    private ShootState currentShootState = ShootState.IDLE;
+    private ElapsedTime shootStateTimer = new ElapsedTime();
 
 
     // Using pedros drive op for simplicity
@@ -62,12 +71,56 @@ public class TeleV2 extends OpMode {
                 true // Robot Centric
         );
 
-        // the automatic shooting mode that SHOULD work but maybe not
         if (gamepad1.a) {
             shooter.Shoot();
         } else {
             shooter.StopMotors();
         }
+
+//        the automatic shooting mode that SHOULD work but maybe not
+//        switch (currentShootState){
+//            case IDLE:
+//                if (gamepad1.a){
+//                    shootStateTimer.reset();
+//                    currentShootState = ShootState.SPIN_UP;
+//                } else {
+//                    shooter.StopMotors();
+//                    shooter.feeder.setPosition(openPos);
+//                } break;
+//
+//            case SPIN_UP:
+//                shooter.Shoot();
+//
+//                // checks for if the flywheel is in an error window
+//                double error = Math.abs(shooter.shootVel - shooter.flywheel.getVelocity());
+//                if (error < 100){
+//                    currentShootState = ShootState.FIRING;
+//                    shootStateTimer.reset();
+//                }
+//
+//                if (!gamepad1.a){
+//                    currentShootState = ShootState.IDLE;
+//                }
+//
+//                break;
+//
+//
+//            case FIRING:
+//                shooter.Shoot();
+//                shooter.RunBelt(1.0);
+//
+//                if (shootStateTimer.milliseconds() > 700) {
+//                    shooter.feeder.setPosition(FeedBackShootSystem.closePos);
+//                }
+//
+//                if (!gamepad1.a || shootStateTimer.milliseconds() > 1500) {
+//                    currentShootState = ShootState.IDLE;
+//                    shooter.StopMotors();
+//                    shooter.feeder.setPosition(openPos);
+//                }
+//                break;
+//
+//        }
 
 
 
@@ -92,6 +145,7 @@ public class TeleV2 extends OpMode {
         // prints data
         //telemetry.addData("Target TPS", );
         //shooter.spinUpWhileDriving();
+        telemetry.addData("Current State", currentShootState);
         telemetry.addData("Target TPS", ShootSystem.shootVel);
         telemetry.addData("Actual TPS", shooter.flywheel.getVelocity());
         telemetry.update();
