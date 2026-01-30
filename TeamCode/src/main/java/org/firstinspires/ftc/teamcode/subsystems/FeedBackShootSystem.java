@@ -228,10 +228,7 @@ public class FeedBackShootSystem {
         double angle = 25.2 + res.getTargetYDegrees();
         double limeDist = (0.646 / Math.tan(Math.toRadians(angle))) + 0.2;
 
-        if (limeDist > 2.6)
-            beltSpeed = 0.4;
-        else
-            beltSpeed = 0.8;
+        beltSpeed = 0.2;
 
         setShootPos(limeDist);
 

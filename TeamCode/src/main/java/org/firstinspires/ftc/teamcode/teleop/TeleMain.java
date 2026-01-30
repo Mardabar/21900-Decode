@@ -102,10 +102,11 @@ public class TeleMain extends LinearOpMode {
         iSum += error;
         double derError = lastError - error;
 
-        lb.setPower((error * p) + (iSum * i) + (derError * d));
-        rb.setPower(-((error * p) + (iSum * i) + (derError * d)));
-        lf.setPower((error * p) + (iSum * i) + (derError * d));
-        rf.setPower(-((error * p) + (iSum * i) + (derError * d)));
+        SetDriveDirection("forward");
+        lb.setPower(-((error * p) + (iSum * i) + (derError * d)));
+        rb.setPower((error * p) + (iSum * i) + (derError * d));
+        lf.setPower(-((error * p) + (iSum * i) + (derError * d)));
+        rf.setPower((error * p) + (iSum * i) + (derError * d));
 
         lastError = error;
     }
