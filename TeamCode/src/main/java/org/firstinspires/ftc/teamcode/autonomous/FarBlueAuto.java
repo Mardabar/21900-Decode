@@ -22,21 +22,17 @@ public class FarBlueAuto extends OpMode {
     ///  Paths
 
     private final Pose startPose = new Pose(56, 8, Math.toRadians(90));
-    private final Pose preScorePose = new Pose(63, 18, Math.toRadians(114)); // for close shooting do 62, 119, 159
-    private final Pose row3Line = new Pose (48, 36, Math.toRadians(180));
-    private final Pose row3Grab = new Pose (11, 36, Math.toRadians(180));
-    private final Pose row3Score = new Pose(63, 18, Math.toRadians(114)); // 55.5, 121. 159
+    private final Pose preScorePose = new Pose(57, 11, Math.toRadians(112)); // for close shooting do 62, 119, 159
+    private final Pose row3Line = new Pose (50, 35.5, Math.toRadians(180));
+    private final Pose row3Grab = new Pose (7, 35.5, Math.toRadians(180));
+    private final Pose row3Score = new Pose(57, 11, Math.toRadians(112)); // 63, 18, 114
+    private final Pose row2Line = new Pose(48, 60, Math.toRadians(180));
+    private final Pose row2Grab = new Pose(7, 60, Math.toRadians(180));
+    private final Pose row2Score = new Pose(63, 18, Math.toRadians(114)); // was 52, 88.5, 135
+    private final Pose row2ScoreCP = new Pose(53, 58);
     private final Pose row1Line = new Pose(48, 84, Math.toRadians(180));
     private final Pose row1Grab = new Pose(18.5, 84, Math.toRadians(180));
     private final Pose row1Score = new Pose(39.5, 102, Math.toRadians(135));
-    private final Pose row2Line = new Pose(48, 60, Math.toRadians(180));
-    private final Pose row2Grab = new Pose(13, 60, Math.toRadians(180));
-    private final Pose row2Score = new Pose(50, 93, Math.toRadians(135)); // was 52, 88.5, 135
-    private final Pose row2ScoreCP = new Pose(53, 58);
-
-    /// Row 3 score and park close
-    private final Pose row3ScoreClose = new Pose (48, 107, Math.toRadians(138));
-    private final Pose row3ScoreCP = new Pose(102, 70);
 
 
 
@@ -66,6 +62,8 @@ public class FarBlueAuto extends OpMode {
         // Pedro paths init
         buildPaths();
         setPathState(0);
+        telemetry.addData("Current TPS", shooter.flywheel.getVelocity());
+        telemetry.update();
 
     }
 
@@ -217,7 +215,7 @@ public class FarBlueAuto extends OpMode {
                 .build();
 
         pathRow2Score = fol.pathBuilder()
-                .addPath(new BezierCurve(row2Grab, row2ScoreCP, row2Score))
+                .addPath(new BezierLine(row2Grab, row2Score))
                 .setLinearHeadingInterpolation(row2Grab.getHeading(), row2Score.getHeading())
                 .build();
 
@@ -233,8 +231,8 @@ public class FarBlueAuto extends OpMode {
 
         //              Row 3 close score and shoot
         pathRow3Score = fol.pathBuilder()
-                .addPath(new BezierLine(row3Grab, row3ScoreClose))
-                .setLinearHeadingInterpolation(row3Grab.getHeading(), row3ScoreClose.getHeading())
+                .addPath(new BezierLine(row3Grab, row3Score))
+                .setLinearHeadingInterpolation(row3Grab.getHeading(), row3Score.getHeading())
                 .build();
 
 
@@ -290,7 +288,7 @@ public class FarBlueAuto extends OpMode {
         // updates and sets motors to power
         shooter.Shoot();
 
-        if (shootTimer.milliseconds() > 3000) {
+        if (shootTimer.milliseconds() > 2700) {
             shooter.feeder.setPosition(FeedBackShootSystem.closePos);
         } else {
             shooter.feeder.setPosition(FeedBackShootSystem.openPos);
@@ -308,7 +306,7 @@ public class FarBlueAuto extends OpMode {
         }
 
         // After 4 seconds stop everything and move to the next path state incase sum gets messed up
-        if (shootTimer.milliseconds() > 3500) {
+        if (shootTimer.milliseconds() > 3000) {
             shooter.StopMotors();
             shooter.feeder.setPosition(FeedBackShootSystem.openPos);
             setPathState(nextState);

@@ -16,25 +16,26 @@ import org.firstinspires.ftc.teamcode.subsystems.FeedBackShootSystem;
 
 
 
-@Autonomous(name = "Close Red")
+@Autonomous(name = "CloseRed")
 public class CloseRedAuto extends OpMode{
 
     /// PATHS
-    private final Pose startPose = new Pose(27.3, 132.7, Math.toRadians(143)).mirror();
+    private final Pose startPose = new Pose(27, 131.8, Math.toRadians(143)).mirror();
     private final Pose preScorePose = new Pose(50, 115, Math.toRadians(146)).mirror();
     private final Pose row1Line = new Pose(48, 84, Math.toRadians(180)).mirror();
-    private final Pose row1Grab = new Pose(17.5, 84, Math.toRadians(180)).mirror();
+    private final Pose row1Grab = new Pose(18.5, 84, Math.toRadians(180)).mirror();
     private final Pose row1Score = new Pose(39.5, 102, Math.toRadians(135)).mirror();
     private final Pose row2Line = new Pose(48, 60, Math.toRadians(180)).mirror();
-    private final Pose row2Grab = new Pose(12, 60, Math.toRadians(180)).mirror();
-    private final Pose row2Score = new Pose(50, 93, Math.toRadians(135)).mirror(); // was 52, 88.5, 135
+    private final Pose row2Grab = new Pose(7.5, 60, Math.toRadians(180)).mirror();
+    private final Pose row2Score = new Pose(52, 88.5, Math.toRadians(135)).mirror(); // was 52, 88.5, 135
     private final Pose row2ScoreCP = new Pose(53, 58).mirror();
-    private final Pose row3Line = new Pose (48, 36, Math.toRadians(180)).mirror();
-    private final Pose row3Grab = new Pose (12, 36, Math.toRadians(180)).mirror();
+    private final Pose row3Line = new Pose (50, 35.5, Math.toRadians(180)).mirror();
+    private final Pose row3Grab = new Pose (8.5, 35.5, Math.toRadians(180)).mirror();
+    private final Pose row3Score = new Pose(48, 107, Math.toRadians(138)).mirror(); // 63, 18, 114
 
     /// Row 3 score and park close
-    private final Pose row3ScoreClose = new Pose (48, 107, Math.toRadians(134)).mirror();
-    private final Pose row3ParkClose = new Pose (55, 63, Math.toRadians(134)).mirror();
+    private final Pose row3ScoreClose = new Pose (48, 107, Math.toRadians(138)).mirror();
+    private final Pose row3ParkClose = new Pose (45, 72, Math.toRadians(138)).mirror();
 
     /// Row 3 score and park far
     private final Pose row3ScoreFar = new Pose (58, 13.5, Math.toRadians(124)).mirror();
@@ -102,10 +103,6 @@ public class CloseRedAuto extends OpMode{
                     fol.followPath(pathPreScore);
                     setPathState(1);
                 } break;
-
-
-
-
             // Bot will do a check if its not moving here
             case 1:
                 if (!fol.isBusy()){
@@ -114,7 +111,7 @@ public class CloseRedAuto extends OpMode{
                 } break;
             // Bot will score here then move to next pathState
             case -1:
-                shoot(2); // change back to 2
+                shoot(2); // Bot moves onto next pathState
                 break;
 
 
@@ -129,8 +126,8 @@ public class CloseRedAuto extends OpMode{
             // Bot moves and grabs row 1
             case 3:
                 if (!fol.isBusy()){
-                    fol.setMaxPower(.65);
-                    shooter.RunBelt(.4);
+                    fol.setMaxPower(.6);
+                    shooter.RunBelt(.3);
                     fol.followPath(pathRow1Grab);
                     beltTimer.reset();
                     setPathState(4); // back to 4
@@ -172,9 +169,9 @@ public class CloseRedAuto extends OpMode{
             // Bot grabs the balls in row 2
             case 7:
                 if(!fol.isBusy()){
-                    fol.setMaxPower(.65);
+                    fol.setMaxPower(.6);
                     fol.followPath(pathRow2Grab);
-                    shooter.RunBelt(.4);
+                    shooter.RunBelt(.3);
                     setPathState(8);
                 } break;
 
@@ -209,8 +206,8 @@ public class CloseRedAuto extends OpMode{
             case 11:
                 if(!fol.isBusy()){
                     fol.followPath(pathRow3Grab);
-                    fol.setMaxPower(.65);
-                    shooter.RunBelt(.4);
+                    fol.setMaxPower(.6);
+                    shooter.RunBelt(.3);
                     beltTimer.reset();
                     setPathState(12);
                 } break;
@@ -308,8 +305,8 @@ public class CloseRedAuto extends OpMode{
 
         //              Row 3 close score and shoot
         pathRow3Score = fol.pathBuilder()
-                .addPath(new BezierLine(row3Grab, row3ScoreClose))
-                .setLinearHeadingInterpolation(row3Grab.getHeading(), row3ScoreClose.getHeading())
+                .addPath(new BezierLine(row3Grab, row3Score))
+                .setLinearHeadingInterpolation(row3Grab.getHeading(), row3Score.getHeading())
                 .build();
 
         pathPark = fol.pathBuilder()
@@ -350,8 +347,37 @@ public class CloseRedAuto extends OpMode{
         }
 
         // after that checks if the flywheel is at the velocity or if we have spun for over 3 seconds
-        else if (Math.abs(shooter.shootVel - shooter.flywheel.getVelocity()) < 500 || shootTimer.milliseconds() > 700) {
+        else if (Math.abs(shooter.shootVel - shooter.flywheel.getVelocity()) < 50 || shootTimer.milliseconds() > 700) {
             shooter.RunBelt(0.8);
+
+        }
+
+        // After 4 seconds stop everything and move to the next path state incase sum gets messed up
+        if (shootTimer.milliseconds() > 1900) {
+            shooter.StopMotors();
+            shooter.feeder.setPosition(FeedBackShootSystem.openPos);
+            setPathState(nextState);
+        }
+    }
+
+    private void shootFar(int nextState) {
+        // updates and sets motors to power
+        shooter.Shoot();
+
+        if (shootTimer.milliseconds() > 900) {
+            shooter.feeder.setPosition(FeedBackShootSystem.closePos);
+        } else {
+            shooter.feeder.setPosition(FeedBackShootSystem.openPos);
+        }
+
+        // lets the flywheel spin up for a bit might need to make bigger
+        if (shootTimer.milliseconds() < 500) {
+            shooter.stopBelt();
+        }
+
+        // after that checks if the flywheel is at the velocity or if we have spun for over 3 seconds
+        else if (Math.abs(shooter.shootVel - shooter.flywheel.getVelocity()) < 500 || shootTimer.milliseconds() > 700) {
+            shooter.RunBelt(0.2);
 
         }
 

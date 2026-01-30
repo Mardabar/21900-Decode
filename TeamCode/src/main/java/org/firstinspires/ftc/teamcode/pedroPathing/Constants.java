@@ -21,15 +21,15 @@ import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 @Configurable
 public class Constants {
     public static FollowerConstants followerConstants = new FollowerConstants()
-            .forwardZeroPowerAcceleration(-47.521)
-            .lateralZeroPowerAcceleration(-75.435)
-            .mass(9.2)
-            .translationalPIDFCoefficients(new PIDFCoefficients(0.2, 0, 0.0062, 0.022))
-            .headingPIDFCoefficients(new PIDFCoefficients(1,0,0.01,0.01))
-            .drivePIDFCoefficients(new FilteredPIDFCoefficients(0.04
-                    ,0,0.0025,0.6,0.05))
+        .translationalPIDFCoefficients(new PIDFCoefficients(0.2, 0, 0.0062, 0.022))
+        .headingPIDFCoefficients(new PIDFCoefficients(1,0,0.01,0.01))
+        .drivePIDFCoefficients(new FilteredPIDFCoefficients(0.04,0,0.0025,0.6,0.05))
 
-            .centripetalScaling(0.0005);
+
+            .centripetalScaling(0.0005)
+            .mass(9.2)
+            .forwardZeroPowerAcceleration(-47.521)
+            .lateralZeroPowerAcceleration(-75.435);
 
 
     public static MecanumConstants driveConstants = new MecanumConstants()

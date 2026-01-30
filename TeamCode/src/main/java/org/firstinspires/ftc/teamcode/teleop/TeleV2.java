@@ -24,11 +24,15 @@ import org.firstinspires.ftc.teamcode.subsystems.ShootSystem;
 import java.util.Set;
 
 
+
+
 ///  BLEUAFEHATGSWF why do we have so many teleop modeeasdssdsd
 ///
 @Configurable
 @TeleOp(name = "Tele V2")
 public class TeleV2 extends OpMode {
+
+
 
 
     // Calls new feedbakc shoot system
@@ -106,13 +110,13 @@ public class TeleV2 extends OpMode {
         //shooter.adjustServoManual(gamepad1.dpad_up, gamepad1.dpad_down);
 
 
-        if (gamepad1.a) {
+        if (gamepad2.a) {
             shooter.Shoot();
         } else {
             shooter.StopMotors();
         }
 
-        if(gamepad1.dpad_left){
+        if(gamepad1.dpad_left || gamepad2.dpad_left){
             shooter.flywheel.setVelocity(-IDLE_VELO);
         }
 
@@ -165,14 +169,14 @@ public class TeleV2 extends OpMode {
 
 
         //belt stuff
-        if (gamepad1.x)
+        if (gamepad2.x)
             shooter.RunBelt(1);
-        else if (gamepad1.b)
+        else if (gamepad2.b)
             shooter.RunBelt(-1);
         else
             shooter.RunBelt(0);
 
-        if (gamepad1.y){
+        if (gamepad2.y){
             shooter.feeder.setPosition(closePos);
         } else {
             shooter.feeder.setPosition(openPos);
