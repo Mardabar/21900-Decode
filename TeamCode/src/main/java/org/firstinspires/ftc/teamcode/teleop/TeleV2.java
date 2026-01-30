@@ -7,29 +7,21 @@ import static org.firstinspires.ftc.teamcode.subsystems.ShootSystem.openPos;
 import com.bylazar.configurables.annotations.Configurable;
 import com.pedropathing.follower.Follower;
 import com.pedropathing.geometry.Pose;
-import com.qualcomm.hardware.limelightvision.LLResult;
 import com.qualcomm.hardware.limelightvision.LLResultTypes;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
-import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 import org.firstinspires.ftc.teamcode.subsystems.FeedBackShootSystem;
-import org.firstinspires.ftc.teamcode.subsystems.ShootSystem;
-
-import java.util.Set;
-
-
 
 
 ///  BLEUAFEHATGSWF why do we have so many teleop modeeasdssdsd
 ///
 @Configurable
-@TeleOp(name = "Tele V2")
+@TeleOp(name = "Tele V2 David")
 public class TeleV2 extends OpMode {
 
 
@@ -65,12 +57,10 @@ public class TeleV2 extends OpMode {
     private final double driveSpeed = 1;
     private final double acceleration = 4;
     private final double turnSpeed = 3;
-    private boolean isDriving = true;
 
-    private final double p = 0.03, i = 0.0000, d = 0.00011;
+    private final double p = 0.021, i = 0.00001, d = 0.00011;
     private double lastError;
     private double iSum;
-    private boolean isShooting;
 
 
     private double lStickPosX;
@@ -85,10 +75,6 @@ public class TeleV2 extends OpMode {
     public void init() {
         shooter = new FeedBackShootSystem(hardwareMap, telemetry);
 
-        lb = hardwareMap.get(DcMotorEx.class, "lb");
-        rb = hardwareMap.get(DcMotorEx.class, "rb");
-        lf = hardwareMap.get(DcMotorEx.class, "lf");
-        rf = hardwareMap.get(DcMotorEx.class, "rf");
 
         // tele method i got from pedro
         fol = Constants.createFollower(hardwareMap);
@@ -97,7 +83,6 @@ public class TeleV2 extends OpMode {
 
         fol.startTeleOpDrive();
 
-        shooter.beltSpeed = 0.8;
 
     }
 
@@ -107,44 +92,20 @@ public class TeleV2 extends OpMode {
         //Drive();
 
         fol.update();
-
-        if (!isShooting) {
-            fol.setTeleOpDrive(
-                    -gamepad1.left_stick_y,
-                    -gamepad1.left_stick_x,
-                    -gamepad1.right_stick_x,
-                    true // Robot Centric
-            );
-        }
+        fol.setTeleOpDrive(
+                -gamepad1.left_stick_y,
+                -gamepad1.left_stick_x,
+                -gamepad1.right_stick_x,
+                true // Robot Centric
+        );
 
         //shooter.adjustServoManual(gamepad1.dpad_up, gamepad1.dpad_down);
 
-        if (Math.abs(gamepad1.left_stick_x + gamepad1.left_stick_y + gamepad1.right_stick_x) > 0.1 && isShooting) {
-            isDriving = true;
-            fol.setTeleOpDrive(
-                    -gamepad1.left_stick_y,
-                    -gamepad1.left_stick_x,
-                    -gamepad1.right_stick_x,
-                    true // Robot Centric
-            );
-        } else if (isDriving || isShooting) {
-            for (LLResultTypes.FiducialResult res : shooter.GetImage().getFiducialResults()) {
-                int id = res.getFiducialId();
-                if ((id == 20 || id == 24) && !isDriving)
-                    PIDAdjusting(res);
-            }
-            isDriving = false;
-        }
-
 
         if (gamepad2.a) {
-            isShooting = true;
             shooter.Shoot();
         } else {
-            isShooting = false;
             shooter.StopMotors();
-            shooter.beltSpeed = 0.8;
-            iSum = 0;
         }
 
         if(gamepad1.dpad_left || gamepad2.dpad_left){
@@ -233,10 +194,10 @@ public class TeleV2 extends OpMode {
         iSum += error;
         double derError = lastError - error;
 
-        lb.setPower(((error * p) + (iSum * i) + (derError * d)));
-        rb.setPower(-((error * p) + (iSum * i) + (derError * d)));
-        lf.setPower(((error * p) + (iSum * i) + (derError * d)));
-        rf.setPower(-((error * p) + (iSum * i) + (derError * d)));
+        lb.setPower(-((error * p) + (iSum * i) + (derError * d)));
+        rb.setPower((error * p) + (iSum * i) + (derError * d));
+        lf.setPower(-((error * p) + (iSum * i) + (derError * d)));
+        rf.setPower((error * p) + (iSum * i) + (derError * d));
 
         lastError = error;
     }
@@ -254,10 +215,10 @@ public class TeleV2 extends OpMode {
     }
 
     private void SetDriveDirection(){
-            lb.setDirection(DcMotorEx.Direction.REVERSE);
-            rb.setDirection(DcMotorEx.Direction.FORWARD);
-            lf.setDirection(DcMotorEx.Direction.REVERSE);
-            rf.setDirection(DcMotorEx.Direction.FORWARD);
+        lb.setDirection(DcMotorEx.Direction.REVERSE);
+        rb.setDirection(DcMotorEx.Direction.FORWARD);
+        lf.setDirection(DcMotorEx.Direction.REVERSE);
+        rf.setDirection(DcMotorEx.Direction.FORWARD);
 
     }
 
