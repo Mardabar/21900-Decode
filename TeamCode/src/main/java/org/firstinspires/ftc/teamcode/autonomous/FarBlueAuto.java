@@ -28,7 +28,7 @@ public class FarBlueAuto extends OpMode {
     private final Pose row3Score = new Pose(57, 11, Math.toRadians(112)); // 63, 18, 114
     private final Pose row2Line = new Pose(48, 60, Math.toRadians(180));
     private final Pose row2Grab = new Pose(7, 60, Math.toRadians(180));
-    private final Pose row2Score = new Pose(63, 18, Math.toRadians(114)); // was 52, 88.5, 135
+    private final Pose row2Score = new Pose(57, 11, Math.toRadians(112)); // was 52, 88.5, 135
     private final Pose row2ScoreCP = new Pose(53, 58);
     private final Pose row1Line = new Pose(48, 84, Math.toRadians(180));
     private final Pose row1Grab = new Pose(18.5, 84, Math.toRadians(180));

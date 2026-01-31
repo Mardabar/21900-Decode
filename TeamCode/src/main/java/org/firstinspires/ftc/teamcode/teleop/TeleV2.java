@@ -171,9 +171,9 @@ public class TeleV2 extends OpMode {
 
         //belt stuff
         if (gamepad2.x)
-            shooter.RunBelt(1);
+            shooter.RunBelt(shooter.beltSpeed);
         else if (gamepad2.b)
-            shooter.RunBelt(-1);
+            shooter.RunBelt(-shooter.beltSpeed);
         else
             shooter.RunBelt(0);
 

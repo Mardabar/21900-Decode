@@ -22,7 +22,7 @@ import org.firstinspires.ftc.teamcode.subsystems.FeedBackShootSystem;
 ///
 @Configurable
 @TeleOp(name = "Tele V2 David")
-public class TeleV2Leif extends OpMode {
+public class TeleV2David extends OpMode {
 
 
 
@@ -246,10 +246,10 @@ public class TeleV2Leif extends OpMode {
     }
 
     private void SetDriveDirection(){
-            lb.setDirection(DcMotorEx.Direction.REVERSE);
-            rb.setDirection(DcMotorEx.Direction.FORWARD);
-            lf.setDirection(DcMotorEx.Direction.REVERSE);
-            rf.setDirection(DcMotorEx.Direction.FORWARD);
+        lb.setDirection(DcMotorEx.Direction.REVERSE);
+        rb.setDirection(DcMotorEx.Direction.FORWARD);
+        lf.setDirection(DcMotorEx.Direction.REVERSE);
+        rf.setDirection(DcMotorEx.Direction.FORWARD);
 
     }
 

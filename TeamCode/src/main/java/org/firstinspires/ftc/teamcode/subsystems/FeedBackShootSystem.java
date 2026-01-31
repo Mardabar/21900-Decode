@@ -22,7 +22,7 @@ public class FeedBackShootSystem {
 
 
     // Feedback constants and battery declaring
-    public static double kP = 0.005; // was 0.004
+    public static double kP = 0.007; // was 0.004
     public static double kS = 0.02;
     public static double kV = 0.00045;  //  was 0.00039
 
@@ -112,7 +112,7 @@ public class FeedBackShootSystem {
         double fb = kP * error;
 
         // voltage compensation for inconsistent battery
-        double power = (ff + fb);
+        double power = (ff + fb)  * (12.0 / currentVoltage);
 
         // Sets power to a value in between 0-1
         flywheel.setPower(Math.clamp(power, -1, 1));
@@ -242,7 +242,10 @@ public class FeedBackShootSystem {
         double angle = 25.2 + res.getTargetYDegrees();
         double limeDist = (0.646 / Math.tan(Math.toRadians(angle))) + 0.2;
 
-        beltSpeed = 0.2;
+        if (limeDist < 2.6)
+            beltSpeed = 0.7;
+        else
+            beltSpeed = 0.3;
 
         setShootPos(limeDist);
 
