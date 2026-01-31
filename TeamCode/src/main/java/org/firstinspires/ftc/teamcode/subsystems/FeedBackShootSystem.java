@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.subsystems;
 
+import java.util.Map;
 import java.util.TreeMap;
 import com.qualcomm.hardware.limelightvision.LLResult;
 import com.qualcomm.hardware.limelightvision.LLResultTypes;
@@ -24,39 +25,36 @@ public class FeedBackShootSystem {
     public static double kP = 0.005; // was 0.004
     public static double kS = 0.02;
     public static double kV = 0.00045;  //  was 0.00039
+
+
+
     private VoltageSensor battery;
 
-
     private TreeMap<Double, Double> distanceToPos = new TreeMap<>();
+    private final TreeMap<Double, Double> angleMap = new TreeMap<>();
 
     private Follower fol;
-    private final Pose redPos = new Pose(132, 135);
-    private final Pose bluePos = new Pose(12, 135);
 
     private Telemetry telemetry;
     public Limelight3A cam;
 
+    public Servo angleAdjuster;
+    public Servo feeder;
     public DcMotorEx belt;
     public DcMotorEx flywheel;
-    public Servo angleAdjuster;
-
-    public Servo feeder;
 
     // Position declaring
 
+    public double anglePos = 0.5;
     public static double openPos = .35;
     public static double closePos = 0;
-    public double anglePos = 0.5;
 
     // CONSTANTS
-
+    public static double IDLE_VELO = 300;
+    private final double MAX_HEIGHT = 1.4;
     public final double OVERSHOOT_VEL_MULT = 2.21;
     public final double OVERSHOOT_ANG_MULT = 1; // was .8
-
-    private final double MAX_HEIGHT = 1.4;
-    public static double IDLE_VELO = 300;
-
-    public double manualServoPos = 0.15; // Start at your init/idle position
+    public double manualServoPos = 0.15;
 
 
     // SHOOT VARS
@@ -67,9 +65,6 @@ public class FeedBackShootSystem {
     public double beltSpeed = 1;
     private enum IntakeState{WAITING, FEED, RECOVER}
     private IntakeState intakeState = IntakeState.WAITING;
-    private final double intakeDur = 250;
-    private final double intakeRecover = 300;
-    private final double tolerance = 75;
 
     // INIT
 
@@ -91,7 +86,6 @@ public class FeedBackShootSystem {
 
         angleAdjuster.scaleRange(0, 1);
 
-        angleAdjuster.setPosition(0.15);
         initDistances();
 
         fol = Constants.createFollower(hardwareMap);
@@ -100,6 +94,7 @@ public class FeedBackShootSystem {
         cam = hardwareMap.get(Limelight3A.class, "limelight");
         cam.pipelineSwitch(0);
         cam.start();
+
     }
 
     // PUBLIC METHODS
@@ -117,7 +112,7 @@ public class FeedBackShootSystem {
         double fb = kP * error;
 
         // voltage compensation for inconsistent battery
-        double power = (ff + fb) * (12.0 / currentVoltage);
+        double power = (ff + fb);
 
         // Sets power to a value in between 0-1
         flywheel.setPower(Math.clamp(power, -1, 1));
@@ -127,24 +122,9 @@ public class FeedBackShootSystem {
     public void Shoot(){
         LLResult result = cam.getLatestResult();
 
-        if (result != null && result.isValid()){
-            UpdatePositions(result);
-        } else {
-            anglePos = .015;
-        }
-
-        updateFlywheelControl(shootVel);
-        angleAdjuster.setPosition(anglePos);
-        fol.update();
-    }
-
-    public void ShootFar(){
-        LLResult result = cam.getLatestResult();
-
         if (result != null && result.isValid())
             UpdatePositions(result);
-        else
-            anglePos = 0.015;
+
 
         updateFlywheelControl(shootVel);
         angleAdjuster.setPosition(anglePos);
@@ -156,21 +136,48 @@ public class FeedBackShootSystem {
     }
 
     private void setShootPos(double dist){
-        dist *= 1.2; // was 1.3
+        dist *= 1.2;
         double veloMult = OVERSHOOT_VEL_MULT + (dist * 0.15);
 
         double rawVel = angleToVel(distToAngle(dist)) * veloMult;
 
         shootVel = velToTPS(rawVel);
         //shootVel = Math.max(velToTPS(rawVel), IDLE_VELO);
-        anglePos = getServoPosition(dist);
+
+        //anglePos = getServoPosition(dist); // LERP old
+        angleInterpolation(dist); // LERP new
     }
 
 
 
+    public void angleInterpolation(double distance) {
+        Map.Entry<Double, Double> lowEntry = angleMap.floorEntry(distance);
+        Map.Entry<Double, Double> highEntry = angleMap.ceilingEntry(distance);
+
+        if (lowEntry == null && highEntry == null) return;
+
+        if (lowEntry == null) {
+            anglePos = highEntry.getValue();
+        } else if (highEntry == null || lowEntry.getKey().equals(highEntry.getKey())) {
+            anglePos = lowEntry.getValue();
+        } else {
+            double x0 = lowEntry.getKey();
+            double y0 = lowEntry.getValue();
+            double x1 = highEntry.getKey();
+            double y1 = highEntry.getValue();
+
+            anglePos = y0 + (distance - x0) * ((y1 - y0) / (x1 - x0));
+        }
+
+        //anglePos += hoodManualAdjustment;
+        // Clamp to valid servo range
+        anglePos = Math.max(0, Math.min(1, anglePos));
+    }
+
 
     // LUT servo system
     private void initDistances() {
+
         // Ok so the first num is the distance in meters and the second num is the position of the servo
         distanceToPos.put(0.8128, 0.0830);
         distanceToPos.put(0.9652, 0.75);
@@ -181,22 +188,29 @@ public class FeedBackShootSystem {
         distanceToPos.put(1.8796, 0.195);
         distanceToPos.put(1.6256, 0.106);
         distanceToPos.put(1.8288, 0.186);
-        distanceToPos.put(1.8769, 0.195);
         distanceToPos.put(2.9718, 0.15);
 
 
-        /// 35 in, 0.060
-        /// 48 in, 0.0830
-        /// 32 in, 0.0830
-        /// 40 in, 0.0820
-        /// 49 in, 0.15
-        /// 56 in, 0.15
+        angleMap.put(0.9144, 0.122);
+        angleMap.put(1.0922, 0.132);
+        angleMap.put(1.1938, 0.130);
+        angleMap.put(1.2954, 0.135);
+        //angleMap.put(1.4224, 0.150);
+        angleMap.put(1.5240, 0.150); // was 0.166
+        angleMap.put(1.6256, 0.237);
+        angleMap.put(2.0574, 0.248);
+        angleMap.put(3.0734, 0.188);
 
+        // 36 in, 0.122
+        // 43 in, 0.1320
+        // 47, 0.130
+        // 51, 0.1350
+        // 56, 0.1500
+        // 60, 0.1660
+        //64, 0.2370
+        // 81, 0.2480
+        //121, 0.1880
 
-        /// 64 in, 0.106
-        /// 72 in, 0.186
-        /// 74 in, 0.195
-        // 117 in,
     }
 
     // Here we get the distance using linear interpolation
@@ -232,8 +246,6 @@ public class FeedBackShootSystem {
 
         setShootPos(limeDist);
 
-        telemetry.addData("Cam Dist", limeDist);
-        telemetry.update();
     }
 
     public void UpdatePositions(LLResult pic){
@@ -264,13 +276,18 @@ public class FeedBackShootSystem {
         belt.setPower(speed);
     }
 
+    public void MoveBelt() {
+        belt.setPower(beltSpeed);
+    }
+
+
     public void stopBelt(){
         belt.setPower(0);
     }
 
     public void StopMotors(){
         flywheel.setPower(0);
-        RunBelt(0);
+        stopBelt();
         //angleAdjuster.setPosition(0.15);
     }
 

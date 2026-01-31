@@ -9,6 +9,7 @@ import static org.firstinspires.ftc.teamcode.subsystems.ShootSystem.openPos;
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.bylazar.configurables.annotations.Configurable;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
@@ -18,6 +19,7 @@ import com.qualcomm.robotcore.hardware.VoltageSensor;
 import org.firstinspires.ftc.teamcode.subsystems.FeedBackShootSystem;
 
 
+@Disabled
 @Configurable
 @TeleOp(name = "FlyWheelTuner")
 public class FlyWheelTuner extends OpMode {

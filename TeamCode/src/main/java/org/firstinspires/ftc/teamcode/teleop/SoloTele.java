@@ -103,7 +103,8 @@ public class SoloTele extends OpMode {
                 true // Robot Centric
         );
 
-        //shooter.adjustServoManual(gamepad1.dpad_up, gamepad1.dpad_down);
+        shooter.adjustServoManual(gamepad1.dpad_up, gamepad1.dpad_down);
+
 
 
         if (gamepad1.a) {
@@ -115,6 +116,11 @@ public class SoloTele extends OpMode {
         if(gamepad1.dpad_left){
             shooter.flywheel.setVelocity(-IDLE_VELO);
         }
+
+        if(shooter.shootVel >= 2000)
+            shooter.beltSpeed = 0.2;
+        else
+            shooter.beltSpeed = 0.8;
 
 //        the automatic shooting mode that SHOULD work but maybe not
 //        switch (currentShootState){
@@ -170,7 +176,7 @@ public class SoloTele extends OpMode {
         else if (gamepad1.b)
             shooter.RunBelt(-1);
         else
-            shooter.RunBelt(0);
+            shooter.stopBelt();
 
         if (gamepad1.y){
             shooter.feeder.setPosition(closePos);
