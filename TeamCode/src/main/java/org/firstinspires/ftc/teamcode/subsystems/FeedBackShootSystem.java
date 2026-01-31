@@ -21,7 +21,7 @@ public class FeedBackShootSystem {
 
 
     // Feedback constants and battery declaring
-    public static double kP = 0.004; // was 0.003
+    public static double kP = 0.005; // was 0.004
     public static double kS = 0.02;
     public static double kV = 0.00045;  //  was 0.00039
     private VoltageSensor battery;
