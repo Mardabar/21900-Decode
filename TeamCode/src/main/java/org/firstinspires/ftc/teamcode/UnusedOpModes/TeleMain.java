@@ -1,16 +1,17 @@
-package org.firstinspires.ftc.teamcode.teleop;
+package org.firstinspires.ftc.teamcode.UnusedOpModes;
 
 import static org.firstinspires.ftc.teamcode.subsystems.ShootSystem.openPos;
 import static org.firstinspires.ftc.teamcode.subsystems.ShootSystem.closePos;
 
-import com.qualcomm.hardware.limelightvision.LLResult;
 import com.qualcomm.hardware.limelightvision.LLResultTypes;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 
 import org.firstinspires.ftc.teamcode.subsystems.FeedBackShootSystem;
 
+@Disabled
 @TeleOp(name = "TeleMain")
 public class TeleMain extends LinearOpMode {
     private FeedBackShootSystem shooter;
