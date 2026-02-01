@@ -33,7 +33,7 @@ public class FarBlueAuto extends OpMode {
     private final Pose row1Line = new Pose(48, 84, Math.toRadians(180));
     private final Pose row1Grab = new Pose(18.5, 84, Math.toRadians(180));
     private final Pose row1Score = new Pose(39.5, 102, Math.toRadians(135));
-
+    private final Pose park = new Pose(58, 36, Math.toRadians(114));
 
 
     // Pedro vars
@@ -135,7 +135,7 @@ public class FarBlueAuto extends OpMode {
             // Bot does shooting here, need to add timer to check when the bot can move again
             case 5:
                 if(!fol.isBusy()){
-                    shootFar(6);
+                    shootFar(72);
                 } break;
 
             case 6:
@@ -174,6 +174,11 @@ public class FarBlueAuto extends OpMode {
             case 9:
                 if(!fol.isBusy()){
                     shootFar(10);
+                } break;
+
+            case 72:
+                if (!fol.isBusy()){
+                    fol.followPath(pathPark);
                 } break;
 
 
@@ -241,12 +246,12 @@ public class FarBlueAuto extends OpMode {
         pathRow3Score = fol.pathBuilder()
                 .addPath(new BezierLine(row3Grab, row3ScoreFar))
                 .setLinearHeadingInterpolation(row3Grab.getHeading(), row3ScoreFar.getHeading())
-                .build();
+                .build(); */
 
         pathPark = fol.pathBuilder()
-                .addPath(new BezierLine(row3ScoreFar, row3ParkFar))
-                .setLinearHeadingInterpolation(row3ScoreFar.getHeading(), row3ParkFar.getHeading())
-                .build();  */
+                .addPath(new BezierLine(row3Score, park))
+                .setLinearHeadingInterpolation(row3Score.getHeading(), park.getHeading())
+                .build();
 
 
 

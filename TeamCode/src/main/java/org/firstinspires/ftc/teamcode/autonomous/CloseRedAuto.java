@@ -23,23 +23,18 @@ public class CloseRedAuto extends OpMode{
     private final Pose startPose = new Pose(27, 131.8, Math.toRadians(143)).mirror();
     private final Pose preScorePose = new Pose(50, 115, Math.toRadians(146)).mirror();
     private final Pose row1Line = new Pose(48, 84, Math.toRadians(180)).mirror();
-    private final Pose row1Grab = new Pose(18.5, 84, Math.toRadians(180)).mirror();
+    private final Pose row1Grab = new Pose(18, 84, Math.toRadians(180)).mirror();
     private final Pose row1Score = new Pose(39.5, 102, Math.toRadians(135)).mirror();
-    private final Pose row2Line = new Pose(48, 60, Math.toRadians(180)).mirror();
-    private final Pose row2Grab = new Pose(7.5, 60, Math.toRadians(180)).mirror();
-    private final Pose row2Score = new Pose(52, 88.5, Math.toRadians(135)).mirror(); // was 52, 88.5, 135
+    private final Pose row2Line = new Pose(50, 60, Math.toRadians(180)).mirror();
+    private final Pose row2Grab = new Pose(11.5, 60, Math.toRadians(180)).mirror();
+    private final Pose row2Score = new Pose(50, 93, Math.toRadians(135)).mirror(); // was 52, 88.5, 135
     private final Pose row2ScoreCP = new Pose(53, 58).mirror();
     private final Pose row3Line = new Pose (50, 35.5, Math.toRadians(180)).mirror();
-    private final Pose row3Grab = new Pose (8.5, 35.5, Math.toRadians(180)).mirror();
-    private final Pose row3Score = new Pose(48, 107, Math.toRadians(138)).mirror(); // 63, 18, 114
+    private final Pose row3Grab = new Pose (11.5, 35.5, Math.toRadians(180)).mirror();
 
     /// Row 3 score and park close
-    private final Pose row3ScoreClose = new Pose (48, 107, Math.toRadians(138)).mirror();
+    private final Pose row3Score = new Pose (48, 107, Math.toRadians(138)).mirror();
     private final Pose row3ParkClose = new Pose (45, 72, Math.toRadians(138)).mirror();
-
-    /// Row 3 score and park far
-    private final Pose row3ScoreFar = new Pose (58, 13.5, Math.toRadians(124)).mirror();
-    private final Pose row3ParkFar = new Pose (55.5, 39, Math.toRadians(124)).mirror();
 
     // PEDRO VARS
     //private CloseBluePaths paths;
@@ -310,8 +305,8 @@ public class CloseRedAuto extends OpMode{
                 .build();
 
         pathPark = fol.pathBuilder()
-                .addPath(new BezierLine(row3ScoreClose, row3ParkClose))
-                .setLinearHeadingInterpolation(row3ScoreClose.getHeading(), row3ParkClose.getHeading())
+                .addPath(new BezierLine(row3Score, row3ParkClose))
+                .setLinearHeadingInterpolation(row3Score.getHeading(), row3ParkClose.getHeading())
                 .build();
 
         /*              Row 3 far score and shoot

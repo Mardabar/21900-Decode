@@ -25,11 +25,11 @@ public class CloseBlueAuto extends OpMode{
     private final Pose row1Grab = new Pose(17, 84, Math.toRadians(180));
     private final Pose row1Score = new Pose(39.5, 102, Math.toRadians(135));
     private final Pose row2Line = new Pose(50, 60, Math.toRadians(180));
-    private final Pose row2Grab = new Pose(11.5, 60, Math.toRadians(180));
+    private final Pose row2Grab = new Pose(8, 60, Math.toRadians(180));
     private final Pose row2Score = new Pose(50, 93, Math.toRadians(135)); // was 52, 88.5, 135
     private final Pose row2ScoreCP = new Pose(53, 58);
     private final Pose row3Line = new Pose (50, 35.5, Math.toRadians(180));
-    private final Pose row3Grab = new Pose (13, 35.5, Math.toRadians(180));
+    private final Pose row3Grab = new Pose (8, 35.5, Math.toRadians(180));
 
     /// Row 3 score and park close
     private final Pose row3Score = new Pose (48, 107, Math.toRadians(138));

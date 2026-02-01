@@ -243,7 +243,7 @@ public class FeedBackShootSystem {
         double limeDist = (0.646 / Math.tan(Math.toRadians(angle))) + 0.2;
 
         if (limeDist < 2.6)
-            beltSpeed = 0.7;
+            beltSpeed = 0.65;
         else
             beltSpeed = 0.3;
 
