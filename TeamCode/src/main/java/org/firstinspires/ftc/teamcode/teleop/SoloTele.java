@@ -1,27 +1,21 @@
 package org.firstinspires.ftc.teamcode.teleop;
 
 import static org.firstinspires.ftc.teamcode.subsystems.FeedBackShootSystem.IDLE_VELO;
-import static org.firstinspires.ftc.teamcode.subsystems.ShootSystem.closePos;
-import static org.firstinspires.ftc.teamcode.subsystems.ShootSystem.openPos;
+import static org.firstinspires.ftc.teamcode.subsystems.FeedBackShootSystem.closePos;
+import static org.firstinspires.ftc.teamcode.subsystems.FeedBackShootSystem.openPos;
 
 import com.bylazar.configurables.annotations.Configurable;
 import com.pedropathing.follower.Follower;
 import com.pedropathing.geometry.Pose;
-import com.qualcomm.hardware.limelightvision.LLResult;
 import com.qualcomm.hardware.limelightvision.LLResultTypes;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
-import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 import org.firstinspires.ftc.teamcode.subsystems.FeedBackShootSystem;
-import org.firstinspires.ftc.teamcode.subsystems.ShootSystem;
-
-import java.util.Set;
 
 
 ///  BLEUAFEHATGSWF why do we have so many teleop modeeasdssdsd

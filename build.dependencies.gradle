@@ -1,31 +1,29 @@
 repositories {
     mavenCentral()
-    google() // Needed for androidx
+    google()
     maven { url = 'https://maven.pedropathing.com' }
     maven { url = "https://mymaven.bylazar.com/releases" }
     maven { url = 'https://maven.brott.dev/'}
     maven { url = 'https://maven.rowanmcalpin.com/' }
-
+    maven { url = 'https://jitpack.io' }
 }
+
 dependencies {
+    // official ftc imports
+
     implementation 'org.firstinspires.ftc:Inspection:11.0.0'
-    implementation 'org.firstinspires.ftc:Blocks:11.0.0'
     implementation 'org.firstinspires.ftc:RobotServer:11.0.0'
-    implementation 'org.firstinspires.ftc:OnBotJava:11.0.0'
     implementation 'org.firstinspires.ftc:Hardware:11.0.0'
     implementation 'org.firstinspires.ftc:FtcCommon:11.0.0'
     implementation 'org.firstinspires.ftc:Vision:11.0.0'
 
+    // Pedro imp
     implementation 'com.pedropathing:ftc:2.0.5'
-    implementation 'com.pedropathing:telemetry:1.0.0'
-    implementation 'com.rowanmcalpin.nextftc:core:0.5.6-beta'
-    //implementation 'com.pedropathing:ftc:2.1.0-SNAPSHOT'
-    implementation 'com.pedropathing:telemetry:1.0.0'
-    implementation 'com.bylazar:fullpanels:1.0.12'
-    implementation 'com.rowanmcalpin.nextftc:ftc:0.5.6-beta'
+
+    // Dahsboard stuf
     implementation 'com.acmerobotics.dashboard:dashboard:0.4.16'
+    implementation 'com.bylazar:fullpanels:1.0.12'
 
-
+    // Android stuff
     implementation 'androidx.appcompat:appcompat:1.7.1'
-
 }

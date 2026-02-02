@@ -1,7 +1,5 @@
 package org.firstinspires.ftc.teamcode.autonomous;
 
-
-
 import com.pedropathing.follower.Follower;
 import com.pedropathing.geometry.BezierCurve;
 import com.pedropathing.geometry.BezierLine;
@@ -9,384 +7,256 @@ import com.pedropathing.geometry.Pose;
 import com.pedropathing.paths.PathChain;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
-
 import com.qualcomm.robotcore.util.ElapsedTime;
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 import org.firstinspires.ftc.teamcode.subsystems.FeedBackShootSystem;
 
-
-
 @Autonomous(name = "CloseRed")
-public class CloseRedAuto extends OpMode{
+public class CloseRedAuto extends OpMode {
 
-    /// PATHS
     private final Pose startPose = new Pose(27, 131.8, Math.toRadians(143)).mirror();
     private final Pose preScorePose = new Pose(50, 115, Math.toRadians(146)).mirror();
-    private final Pose row1Line = new Pose(48, 84, Math.toRadians(180)).mirror();
-    private final Pose row1Grab = new Pose(18, 84, Math.toRadians(180)).mirror();
-    private final Pose row1Score = new Pose(39.5, 102, Math.toRadians(135)).mirror();
-    private final Pose row2Line = new Pose(50, 60, Math.toRadians(180)).mirror();
-    private final Pose row2Grab = new Pose(11.5, 60, Math.toRadians(180)).mirror();
-    private final Pose row2Score = new Pose(50, 93, Math.toRadians(135)).mirror(); // was 52, 88.5, 135
-    private final Pose row2ScoreCP = new Pose(53, 58).mirror();
-    private final Pose row3Line = new Pose (50, 35.5, Math.toRadians(180)).mirror();
-    private final Pose row3Grab = new Pose (11.5, 35.5, Math.toRadians(180)).mirror();
+    private final Pose row1Line = new Pose(48, 84, Math.toRadians(180)).mirror(), row1Grab = new Pose(17, 84, Math.toRadians(180)).mirror(), row1Score = new Pose(39.5, 102, Math.toRadians(135)).mirror();
+    private final Pose row2Line = new Pose(50, 60, Math.toRadians(180)).mirror(), row2Grab = new Pose(8, 60, Math.toRadians(180)).mirror(), row2ScoreCP = new Pose(53, 58).mirror(), row2Score = new Pose(50, 93, Math.toRadians(135)).mirror();
+    private final Pose row3Line = new Pose(50, 35.5, Math.toRadians(180)).mirror(), row3Grab = new Pose(8, 35.5, Math.toRadians(180)).mirror(), row3Score = new Pose(48, 107, Math.toRadians(138)).mirror();
+    private final Pose row3ParkClose = new Pose(45, 72, Math.toRadians(138)).mirror();
 
-    /// Row 3 score and park close
-    private final Pose row3Score = new Pose (48, 107, Math.toRadians(138)).mirror();
-    private final Pose row3ParkClose = new Pose (45, 72, Math.toRadians(138)).mirror();
 
-    // PEDRO VARS
-    //private CloseBluePaths paths;
+
+
     private Follower fol;
-    private int pathState; // Current path #
-    private PathChain pathPreScore, pathRow1Line, pathRow1Grab, pathRow1Score, pathRow2Line, pathRow2Grab, pathRow2Score, pathRow3Line, pathRow3Grab,  pathRow3Score, pathPark;
+    private int pathState;
+    private PathChain pathPreScore, pathRow1Line, pathRow1Grab, pathRow1Score, pathRow2Line, pathRow2Grab, pathRow2Score, pathRow3Line, pathRow3Grab, pathRow3Score, pathPark;
 
-
-
-
-
-    // Subsystem
     private FeedBackShootSystem shooter;
-
-
-    // Time
     private ElapsedTime shootTimer, beltTimer;
 
     @Override
-    public void init(){
-
-
-        // Fol init
-
+    public void init() {
         shooter = new FeedBackShootSystem(hardwareMap, telemetry);
-
         fol = Constants.createFollower(hardwareMap);
         fol.setStartingPose(startPose);
-
-
-
-
-
-
-
-
         shootTimer = new ElapsedTime();
         beltTimer = new ElapsedTime();
-
-        // Pedro paths init
         buildPaths();
-        setPathState(0);
-
+        pathState = 0;
     }
 
-
-    public void loop(){
-
-        // Pedro runs paths
+    @Override
+    public void loop() {
         fol.update();
         autonomousPathUpdate();
     }
 
-
-
-    private void autonomousPathUpdate(){
-        switch (pathState){
-            // Bot moves from starting to prescore
+    private void autonomousPathUpdate() {
+        switch (pathState) {
             case 0:
                 if (!fol.isBusy()) {
                     fol.followPath(pathPreScore);
-                    setPathState(1);
+                    pathState = 1;
                 } break;
-            // Bot will do a check if its not moving here
+
             case 1:
-                if (!fol.isBusy()){
+                if (!fol.isBusy()) {
                     shootTimer.reset();
-                    setPathState(-1);
+                    pathState = 2;
                 } break;
-            // Bot will score here then move to next pathState
-            case -1:
-                shoot(2); // Bot moves onto next pathState
+
+            case 2:
+                Shoot(3, 0.8, 1900);
                 break;
 
-
-
-            // Bot lines to row 1
-            case 2:
-                if (!fol.isBusy()){
+            case 3:
+                if (!fol.isBusy()) {
                     fol.followPath(pathRow1Line);
-                    setPathState(3);
+                    pathState = 4;
                 } break;
 
-            // Bot moves and grabs row 1
-            case 3:
-                if (!fol.isBusy()){
-                    fol.setMaxPower(.6);
-                    shooter.RunBelt(.3);
+            case 4:
+                if (!fol.isBusy()) {
+                    fol.setMaxPower(0.65);
+                    shooter.RunBelt(0.3);
                     fol.followPath(pathRow1Grab);
                     beltTimer.reset();
-                    setPathState(4); // back to 4
+                    pathState = 5;
                 } break;
 
-            // Bot goes to score pos
-            case 4:
-
-                while (beltTimer.milliseconds() > 3000) {
-                    shooter.RunBelt(0.5);
-                }
-
-                if(!fol.isBusy()){
-                    fol.setMaxPower(1);
-                    fol.followPath(pathRow1Score);
-                    shooter.stopBelt();
-                    //stopBelt();
-                    setPathState(-5);
-                } break;
-
-            case -5:
-                if(!fol.isBusy()){
-                    shootTimer.reset();
-                    setPathState(5);
-                } break;
-
-            // Bot does shooting here
             case 5:
-                shoot(6);
+                if (beltTimer.milliseconds() >= 3000 && !fol.isBusy()) {
+                    fol.setMaxPower(1.0);
+                    shooter.stopBelt();
+                    fol.followPath(pathRow1Score);
+                    pathState = 6;
+                } break;
+
+            case 6:
+                if (!fol.isBusy()) {
+                    shootTimer.reset();
+                    pathState = 7;
+                } break;
+
+            case 7:
+                Shoot(8, 0.8, 1900);
                 break;
 
-            // Bot will go to line with row 2
-            case 6:
-                if(!fol.isBusy()){
-                    fol.followPath(pathRow2Line);
-                    setPathState(7);
-                } break;
-
-            // Bot grabs the balls in row 2
-            case 7:
-                if(!fol.isBusy()){
-                    fol.setMaxPower(.6);
-                    fol.followPath(pathRow2Grab);
-                    shooter.RunBelt(.3);
-                    setPathState(8);
-                } break;
-
-            // Bot goes to scoring pos
             case 8:
-                if(!fol.isBusy()){
-                    //stop belt
-                    fol.setMaxPower(1);
-                    shooter.stopBelt();
-                    fol.followPath(pathRow2Score);
-                    setPathState(-8);
-                } break;
-
-            // Bot does shooting here, need to add timer to check when the bot can move again
-            case -8:
-                if(!fol.isBusy()){
-                    shootTimer.reset();
-                    setPathState(9);
+                if (!fol.isBusy()) {
+                    fol.followPath(pathRow2Line);
+                    pathState = 9;
                 } break;
 
             case 9:
-                shoot(10);
-                break;
-
+                if (!fol.isBusy()) {
+                    fol.setMaxPower(0.65);
+                    shooter.RunBelt(0.3);
+                    fol.followPath(pathRow2Grab);
+                    pathState = 10;
+                } break;
 
             case 10:
-                if (!fol.isBusy()){
-                    fol.followPath(pathRow3Line);
-                    setPathState(11);
-                }
-                // Bot grabs the balls in row 3
-            case 11:
-                if(!fol.isBusy()){
-                    fol.followPath(pathRow3Grab);
-                    fol.setMaxPower(.6);
-                    shooter.RunBelt(.3);
-                    beltTimer.reset();
-                    setPathState(12);
-                } break;
-
-
-            // Bot goes to scoring pos
-            case 12:
-                if(!fol.isBusy()){
-                    fol.setMaxPower(1);
+                if (!fol.isBusy()) {
+                    fol.setMaxPower(1.0);
                     shooter.stopBelt();
-                    //stopBelt();
-                    fol.followPath(pathRow3Score);
-                    setPathState(-12);
+                    fol.followPath(pathRow2Score);
+                    pathState = 11;
                 } break;
 
-            // Bot checks for it to stop moving
-            case -12:
-                if(!fol.isBusy()){
+            case 11:
+                if (!fol.isBusy()) {
                     shootTimer.reset();
-                    setPathState(13);
+                    pathState = 12;
                 } break;
 
-            // Bot does shooting here, need to add timer to check when the bot can move again
+            case 12:
+                Shoot(13, 0.8, 1900);
+                break;
+
             case 13:
-                if(!fol.isBusy()){
-                    shoot(14);
+                if (!fol.isBusy()) {
+                    fol.followPath(pathRow3Line);
+                    pathState = 14;
                 } break;
 
-            // Bot goes to park
             case 14:
-                if(!fol.isBusy()){
-                    fol.followPath(pathPark);
-                    setPathState(15);
+                if (!fol.isBusy()) {
+                    fol.setMaxPower(0.65);
+                    shooter.RunBelt(0.3);
+                    fol.followPath(pathRow3Grab);
+                    pathState = 15;
                 } break;
 
+            case 15:
+                if (!fol.isBusy()) {
+                    fol.setMaxPower(1.0);
+                    shooter.stopBelt();
+                    fol.followPath(pathRow3Score);
+                    pathState = 16;
+                } break;
 
+            case 16:
+                if (!fol.isBusy()) {
+                    shootTimer.reset();
+                    pathState = 17;
+                } break;
+
+            case 17:
+                Shoot(18, 0.8, 1900);
+                break;
+
+            case 18:
+                if (!fol.isBusy()) {
+                    fol.followPath(pathPark);
+                    pathState = 19;
+                } break;
+
+            case 19:
+                break;
         }
-
     }
 
+    private void Shoot(int nextState, double beltPower, double duration) {
+        shooter.Shoot();
 
-    /// PEDRO FUNCTIONS
-    private void setPathState(int num){
-        pathState = num;
+        if (shootTimer.milliseconds() > 900)
+            shooter.feeder.setPosition(FeedBackShootSystem.closePos);
+        else
+            shooter.feeder.setPosition(FeedBackShootSystem.openPos);
+
+        if (shootTimer.milliseconds() > 500 && (Math.abs(shooter.shootVel - shooter.flywheel.getVelocity()) < 50 || shootTimer.milliseconds() > 700))
+            shooter.RunBelt(beltPower);
+
+        if (shootTimer.milliseconds() > duration) {
+            shooter.StopMotors();
+            shooter.feeder.setPosition(FeedBackShootSystem.openPos);
+            pathState = nextState;
+        }
     }
 
+    private void buildPaths() {
 
-
-
-    private void buildPaths(){
         pathPreScore = fol.pathBuilder()
                 .addPath(new BezierLine(startPose, preScorePose))
                 .setLinearHeadingInterpolation(startPose.getHeading(), preScorePose.getHeading())
                 .build();
+
 
         pathRow1Line = fol.pathBuilder()
                 .addPath(new BezierLine(preScorePose, row1Line))
                 .setLinearHeadingInterpolation(preScorePose.getHeading(), row1Line.getHeading())
                 .build();
 
+
         pathRow1Grab = fol.pathBuilder()
                 .addPath(new BezierLine(row1Line, row1Grab))
                 .setLinearHeadingInterpolation(row1Line.getHeading(), row1Grab.getHeading())
                 .build();
+
 
         pathRow1Score = fol.pathBuilder()
                 .addPath(new BezierLine(row1Grab, row1Score))
                 .setLinearHeadingInterpolation(row1Grab.getHeading(), row1Score.getHeading())
                 .build();
 
+
         pathRow2Line = fol.pathBuilder()
                 .addPath(new BezierLine(row1Score, row2Line))
                 .setLinearHeadingInterpolation(row1Score.getHeading(), row2Line.getHeading())
                 .build();
+
 
         pathRow2Grab = fol.pathBuilder()
                 .addPath(new BezierLine(row2Line, row2Grab))
                 .setLinearHeadingInterpolation(row2Line.getHeading(), row2Grab.getHeading())
                 .build();
 
+
         pathRow2Score = fol.pathBuilder()
                 .addPath(new BezierCurve(row2Grab, row2ScoreCP, row2Score))
                 .setLinearHeadingInterpolation(row2Grab.getHeading(), row2Score.getHeading())
                 .build();
+
 
         pathRow3Line = fol.pathBuilder()
                 .addPath(new BezierLine(row2Score, row3Line))
                 .setLinearHeadingInterpolation(row2Score.getHeading(), row3Line.getHeading())
                 .build();
 
+
         pathRow3Grab = fol.pathBuilder()
                 .addPath(new BezierLine(row3Line, row3Grab))
                 .setLinearHeadingInterpolation(row3Line.getHeading(), row3Grab.getHeading())
                 .build();
 
-        //              Row 3 close score and shoot
+
         pathRow3Score = fol.pathBuilder()
                 .addPath(new BezierLine(row3Grab, row3Score))
                 .setLinearHeadingInterpolation(row3Grab.getHeading(), row3Score.getHeading())
                 .build();
 
+
         pathPark = fol.pathBuilder()
                 .addPath(new BezierLine(row3Score, row3ParkClose))
                 .setLinearHeadingInterpolation(row3Score.getHeading(), row3ParkClose.getHeading())
                 .build();
-
-        /*              Row 3 far score and shoot
-        pathRow3Score = fol.pathBuilder()
-                .addPath(new BezierLine(row3Grab, row3ScoreFar))
-                .setLinearHeadingInterpolation(row3Grab.getHeading(), row3ScoreFar.getHeading())
-                .build();
-
-        pathPark = fol.pathBuilder()
-                .addPath(new BezierLine(row3ScoreFar, row3ParkFar))
-                .setLinearHeadingInterpolation(row3ScoreFar.getHeading(), row3ParkFar.getHeading())
-                .build();  */
-
-
-
     }
-
-
-    // call this method at a
-    private void shoot(int nextState) {
-        // updates and sets motors to power
-        shooter.Shoot();
-
-        if (shootTimer.milliseconds() > 900) {
-            shooter.feeder.setPosition(FeedBackShootSystem.closePos);
-        } else {
-            shooter.feeder.setPosition(FeedBackShootSystem.openPos);
-        }
-
-        // lets the flywheel spin up for a bit might need to make bigger
-        if (shootTimer.milliseconds() < 500) {
-            shooter.stopBelt();
-        }
-
-        // after that checks if the flywheel is at the velocity or if we have spun for over 3 seconds
-        else if (Math.abs(shooter.shootVel - shooter.flywheel.getVelocity()) < 50 || shootTimer.milliseconds() > 700) {
-            shooter.RunBelt(0.8);
-
-        }
-
-        // After 4 seconds stop everything and move to the next path state incase sum gets messed up
-        if (shootTimer.milliseconds() > 1900) {
-            shooter.StopMotors();
-            shooter.feeder.setPosition(FeedBackShootSystem.openPos);
-            setPathState(nextState);
-        }
-    }
-
-    private void shootFar(int nextState) {
-        // updates and sets motors to power
-        shooter.Shoot();
-
-        if (shootTimer.milliseconds() > 900) {
-            shooter.feeder.setPosition(FeedBackShootSystem.closePos);
-        } else {
-            shooter.feeder.setPosition(FeedBackShootSystem.openPos);
-        }
-
-        // lets the flywheel spin up for a bit might need to make bigger
-        if (shootTimer.milliseconds() < 500) {
-            shooter.stopBelt();
-        }
-
-        // after that checks if the flywheel is at the velocity or if we have spun for over 3 seconds
-        else if (Math.abs(shooter.shootVel - shooter.flywheel.getVelocity()) < 500 || shootTimer.milliseconds() > 700) {
-            shooter.RunBelt(0.2);
-
-        }
-
-        // After 4 seconds stop everything and move to the next path state incase sum gets messed up
-        if (shootTimer.milliseconds() > 1900) {
-            shooter.StopMotors();
-            shooter.feeder.setPosition(FeedBackShootSystem.openPos);
-            setPathState(nextState);
-        }
-    }
-
-
-
-
-
 }
-

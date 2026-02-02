@@ -11,15 +11,15 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 import org.firstinspires.ftc.teamcode.subsystems.FeedBackShootSystem;
 
-@Autonomous(name = "FarBlue")
-public class FarBlueAuto extends OpMode {
+@Autonomous(name = "FarRed")
+public class FarRedAuto extends OpMode {
 
-    private final Pose startPose = new Pose(27, 131.8, Math.toRadians(143));
-    private final Pose preScorePose = new Pose(50, 115, Math.toRadians(146));
-    private final Pose row1Line = new Pose(48, 84, Math.toRadians(180)), row1Grab = new Pose(17, 84, Math.toRadians(180)), row1Score = new Pose(39.5, 102, Math.toRadians(135));
-    private final Pose row2Line = new Pose(50, 60, Math.toRadians(180)), row2Grab = new Pose(8, 60, Math.toRadians(180)), row2ScoreCP = new Pose(53, 58), row2Score = new Pose(50, 93, Math.toRadians(135));
-    private final Pose row3Line = new Pose(50, 35.5, Math.toRadians(180)), row3Grab = new Pose(8, 35.5, Math.toRadians(180)), row3Score = new Pose(48, 107, Math.toRadians(138));
-    private final Pose park = new Pose(45, 72, Math.toRadians(138));
+    private final Pose startPose = new Pose(27, 131.8, Math.toRadians(143)).mirror();
+    private final Pose preScorePose = new Pose(50, 115, Math.toRadians(146)).mirror();
+    private final Pose row1Line = new Pose(48, 84, Math.toRadians(180)).mirror(), row1Grab = new Pose(17, 84, Math.toRadians(180)).mirror(), row1Score = new Pose(39.5, 102, Math.toRadians(135)).mirror();
+    private final Pose row2Line = new Pose(50, 60, Math.toRadians(180)).mirror(), row2Grab = new Pose(8, 60, Math.toRadians(180)).mirror(), row2ScoreCP = new Pose(53, 58).mirror(), row2Score = new Pose(50, 93, Math.toRadians(135)).mirror();
+    private final Pose row3Line = new Pose(50, 35.5, Math.toRadians(180)).mirror(), row3Grab = new Pose(8, 35.5, Math.toRadians(180)).mirror(), row3Score = new Pose(48, 107, Math.toRadians(138)).mirror();
+    private final Pose park = new Pose(45, 72, Math.toRadians(138)).mirror();
 
     private Follower fol;
     private int pathState;
