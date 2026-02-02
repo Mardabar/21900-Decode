@@ -26,14 +26,13 @@ public class FarBlueAuto extends OpMode {
     private PathChain pathPreScore, pathRow3Line, pathRow3Grab, pathRow3Score, pathRow2Line, pathRow2Grab, pathRow2Score, pathRow1Line, pathRow1Grab, pathRow1Score, pathPark;
 
     private FeedBackShootSystem shooter;
-    private ElapsedTime shootTimer, beltTimer;
+    private final ElapsedTime shootTimer = new ElapsedTime(), beltTimer = new ElapsedTime();
 
     @Override
     public void init() {
         shooter = new FeedBackShootSystem(hardwareMap, telemetry);
         fol = Constants.createFollower(hardwareMap);
         fol.setStartingPose(startPose);
-        shootTimer = new ElapsedTime();
         buildPaths();
         pathState = 0;
     }

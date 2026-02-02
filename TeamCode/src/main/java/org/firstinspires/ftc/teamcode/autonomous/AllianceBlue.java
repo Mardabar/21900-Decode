@@ -49,7 +49,7 @@ public class AllianceBlue extends OpMode {
     private FeedBackShootSystem shooter;
 
     // Timeers
-    private ElapsedTime shootTimer, beltTimer;
+    private ElapsedTime shootTimer = new ElapsedTime(), beltTimer = new ElapsedTime();
 
 
     @Override
@@ -60,8 +60,7 @@ public class AllianceBlue extends OpMode {
 
         fol = Constants.createFollower(hardwareMap);
         fol.setStartingPose(startPose);
-        shootTimer = new ElapsedTime();
-        beltTimer = new ElapsedTime();
+
 
         // Pedro paths init
         buildPaths();

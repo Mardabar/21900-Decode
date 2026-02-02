@@ -17,12 +17,10 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 
 public class FeedBackShootSystem {
 
-    // --- GAINS & CONSTANTS ---
     public static double kP = 0.007, kS = 0.02, kV = 0.00045;
     public static final double openPos = .35, closePos = 0, IDLE_VELO = 300;
     private static final double MAX_HEIGHT = 1.4;
 
-    // --- HARDWARE ---
     private final VoltageSensor battery;
     private final Follower fol;
     public final Limelight3A cam;
@@ -30,12 +28,11 @@ public class FeedBackShootSystem {
     public final DcMotorEx belt, flywheel;
     private final Telemetry telemetry;
 
-    // --- STATE ---
     private final TreeMap<Double, Double> angleMap = new TreeMap<>();
     public double anglePos = 0.5, shootVel, beltSpeed = 1, manualServoPos = 0.15;
 
     public FeedBackShootSystem(HardwareMap hardwareMap, Telemetry telemetry) {
-        // Use the static follower from Tuning to prevent duplicate threads
+
         this.fol = follower;
         this.telemetry = telemetry;
 
@@ -46,7 +43,7 @@ public class FeedBackShootSystem {
         battery = hardwareMap.voltageSensor.iterator().next();
         cam = hardwareMap.get(Limelight3A.class, "limelight");
 
-        // Motor Setup
+        // Motor init
         flywheel.setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
         flywheel.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         flywheel.setDirection(DcMotorEx.Direction.REVERSE);

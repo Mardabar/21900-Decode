@@ -23,8 +23,8 @@ public class TeleV2 extends OpMode {
     FeedBackShootSystem shooter;
 
     private enum ShootState { IDLE, SPIN_UP, FIRING }
-    private ShootState currentShootState = ShootState.IDLE;
-    private ElapsedTime shootStateTimer = new ElapsedTime();
+    private final ShootState currentShootState = ShootState.IDLE;
+    private final ElapsedTime shootStateTimer = new ElapsedTime();
 
     private Follower fol;
     private final Pose startingPose = new Pose(72, 72, Math.toRadians(0));
