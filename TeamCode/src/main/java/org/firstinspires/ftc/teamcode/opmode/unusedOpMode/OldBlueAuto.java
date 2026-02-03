@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.opmode.auto;
+package org.firstinspires.ftc.teamcode.opmode.unusedOpMode;
 
 import com.pedropathing.follower.Follower;
 import com.pedropathing.geometry.BezierCurve;
@@ -12,7 +12,7 @@ import org.firstinspires.ftc.teamcode.config.pedroPathing.Constants;
 import org.firstinspires.ftc.teamcode.config.subsystems.FeedBackShootSystem;
 
 @Autonomous(name = "FarBlue")
-public class FarBlueAuto extends OpMode {
+public class OldBlueAuto extends OpMode {
 
     private final Pose startPose = new Pose(27, 131.8, Math.toRadians(143));
     private final Pose preScorePose = new Pose(50, 115, Math.toRadians(146));

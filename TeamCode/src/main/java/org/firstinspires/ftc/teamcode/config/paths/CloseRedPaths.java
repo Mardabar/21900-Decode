@@ -12,24 +12,12 @@ public class CloseRedPaths {
     /// BOT LENGTH 15.75
 
     /// START POSE
-    public static final Pose startPose = new Pose(27.3, 132.7, Math.toRadians(143)).mirror();
-    final Pose preScorePose = new Pose(50, 115, Math.toRadians(143)).mirror();
-    final Pose row1Line = new Pose(48, 84, Math.toRadians(180)).mirror();
-    final Pose row1Grab = new Pose(23, 84, Math.toRadians(180)).mirror();
-    final Pose row1Score = new Pose(39.5, 102, Math.toRadians(135)).mirror();
-    final Pose row2Line = new Pose(48, 59.5, Math.toRadians(180)).mirror();
-    final Pose row2Grab = new Pose(23, 59.5, Math.toRadians(180)).mirror();
-    final Pose row2Score = new Pose(52, 88.5, Math.toRadians(135)).mirror();
-    final Pose row3Line = new Pose (48, 35.5, Math.toRadians(180)).mirror();
-    final Pose row3Grab = new Pose (20, 35.5, Math.toRadians(180)).mirror();
-
-    /// Row 3 score and park close
-    final Pose row3ScoreClose = new Pose (57.5, 84.3, Math.toRadians(134)).mirror();
-    final Pose row3ParkClose = new Pose (55, 63, Math.toRadians(134)).mirror();
-
-    /// Row 3 score and park far
-    final Pose row3ScoreFar = new Pose (58, 13.5, Math.toRadians(124)).mirror();
-    final Pose row3ParkFar = new Pose (55.5, 39, Math.toRadians(124)).mirror();
+    final Pose startPose = new Pose(27, 131.8, Math.toRadians(143)).mirror();
+    final Pose preScorePose = new Pose(50, 115, Math.toRadians(146)).mirror();
+    final Pose row1Line = new Pose(48, 84, Math.toRadians(180)).mirror(), row1Grab = new Pose(17, 84, Math.toRadians(180)).mirror(), row1Score = new Pose(39.5, 102, Math.toRadians(135)).mirror();
+    final Pose row2Line = new Pose(50, 60, Math.toRadians(180)).mirror(), row2Grab = new Pose(8, 60, Math.toRadians(180)).mirror(), row2ScoreCP = new Pose(53, 58).mirror(), row2Score = new Pose(50, 93, Math.toRadians(135)).mirror();
+    final Pose row3Line = new Pose(50, 35.5, Math.toRadians(180)).mirror(), row3Grab = new Pose(8, 35.5, Math.toRadians(180)).mirror(), row3Score = new Pose(48, 107, Math.toRadians(138)).mirror();
+    final Pose row3ParkClose = new Pose(45, 72, Math.toRadians(138)).mirror();
 
 
     public PathChain pathPreScore, pathRow1Line, pathRow1Grab, pathRow1Score, pathRow2Line, pathRow2Grab, pathRow2Score, pathRow3Line, pathRow3Grab,  pathRow3Score, pathPark;
@@ -87,15 +75,15 @@ public class CloseRedPaths {
                 .setLinearHeadingInterpolation(row3Line.getHeading(), row3Grab.getHeading())
                 .build();
 
-        //              Row 3 close score and shoot
+
         pathRow3Score = fol.pathBuilder()
-                .addPath(new BezierLine(row3Grab, row3ScoreClose))
-                .setLinearHeadingInterpolation(row3Grab.getHeading(), row3ScoreClose.getHeading())
+                .addPath(new BezierLine(row3Grab, row3Score))
+                .setLinearHeadingInterpolation(row3Grab.getHeading(), row3Score.getHeading())
                 .build();
 
         pathPark = fol.pathBuilder()
-                .addPath(new BezierLine(row3ScoreClose, row3ParkClose))
-                .setLinearHeadingInterpolation(row3ScoreClose.getHeading(), row3ParkClose.getHeading())
+                .addPath(new BezierLine(row3Score, row3ParkClose))
+                .setLinearHeadingInterpolation(row3Score.getHeading(), row3ParkClose.getHeading())
                 .build();
 
         /*              Row 3 far score and shoot
@@ -114,19 +102,3 @@ public class CloseRedPaths {
 
 
 }
-
-
-/// Here for posibile code simplifying with multiple paths in one chain
-
-//        public PathChain pathPreScore, pathRow1, pathRow1Score, pathRow2Line, pathRow2Grab, pathRow2Score, pathRow3Line, pathRow3Grab;
-//    pathRow1 = fol.pathBuilder()
-//                    .addPath(new BezierLine(preScorePose, row1Line))
-//            .setLinearHeadingInterpolation(preScorePose.getHeading(), row1Line.getHeading())
-//            .addPath(new BezierLine(row1Line, row1Grab))
-//            .setLinearHeadingInterpolation(row1Line.getHeading(), row1Grab.getHeading())
-//            .build();
-//
-//    pathRow1Score = fol.pathBuilder()
-//                    .addPath(new BezierLine(row1Grab, row1Score))
-//            .setLinearHeadingInterpolation(row1Grab.getHeading(), row1Score.getHeading())
-//            .build();

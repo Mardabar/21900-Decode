@@ -31,11 +31,19 @@ dependencies {
 
     // FTC Dashboard
     implementation 'com.acmerobotics.dashboard:dashboard:0.4.16'
+    implementation 'com.bylazar:fullpanels:1.0.12'
 
 
     // Pedro impls
     implementation 'com.github.pedropathing:pedro-pathing:v0.1.1'
     implementation 'com.pedropathing:ftc:2.0.6'
     implementation 'com.pedropathing:telemetry:1.0.0'
-    implementation 'com.bylazar:fullpanels:1.0.12'
+    implementation 'com.pedropathing:ivy:1.0.0'
+
+    // next ftc
+    implementation 'dev.nextftc:ftc:1.0.1'
+    implementation 'dev.nextftc:hardware:1.0.1'
+    implementation("dev.nextftc.extensions:pedro:1.0.0")
+
+
 }

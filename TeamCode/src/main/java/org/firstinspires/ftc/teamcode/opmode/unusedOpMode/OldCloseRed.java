@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.opmode.auto;
+package org.firstinspires.ftc.teamcode.opmode.unusedOpMode;
 
 import com.pedropathing.follower.Follower;
 import com.pedropathing.geometry.BezierCurve;
@@ -11,19 +11,22 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import org.firstinspires.ftc.teamcode.config.pedroPathing.Constants;
 import org.firstinspires.ftc.teamcode.config.subsystems.FeedBackShootSystem;
 
-@Autonomous(name = "FarRed")
-public class FarRedAuto extends OpMode {
+@Autonomous(name = "CloseRed")
+public class OldCloseRed extends OpMode {
 
     private final Pose startPose = new Pose(27, 131.8, Math.toRadians(143)).mirror();
     private final Pose preScorePose = new Pose(50, 115, Math.toRadians(146)).mirror();
     private final Pose row1Line = new Pose(48, 84, Math.toRadians(180)).mirror(), row1Grab = new Pose(17, 84, Math.toRadians(180)).mirror(), row1Score = new Pose(39.5, 102, Math.toRadians(135)).mirror();
     private final Pose row2Line = new Pose(50, 60, Math.toRadians(180)).mirror(), row2Grab = new Pose(8, 60, Math.toRadians(180)).mirror(), row2ScoreCP = new Pose(53, 58).mirror(), row2Score = new Pose(50, 93, Math.toRadians(135)).mirror();
     private final Pose row3Line = new Pose(50, 35.5, Math.toRadians(180)).mirror(), row3Grab = new Pose(8, 35.5, Math.toRadians(180)).mirror(), row3Score = new Pose(48, 107, Math.toRadians(138)).mirror();
-    private final Pose park = new Pose(45, 72, Math.toRadians(138)).mirror();
+    private final Pose row3ParkClose = new Pose(45, 72, Math.toRadians(138)).mirror();
+
+
+
 
     private Follower fol;
-    private int pathState;
-    private PathChain pathPreScore, pathRow3Line, pathRow3Grab, pathRow3Score, pathRow2Line, pathRow2Grab, pathRow2Score, pathRow1Line, pathRow1Grab, pathRow1Score, pathPark;
+    private int pathState = 0;
+    private PathChain pathPreScore, pathRow1Line, pathRow1Grab, pathRow1Score, pathRow2Line, pathRow2Grab, pathRow2Score, pathRow3Line, pathRow3Grab, pathRow3Score, pathPark;
 
     private FeedBackShootSystem shooter;
     private final ElapsedTime shootTimer = new ElapsedTime(), beltTimer = new ElapsedTime();
@@ -34,7 +37,6 @@ public class FarRedAuto extends OpMode {
         fol = Constants.createFollower(hardwareMap);
         fol.setStartingPose(startPose);
         buildPaths();
-        pathState = 0;
     }
 
     @Override
@@ -44,7 +46,7 @@ public class FarRedAuto extends OpMode {
     }
 
     private void autonomousPathUpdate() {
-        switch(pathState) {
+        switch (pathState) {
             case 0:
                 if (!fol.isBusy()) {
                     fol.followPath(pathPreScore);
@@ -52,64 +54,64 @@ public class FarRedAuto extends OpMode {
                 } break;
 
             case 1:
-                if (!fol.isBusy()){
+                if (!fol.isBusy()) {
                     shootTimer.reset();
                     pathState = 2;
                 } break;
 
             case 2:
-                Shoot(3, 0.35, 3000);
+                Shoot(3, 0.8, 1900);
                 break;
 
             case 3:
-                if (!fol.isBusy()){
-                    fol.followPath(pathRow3Line);
+                if (!fol.isBusy()) {
+                    fol.followPath(pathRow1Line);
                     pathState = 4;
                 } break;
 
             case 4:
-                if (!fol.isBusy()){
-                    fol.setMaxPower(0.6);
-                    shooter.RunBelt(0.35);
-                    fol.followPath(pathRow3Grab);
+                if (!fol.isBusy()) {
+                    fol.setMaxPower(0.65);
+                    shooter.RunBelt(0.3);
+                    fol.followPath(pathRow1Grab);
                     beltTimer.reset();
                     pathState = 5;
                 } break;
 
             case 5:
-                if (!fol.isBusy()){
+                if (beltTimer.milliseconds() >= 3000 && !fol.isBusy()) {
                     fol.setMaxPower(1.0);
                     shooter.stopBelt();
-                    fol.followPath(pathRow3Score);
+                    fol.followPath(pathRow1Score);
                     pathState = 6;
                 } break;
 
             case 6:
-                if (!fol.isBusy()){
+                if (!fol.isBusy()) {
                     shootTimer.reset();
                     pathState = 7;
                 } break;
 
             case 7:
-                Shoot(8, 0.35, 3000);
+                Shoot(8, 0.8, 1900);
                 break;
 
             case 8:
-                if (!fol.isBusy()){
+                if (!fol.isBusy()) {
                     fol.followPath(pathRow2Line);
                     pathState = 9;
                 } break;
 
             case 9:
-                if (!fol.isBusy()){
-                    fol.setMaxPower(0.6);
-                    shooter.RunBelt(0.35);
+                if (!fol.isBusy()) {
+                    fol.setMaxPower(0.65);
+                    shooter.RunBelt(0.3);
                     fol.followPath(pathRow2Grab);
                     pathState = 10;
                 } break;
 
             case 10:
-                if (!fol.isBusy()){
+                if (!fol.isBusy()) {
                     fol.setMaxPower(1.0);
                     shooter.stopBelt();
                     fol.followPath(pathRow2Score);
@@ -117,22 +119,54 @@ public class FarRedAuto extends OpMode {
                 } break;
 
             case 11:
-                if (!fol.isBusy()){
+                if (!fol.isBusy()) {
                     shootTimer.reset();
                     pathState = 12;
                 } break;
 
             case 12:
-                Shoot(13, 0.35, 3000);
+                Shoot(13, 0.8, 1900);
                 break;
 
             case 13:
-                if (!fol.isBusy()){
-                    fol.followPath(pathPark);
+                if (!fol.isBusy()) {
+                    fol.followPath(pathRow3Line);
                     pathState = 14;
                 } break;
 
             case 14:
+                if (!fol.isBusy()) {
+                    fol.setMaxPower(0.65);
+                    shooter.RunBelt(0.3);
+                    fol.followPath(pathRow3Grab);
+                    pathState = 15;
+                } break;
+
+            case 15:
+                if (!fol.isBusy()) {
+                    fol.setMaxPower(1.0);
+                    shooter.stopBelt();
+                    fol.followPath(pathRow3Score);
+                    pathState = 16;
+                } break;
+
+            case 16:
+                if (!fol.isBusy()) {
+                    shootTimer.reset();
+                    pathState = 17;
+                } break;
+
+            case 17:
+                Shoot(18, 0.8, 1900);
+                break;
+
+            case 18:
+                if (!fol.isBusy()) {
+                    fol.followPath(pathPark);
+                    pathState = 19;
+                } break;
+
+            case 19:
                 break;
         }
     }
@@ -162,53 +196,64 @@ public class FarRedAuto extends OpMode {
                 .setLinearHeadingInterpolation(startPose.getHeading(), preScorePose.getHeading())
                 .build();
 
+
         pathRow1Line = fol.pathBuilder()
                 .addPath(new BezierLine(preScorePose, row1Line))
                 .setLinearHeadingInterpolation(preScorePose.getHeading(), row1Line.getHeading())
                 .build();
+
 
         pathRow1Grab = fol.pathBuilder()
                 .addPath(new BezierLine(row1Line, row1Grab))
                 .setLinearHeadingInterpolation(row1Line.getHeading(), row1Grab.getHeading())
                 .build();
 
+
         pathRow1Score = fol.pathBuilder()
                 .addPath(new BezierLine(row1Grab, row1Score))
                 .setLinearHeadingInterpolation(row1Grab.getHeading(), row1Score.getHeading())
                 .build();
+
 
         pathRow2Line = fol.pathBuilder()
                 .addPath(new BezierLine(row1Score, row2Line))
                 .setLinearHeadingInterpolation(row1Score.getHeading(), row2Line.getHeading())
                 .build();
 
+
         pathRow2Grab = fol.pathBuilder()
                 .addPath(new BezierLine(row2Line, row2Grab))
                 .setLinearHeadingInterpolation(row2Line.getHeading(), row2Grab.getHeading())
                 .build();
 
+
         pathRow2Score = fol.pathBuilder()
-                .addPath(new BezierCurve(row2Grab, row2ScoreCP, row2Score)) .setLinearHeadingInterpolation(row2Grab.getHeading(), row2Score.getHeading())
+                .addPath(new BezierCurve(row2Grab, row2ScoreCP, row2Score))
+                .setLinearHeadingInterpolation(row2Grab.getHeading(), row2Score.getHeading())
                 .build();
+
 
         pathRow3Line = fol.pathBuilder()
                 .addPath(new BezierLine(row2Score, row3Line))
                 .setLinearHeadingInterpolation(row2Score.getHeading(), row3Line.getHeading())
                 .build();
 
+
         pathRow3Grab = fol.pathBuilder()
                 .addPath(new BezierLine(row3Line, row3Grab))
                 .setLinearHeadingInterpolation(row3Line.getHeading(), row3Grab.getHeading())
                 .build();
+
 
         pathRow3Score = fol.pathBuilder()
                 .addPath(new BezierLine(row3Grab, row3Score))
                 .setLinearHeadingInterpolation(row3Grab.getHeading(), row3Score.getHeading())
                 .build();
 
+
         pathPark = fol.pathBuilder()
-                .addPath(new BezierLine(row3Score, park))
-                .setLinearHeadingInterpolation(row3Score.getHeading(), park.getHeading())
+                .addPath(new BezierLine(row3Score, row3ParkClose))
+                .setLinearHeadingInterpolation(row3Score.getHeading(), row3ParkClose.getHeading())
                 .build();
     }
 }

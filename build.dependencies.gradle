@@ -18,7 +18,9 @@ dependencies {
     implementation 'org.firstinspires.ftc:Vision:11.0.0'
 
     // Pedro imp
-    implementation 'com.pedropathing:ftc:2.0.5'
+    implementation 'com.pedropathing:ftc:2.0.6'
+    implementation 'com.pedropathing:ivy:1.0.0'
+
 
     // Dahsboard stuf
     implementation 'com.acmerobotics.dashboard:dashboard:0.4.16'
@@ -26,4 +28,6 @@ dependencies {
 
     // Android stuff
     implementation 'androidx.appcompat:appcompat:1.7.1'
+
+
 }
