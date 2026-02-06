@@ -58,7 +58,7 @@ public class Shooter {
 
         // Motor init
         flywheel.setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
-        flywheel.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        flywheel.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
         flywheel.setDirection(DcMotorEx.Direction.REVERSE);
         belt.setDirection(DcMotorEx.Direction.REVERSE);
         belt.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
