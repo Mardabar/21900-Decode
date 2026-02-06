@@ -20,6 +20,10 @@ public class FeedBackShootSystem {
     public static final double openPos = .35, closePos = 0, IDLE_VELO = 300;
     private static final double MAX_HEIGHT = 1.4;
 
+    private static final double ballMass = 0.0748;
+    private static final double gravity = 9.8;
+    private static final double dragCoeff = 0.3;
+
     private final VoltageSensor battery;
     private final Follower fol;
     public final Limelight3A cam;
@@ -98,28 +102,34 @@ public class FeedBackShootSystem {
 
     private void setShootPos(double dist) {
         double distMult = dist * 1.2;
-        double veloMult = 2.21 + (distMult * 0.15);
-
+        /*double veloMult = 2.21 + (distMult * 0.15);
 
         double targetAngle = Math.toDegrees(Math.atan(54.88 / (9.8 * distMult)));
         double rawVel = Math.sqrt((MAX_HEIGHT * 19.6) / Math.pow(Math.sin(Math.toRadians(targetAngle)), 2)) * veloMult;
 
+        shootVel = (rawVel / (9.6 * Math.PI)) * 2800; // Vel to TPS*/
+        double terminalVel = (ballMass * gravity) / dragCoeff;
+        double rawVel = (distMult * gravity) / (terminalVel * Math.cos(servoPosToRadians(interpolateAngle(distMult))));
         shootVel = (rawVel / (9.6 * Math.PI)) * 2800; // Vel to TPS
-        interpolateAngle(distMult);
     }
 
     // LERP (we love lerp) boutta lerp you
-    private void interpolateAngle(double distance) {
+    private double interpolateAngle(double distance) {
         Map.Entry<Double, Double> low = angleMap.floorEntry(distance);
         Map.Entry<Double, Double> high = angleMap.ceilingEntry(distance);
 
-        if (low == null && high == null) return;
+        if (low == null && high == null) return 0;
         if (low == null) anglePos = high.getValue();
         else if (high == null) anglePos = low.getValue();
         else {
             anglePos = low.getValue() + (distance - low.getKey()) * ((high.getValue() - low.getValue()) / (high.getKey() - low.getKey()));
         }
         anglePos = Math.max(0, Math.min(1, anglePos));
+        return anglePos;
+    }
+
+    private double servoPosToRadians(double pos){
+        return Math.toRadians(90 - (pos * 300));
     }
 
     public void RunBelt(double speed) { belt.setPower(speed); }
