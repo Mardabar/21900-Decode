@@ -36,6 +36,7 @@ public class FeedBackShootSystem {
     // Servo Angle Stuff
     private final TreeMap<Double, Double> angleMap = new TreeMap<>();
     public double anglePos = 0.5, shootVel, beltSpeed = 1, manualServoPos = 0.15;
+    public double rawVelocity;
 
     public FeedBackShootSystem(HardwareMap hardwareMap, Telemetry telemetry) {
         belt = hardwareMap.get(DcMotorEx.class, "belt");
@@ -80,16 +81,15 @@ public class FeedBackShootSystem {
 
     public void Shoot() {
         LLResult result = cam.getLatestResult();
-        if (result != null && result.isValid()) {
+        if (result != null && result.isValid())
             updateVars(result);
-        }
 
         updateFlywheelControl(shootVel);
         angleAdjuster.setPosition(anglePos);
     }
 
     private void updateVars(LLResult result) {
-        for (LLResultTypes.FiducialResult res : result.getFiducialResults()) {
+        for (LLResultTypes.FiducialResult res : result.getFiducialResults())
             if (res.getFiducialId() == 20 || res.getFiducialId() == 24) {
                 double angle = 25.2 + res.getTargetYDegrees();
                 double limeDist = (0.646 / Math.tan(Math.toRadians(angle))) + 0.2;
@@ -97,20 +97,19 @@ public class FeedBackShootSystem {
                 beltSpeed = (limeDist < 2.6) ? 0.65 : 0.3;
                 setShootPos(limeDist);
             }
-        }
     }
 
     private void setShootPos(double dist) {
         double distMult = dist * 1.2;
-        /*double veloMult = 2.21 + (distMult * 0.15);
+        double veloMult = 1.8;
 
-        double targetAngle = Math.toDegrees(Math.atan(54.88 / (9.8 * distMult)));
-        double rawVel = Math.sqrt((MAX_HEIGHT * 19.6) / Math.pow(Math.sin(Math.toRadians(targetAngle)), 2)) * veloMult;
+        /*double targetAngle = Math.toDegrees(Math.atan(54.88 / (9.8 * distMult)));
+        double rawVel = Math.sqrt((MAX_HEIGHT * 19.6) / Math.pow(Math.sin(Math.toRadians(targetAngle)), 2)) * veloMult;*/
 
-        shootVel = (rawVel / (9.6 * Math.PI)) * 2800; // Vel to TPS*/
         double terminalVel = (BALL_MASS * GRAVITY) / DRAG_COEFF;
-        double rawVel = (distMult * GRAVITY) / (terminalVel * Math.cos(servoPosToRadians(interpolateAngle(distMult))));
-        shootVel = (rawVel / (9.6 * Math.PI)) * 2800; // Vel to TPS
+        double rawVel = (distMult * GRAVITY) / (terminalVel * Math.cos(ServoPosToRadians(interpolateAngle(distMult))));
+        rawVelocity = rawVel;
+        shootVel = ((rawVel * veloMult) / (9.6 * Math.PI)) * 2800; // Vel to TPS
     }
 
     // LERP (we love lerp) boutta lerp you
@@ -121,16 +120,13 @@ public class FeedBackShootSystem {
         if (low == null && high == null) return 0;
         if (low == null) anglePos = high.getValue();
         else if (high == null) anglePos = low.getValue();
-        else {
+        else
             anglePos = low.getValue() + (distance - low.getKey()) * ((high.getValue() - low.getValue()) / (high.getKey() - low.getKey()));
-        }
         anglePos = Math.max(0, Math.min(1, anglePos));
         return anglePos;
     }
 
-    private double servoPosToRadians(double pos){
-        return Math.toRadians(90 - (pos * 300));
-    }
+    public double ServoPosToRadians(double pos) { return Math.toRadians(90 - (pos * 300)); }
 
     public void RunBelt(double speed) { belt.setPower(speed); }
 
@@ -143,8 +139,8 @@ public class FeedBackShootSystem {
 
     public void adjustServoManual(boolean up, boolean down) {
         double increment = 0.001;
-        if (up) {manualServoPos += increment;}
-        else if (down) { manualServoPos -= increment;}
+        if (up) manualServoPos += increment;
+        else if (down) manualServoPos -= increment;
         manualServoPos = Math.clamp(manualServoPos, 0, 1); angleAdjuster.setPosition(manualServoPos);
     }
 }
