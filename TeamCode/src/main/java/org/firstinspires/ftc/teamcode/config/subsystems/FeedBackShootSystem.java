@@ -16,26 +16,28 @@ import com.qualcomm.robotcore.hardware.VoltageSensor;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 
 public class FeedBackShootSystem {
+    // Flywheel PID and Servo Positions
     public static double kP = 0.007, kS = 0.02, kV = 0.00045;
     public static final double openPos = .35, closePos = 0, IDLE_VELO = 300;
-    private static final double MAX_HEIGHT = 1.4;
 
-    private static final double ballMass = 0.0748;
-    private static final double gravity = 9.8;
-    private static final double dragCoeff = 0.3;
+    // Quadratic Drag Vars
+    private static final double BALL_MASS = 0.0748;
+    private static final double GRAVITY = 9.8;
+    private static final double DRAG_COEFF = 0.3;
 
+    // Sensor Vars
     private final VoltageSensor battery;
-    private final Follower fol;
     public final Limelight3A cam;
+
+    // Motor and Servo Vars
     public final Servo angleAdjuster, feeder;
     public final DcMotorEx belt, flywheel;
 
+    // Servo Angle Stuff
     private final TreeMap<Double, Double> angleMap = new TreeMap<>();
     public double anglePos = 0.5, shootVel, beltSpeed = 1, manualServoPos = 0.15;
 
     public FeedBackShootSystem(HardwareMap hardwareMap, Telemetry telemetry) {
-        this.fol = follower;
-
         belt = hardwareMap.get(DcMotorEx.class, "belt");
         flywheel = hardwareMap.get(DcMotorEx.class, "cannon");
         angleAdjuster = hardwareMap.get(Servo.class, "angleServo");
@@ -84,8 +86,6 @@ public class FeedBackShootSystem {
 
         updateFlywheelControl(shootVel);
         angleAdjuster.setPosition(anglePos);
-
-        //fol.update();
     }
 
     private void updateVars(LLResult result) {
@@ -108,8 +108,8 @@ public class FeedBackShootSystem {
         double rawVel = Math.sqrt((MAX_HEIGHT * 19.6) / Math.pow(Math.sin(Math.toRadians(targetAngle)), 2)) * veloMult;
 
         shootVel = (rawVel / (9.6 * Math.PI)) * 2800; // Vel to TPS*/
-        double terminalVel = (ballMass * gravity) / dragCoeff;
-        double rawVel = (distMult * gravity) / (terminalVel * Math.cos(servoPosToRadians(interpolateAngle(distMult))));
+        double terminalVel = (BALL_MASS * GRAVITY) / DRAG_COEFF;
+        double rawVel = (distMult * GRAVITY) / (terminalVel * Math.cos(servoPosToRadians(interpolateAngle(distMult))));
         shootVel = (rawVel / (9.6 * Math.PI)) * 2800; // Vel to TPS
     }
 
