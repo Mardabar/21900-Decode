@@ -24,10 +24,6 @@ import org.firstinspires.ftc.teamcode.config.subsystems.FeedBackShootSystem;
 public class TeleV2Leif extends OpMode {
     FeedBackShootSystem shooter;
 
-    private enum ShootState { IDLE, SPIN_UP, FIRING }
-    private final ShootState currentShootState = ShootState.IDLE;
-    private final ElapsedTime shootStateTimer = new ElapsedTime();
-
     private Follower fol;
     private final Pose startingPose = new Pose(72, 72, Math.toRadians(0));
 
@@ -35,7 +31,6 @@ public class TeleV2Leif extends OpMode {
 
     private final double p = 0.03, d = 0.00011;
     private double lastError;
-    private double iSum;
     private boolean isShooting;
 
     @Override
@@ -50,7 +45,6 @@ public class TeleV2Leif extends OpMode {
         fol = Constants.createFollower(hardwareMap);
         fol.setStartingPose(startingPose);
         fol.update();
-
         fol.startTeleOpDrive();
 
         shooter.beltSpeed = 0.8;
@@ -60,11 +54,7 @@ public class TeleV2Leif extends OpMode {
     public void loop() {
         fol.update();
 
-        if (!isShooting) {
-            fol.setTeleOpDrive(-gamepad1.left_stick_y, -gamepad1.left_stick_x, -gamepad1.right_stick_x, true);
-        }
-
-        if (Math.abs(gamepad1.left_stick_x + gamepad1.left_stick_y + gamepad1.right_stick_x) > 0.25 && isShooting) {
+        if (Math.abs(gamepad1.left_stick_x + gamepad1.left_stick_y + gamepad1.right_stick_x) > 0.1) {
             fol.setTeleOpDrive(-gamepad1.left_stick_y, -gamepad1.left_stick_x, -gamepad1.right_stick_x, true);
         } else if (isShooting) {
             fol.setTeleOpDrive(0, 0, 0, true);
@@ -82,17 +72,11 @@ public class TeleV2Leif extends OpMode {
             isShooting = false;
             shooter.StopMotors();
             shooter.beltSpeed = 0.8;
-            iSum = 0;
         }
 
         if(gamepad1.dpad_left || gamepad2.dpad_left)
             shooter.flywheel.setVelocity(-IDLE_VELO);
 
-
-
-
-
-        //belt stuff
         if (gamepad2.x)
             shooter.RunBelt(shooter.beltSpeed);
         else if (gamepad2.b)
@@ -105,10 +89,8 @@ public class TeleV2Leif extends OpMode {
         else
             shooter.feeder.setPosition(openPos);
 
-
         // prints data
         telemetry.addData("TUNING - Servo Pos", "%.4f", shooter.manualServoPos);
-        telemetry.addData("Current State", currentShootState);
         telemetry.addData("Target TPS", shooter.shootVel);
         telemetry.addData("Actual TPS", shooter.flywheel.getVelocity());
         telemetry.update();
@@ -116,7 +98,6 @@ public class TeleV2Leif extends OpMode {
 
     private void PIDAdjusting(LLResultTypes.FiducialResult res) {
         double error = res.getTargetXDegrees();
-        iSum += error;
         double derError = lastError - error;
 
         double power = (error * p) + (derError * d);

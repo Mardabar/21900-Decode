@@ -16,7 +16,6 @@ import com.qualcomm.robotcore.hardware.VoltageSensor;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 
 public class FeedBackShootSystem {
-
     public static double kP = 0.007, kS = 0.02, kV = 0.00045;
     public static final double openPos = .35, closePos = 0, IDLE_VELO = 300;
     private static final double MAX_HEIGHT = 1.4;
@@ -26,15 +25,12 @@ public class FeedBackShootSystem {
     public final Limelight3A cam;
     public final Servo angleAdjuster, feeder;
     public final DcMotorEx belt, flywheel;
-    private final Telemetry telemetry;
 
     private final TreeMap<Double, Double> angleMap = new TreeMap<>();
     public double anglePos = 0.5, shootVel, beltSpeed = 1, manualServoPos = 0.15;
 
     public FeedBackShootSystem(HardwareMap hardwareMap, Telemetry telemetry) {
-
         this.fol = follower;
-        this.telemetry = telemetry;
 
         belt = hardwareMap.get(DcMotorEx.class, "belt");
         flywheel = hardwareMap.get(DcMotorEx.class, "cannon");
@@ -112,7 +108,7 @@ public class FeedBackShootSystem {
         interpolateAngle(distMult);
     }
 
-    // LERP
+    // LERP (we love lerp) boutta lerp you
     private void interpolateAngle(double distance) {
         Map.Entry<Double, Double> low = angleMap.floorEntry(distance);
         Map.Entry<Double, Double> high = angleMap.ceilingEntry(distance);
@@ -128,7 +124,7 @@ public class FeedBackShootSystem {
 
     public void RunBelt(double speed) { belt.setPower(speed); }
 
-    public void stopBelt() {belt.setPower(0); }
+    public void stopBelt() { belt.setPower(0); }
 
     public void StopMotors() {
         flywheel.setPower(0);
@@ -140,6 +136,5 @@ public class FeedBackShootSystem {
         if (up) {manualServoPos += increment;}
         else if (down) { manualServoPos -= increment;}
         manualServoPos = Math.clamp(manualServoPos, 0, 1); angleAdjuster.setPosition(manualServoPos);
-
     }
 }
