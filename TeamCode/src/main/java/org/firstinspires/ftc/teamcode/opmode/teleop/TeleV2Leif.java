@@ -54,15 +54,12 @@ public class TeleV2Leif extends OpMode {
     public void loop() {
         fol.update();
 
-        if (Math.abs(gamepad1.left_stick_x + gamepad1.left_stick_y + gamepad1.right_stick_x) > 0.1) {
+        if (Math.abs(gamepad1.left_stick_x + gamepad1.left_stick_y + gamepad1.right_stick_x) > 0.1)
             fol.setTeleOpDrive(-gamepad1.left_stick_y, -gamepad1.left_stick_x, -gamepad1.right_stick_x, true);
-        } else if (isShooting) {
+        else {
             fol.setTeleOpDrive(0, 0, 0, true);
-            for (LLResultTypes.FiducialResult res : shooter.cam.getLatestResult().getFiducialResults()) {
-                int id = res.getFiducialId();
-                if ((id == 20 || id == 24))
-                    PIDAdjusting(res);
-            }
+            if (isShooting)
+                AdjustAngle();
         }
 
         if (gamepad2.a) {
@@ -93,7 +90,19 @@ public class TeleV2Leif extends OpMode {
         telemetry.addData("TUNING - Servo Pos", "%.4f", shooter.manualServoPos);
         telemetry.addData("Target TPS", shooter.shootVel);
         telemetry.addData("Actual TPS", shooter.flywheel.getVelocity());
+        telemetry.addLine();
+        telemetry.addData("Servo Position", shooter.anglePos);
+        telemetry.addData("True Angle", shooter.ServoPosToRadians(shooter.anglePos));
+        telemetry.addData("Velocity", shooter.rawVelocity);
         telemetry.update();
+    }
+
+    private void AdjustAngle(){
+        for (LLResultTypes.FiducialResult res : shooter.cam.getLatestResult().getFiducialResults()) {
+            int id = res.getFiducialId();
+            if ((id == 20 || id == 24))
+                PIDAdjusting(res);
+        }
     }
 
     private void PIDAdjusting(LLResultTypes.FiducialResult res) {
