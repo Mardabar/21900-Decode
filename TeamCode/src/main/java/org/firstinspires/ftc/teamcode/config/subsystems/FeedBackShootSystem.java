@@ -81,7 +81,7 @@ public class FeedBackShootSystem {
         updateFlywheelControl(shootVel);
         angleAdjuster.setPosition(anglePos);
 
-        fol.update();
+        //fol.update();
     }
 
     private void updateVars(LLResult result) {

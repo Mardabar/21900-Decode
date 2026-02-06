@@ -16,7 +16,7 @@ import dev.nextftc.ftc.NextFTCOpMode;
 
 
 
-@Autonomous(name = "Close Blue Auto - Command Based")
+@Autonomous(name = "Close Blue")
 public class CloseBlueAuto extends NextFTCOpMode {
 
     Shooter shooter;
@@ -35,51 +35,47 @@ public class CloseBlueAuto extends NextFTCOpMode {
 
         return new SequentialGroup(
 
+                new InstantCommand(() -> PedroComponent.follower().setMaxPower(0.65)),
                 new FollowPath(paths.pathPreScore),
-                shooter.shootCommand(0.8, 1900),
+                shooter.shootCommand(0.8, 1500),
 
                 new FollowPath(paths.pathRow1Line),
-                new InstantCommand(() -> PedroComponent.follower().setMaxPower(0.65)),
 
-                new ParallelGroup(
-                        new FollowPath(paths.pathRow1Grab),
-                        shooter.runBeltCommand(0.3)
-                ),
 
-                new Delay(0.5),
-                new InstantCommand(() -> PedroComponent.follower().setMaxPower(1.0)),
+
+                new FollowPath(paths.pathRow1Grab)
+                        .asDeadline(shooter.runBeltCommand(0.3)),
+
+
                 shooter.stopBeltCommand(),
+                new InstantCommand(() -> PedroComponent.follower().setMaxPower(1.0)),
 
                 new FollowPath(paths.pathRow1Score),
-                shooter.shootCommand(0.8, 1900),
+                shooter.shootCommand(0.8, 1700),
 
                 new FollowPath(paths.pathRow2Line),
                 new InstantCommand(() -> PedroComponent.follower().setMaxPower(0.65)),
 
-                new ParallelGroup(
-                        new FollowPath(paths.pathRow2Grab),
-                        shooter.runBeltCommand(0.3)
-                ),
+                new FollowPath(paths.pathRow2Grab)
+                        .asDeadline(shooter.runBeltCommand(0.3)),
 
                 new InstantCommand(() -> PedroComponent.follower().setMaxPower(1.0)),
                 shooter.stopBeltCommand(),
 
                 new FollowPath(paths.pathRow2Score),
-                shooter.shootCommand(0.8, 1900),
+                shooter.shootCommand(0.8, 1700),
 
                 new FollowPath(paths.pathRow3Line),
                 new InstantCommand(() -> PedroComponent.follower().setMaxPower(0.65)),
 
-                new ParallelGroup(
-                        new FollowPath(paths.pathRow3Grab),
-                        shooter.runBeltCommand(0.3)
-                ),
+                new FollowPath(paths.pathRow3Grab)
+                        .asDeadline(shooter.runBeltCommand(0.3)),
 
                 new InstantCommand(() -> PedroComponent.follower().setMaxPower(1.0)),
                 shooter.stopBeltCommand(),
 
                 new FollowPath(paths.pathRow3Score),
-                shooter.shootCommand(0.8, 1900),
+                shooter.shootCommand(0.8, 1700),
 
                 new FollowPath(paths.pathPark),
                 new InstantCommand(shooter::StopMotors)

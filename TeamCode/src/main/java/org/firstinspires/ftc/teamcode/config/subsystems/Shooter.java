@@ -114,7 +114,6 @@ public class Shooter {
         updateFlywheelControl(shootVel);
         angleAdjuster.setPosition(anglePos);
 
-        fol.update();
     }
 
     public double getDistance() {

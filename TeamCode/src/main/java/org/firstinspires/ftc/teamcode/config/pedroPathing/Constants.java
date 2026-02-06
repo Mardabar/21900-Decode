@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.config.pedroPathing;
 import com.bylazar.configurables.annotations.Configurable;
 import com.pedropathing.control.FilteredPIDFCoefficients;
 import com.pedropathing.control.PIDFCoefficients;
+import com.pedropathing.control.PredictiveBrakingCoefficients;
 import com.pedropathing.follower.Follower;
 import com.pedropathing.follower.FollowerConstants;
 import com.pedropathing.ftc.FollowerBuilder;
@@ -21,9 +22,10 @@ import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 @Configurable
 public class Constants {
     public static FollowerConstants followerConstants = new FollowerConstants()
+        //.predictiveBrakingCoefficients(new PredictiveBrakingCoefficients(0.2, 0.06922094058768, 0.0019898073264081775 ))
         .translationalPIDFCoefficients(new PIDFCoefficients(0.2, 0, 0.0062, 0.022))
         .headingPIDFCoefficients(new PIDFCoefficients(1,0,0.01,0.01))
-        .drivePIDFCoefficients(new FilteredPIDFCoefficients(0.04,0,0.0025,0.6,0.05))
+        .drivePIDFCoefficients(new FilteredPIDFCoefficients(0.07,0,0.0025,0.6,0.05))
 
 
             .centripetalScaling(0.0005)
