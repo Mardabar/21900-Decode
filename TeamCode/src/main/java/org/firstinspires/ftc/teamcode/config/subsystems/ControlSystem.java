@@ -1,7 +1,5 @@
 package org.firstinspires.ftc.teamcode.config.subsystems;
 
-import static org.firstinspires.ftc.teamcode.config.pedroPathing.Tuning.follower;
-
 import java.util.Map;
 import java.util.TreeMap;
 import com.qualcomm.hardware.limelightvision.LLResult;
@@ -10,12 +8,11 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.HardwareMap;
-import com.pedropathing.follower.Follower;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.qualcomm.robotcore.hardware.VoltageSensor;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 
-public class FeedBackShootSystem {
+public class ControlSystem {
     // Flywheel PID and Servo Positions
     public static double kP = 0.007, kS = 0.02, kV = 0.00045;
     public static final double openPos = .35, closePos = 0, IDLE_VELO = 300;
@@ -38,7 +35,7 @@ public class FeedBackShootSystem {
     public double anglePos = 0.5, shootVel, beltSpeed = 1, manualServoPos = 0.15;
     public double rawVelocity;
 
-    public FeedBackShootSystem(HardwareMap hardwareMap, Telemetry telemetry) {
+    public ControlSystem(HardwareMap hardwareMap, Telemetry telemetry) {
         belt = hardwareMap.get(DcMotorEx.class, "belt");
         flywheel = hardwareMap.get(DcMotorEx.class, "cannon");
         angleAdjuster = hardwareMap.get(Servo.class, "angleServo");
@@ -70,6 +67,12 @@ public class FeedBackShootSystem {
         angleMap.put(3.0734, 0.19);
     }
 
+
+    //    kP = 0.007,
+    //    kS = 0.02,
+    //    kV = 0.00045;
+
+
     public void updateFlywheelControl(double targetTPS) {
         double currentTPS = flywheel.getVelocity();
         double ff = (kV * targetTPS) + (kS * Math.signum(targetTPS));
@@ -88,10 +91,12 @@ public class FeedBackShootSystem {
         angleAdjuster.setPosition(anglePos);
     }
 
+
+
     private void updateVars(LLResult result) {
         for (LLResultTypes.FiducialResult res : result.getFiducialResults())
             if (res.getFiducialId() == 20 || res.getFiducialId() == 24) {
-                double angle = 25.2 + res.getTargetYDegrees();
+                double angle = res.getTargetYDegrees();
                 double limeDist = (0.646 / Math.tan(Math.toRadians(angle))) + 0.2;
 
                 beltSpeed = (limeDist < 2.6) ? 0.65 : 0.3;
@@ -100,8 +105,8 @@ public class FeedBackShootSystem {
     }
 
     private void setShootPos(double dist) {
-        double distMult = dist * 1.2;
-        double veloMult = 1.8;
+        double distMult = dist * 1;
+        double veloMult = 1;
 
         /*double targetAngle = Math.toDegrees(Math.atan(54.88 / (9.8 * distMult)));
         double rawVel = Math.sqrt((MAX_HEIGHT * 19.6) / Math.pow(Math.sin(Math.toRadians(targetAngle)), 2)) * veloMult;*/

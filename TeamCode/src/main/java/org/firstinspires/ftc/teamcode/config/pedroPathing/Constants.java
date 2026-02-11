@@ -3,24 +3,29 @@ package org.firstinspires.ftc.teamcode.config.pedroPathing;
 import com.bylazar.configurables.annotations.Configurable;
 import com.pedropathing.control.FilteredPIDFCoefficients;
 import com.pedropathing.control.PIDFCoefficients;
-import com.pedropathing.control.PredictiveBrakingCoefficients;
 import com.pedropathing.follower.Follower;
 import com.pedropathing.follower.FollowerConstants;
 import com.pedropathing.ftc.FollowerBuilder;
 import com.pedropathing.ftc.drivetrains.MecanumConstants;
 import com.pedropathing.ftc.localization.constants.PinpointConstants;
+import com.pedropathing.ftc.localization.localizers.PinpointLocalizer;
 import com.pedropathing.paths.PathConstraints;
 import com.qualcomm.hardware.gobilda.GoBildaPinpointDriver;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
+import org.firstinspires.ftc.teamcode.config.subsystems.LimeLightSubsystem;
 
 
         // Length is 15.5
         // Width 15.75
 @Configurable
 public class Constants {
+
+
+
+
     public static FollowerConstants followerConstants = new FollowerConstants()
         //.predictiveBrakingCoefficients(new PredictiveBrakingCoefficients(0.2, 0.06922094058768, 0.0019898073264081775 ))
         .translationalPIDFCoefficients(new PIDFCoefficients(0.2, 0, 0.0062, 0.022))
@@ -50,16 +55,35 @@ public class Constants {
             .rightFrontMotorDirection(DcMotorSimple.Direction.REVERSE)
             .rightRearMotorDirection(DcMotorSimple.Direction.REVERSE);
 
+
     public static PathConstraints pathConstraints = new PathConstraints(0.99, 100, 1, 1);
 
-    public static Follower createFollower(HardwareMap hardwareMap) {
+
+
+            public static Follower createFollower(HardwareMap hardwareMap) {
+                PinpointLocalizer pinpointLocalizer = new PinpointLocalizer(hardwareMap, localizerConstants);
+
+                LimeLightSubsystem.fusionLocalizer = new FusionLocalizer(
+                        pinpointLocalizer,
+                        new double[]{0.5, 0.5, 0.05},
+                        new double[]{1.0, 1.0, 0.1},
+                        new double[]{4.0, 4.0, 0.04},
+                        100
+                );
+
         return new FollowerBuilder(followerConstants, hardwareMap)
                 .pathConstraints(pathConstraints)
+                .setLocalizer(LimeLightSubsystem.fusionLocalizer)
                 .mecanumDrivetrain(driveConstants)
                 .pinpointLocalizer(localizerConstants)
                 .build();
     }
+
+
+
     public static PinpointConstants localizerConstants = new PinpointConstants()
+
+
             .forwardPodY(5.375) // 4.3125
             .strafePodX(-4.3125) // 0.375  -3.700 -5.375
             .distanceUnit(DistanceUnit.INCH)
@@ -68,4 +92,6 @@ public class Constants {
             //If running into issue with pods later keep in mind the x is y and y is x, no clue why but otherwise values wouldnt work
             .forwardEncoderDirection(GoBildaPinpointDriver.EncoderDirection.REVERSED)
             .strafeEncoderDirection(GoBildaPinpointDriver.EncoderDirection.FORWARD);
+
+
 }

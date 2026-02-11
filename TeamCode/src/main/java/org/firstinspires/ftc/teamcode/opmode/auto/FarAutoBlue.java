@@ -2,46 +2,56 @@ package org.firstinspires.ftc.teamcode.opmode.auto;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
-import org.firstinspires.ftc.teamcode.config.paths.DuckPaths;
+import org.firstinspires.ftc.teamcode.config.paths.FarBluePaths;
 import org.firstinspires.ftc.teamcode.config.pedroPathing.Constants;
 import org.firstinspires.ftc.teamcode.config.subsystems.ShootSystem;
 
 import dev.nextftc.core.commands.CommandManager;
-import dev.nextftc.core.commands.groups.SequentialGroup;
 import dev.nextftc.core.commands.utility.InstantCommand;
+import dev.nextftc.core.commands.groups.SequentialGroup;
 import dev.nextftc.extensions.pedro.FollowPath;
 import dev.nextftc.extensions.pedro.PedroComponent;
 import dev.nextftc.ftc.NextFTCOpMode;
 
-
-
-@Autonomous(name = "Duck")
-public class DUCK extends NextFTCOpMode {
+@Autonomous(name = "FarBlue")
+public class FarAutoBlue extends NextFTCOpMode{
 
     ShootSystem shootSystem;
-    DuckPaths paths;
 
-    public DUCK() {
+    FarBluePaths paths;
+
+    public FarAutoBlue(){
         addComponents(new PedroComponent(Constants::createFollower));
     }
 
-
     private SequentialGroup autonomousRoutine() {
         shootSystem = new ShootSystem(hardwareMap, telemetry);
-        paths = new DuckPaths(PedroComponent.follower());
+        paths = new FarBluePaths(PedroComponent.follower());
 
         PedroComponent.follower().setStartingPose(paths.startPose);
 
         return new SequentialGroup(
+                new InstantCommand(() -> PedroComponent.follower().setMaxPower(0.65)),
+                new FollowPath(paths.pathPreScore),
+                shootSystem.shootCommand(0.8, 1500),
 
-                new InstantCommand(() -> PedroComponent.follower().setMaxPower(1)),
-                //new FollowPath(paths.path1),
-                //new FollowPath(paths.path2),
-                new FollowPath(paths.path3),
-                new FollowPath(paths.path4)
+                new FollowPath(paths.pathRow3Line),
+
+
+                new FollowPath(paths.pathRow3Grab)
+                        .asDeadline(shootSystem.runBeltCommand(0.3)),
+
+                shootSystem.stopBeltCommand()
+
+
+
+
 
         );
+
+
     }
+
 
     @Override
     public void onStartButtonPressed(){

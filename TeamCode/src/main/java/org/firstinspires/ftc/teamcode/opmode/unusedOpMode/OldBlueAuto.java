@@ -9,7 +9,7 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import org.firstinspires.ftc.teamcode.config.pedroPathing.Constants;
-import org.firstinspires.ftc.teamcode.config.subsystems.FeedBackShootSystem;
+import org.firstinspires.ftc.teamcode.config.subsystems.ControlSystem;
 
 @Autonomous(name = "FarBlue")
 public class OldBlueAuto extends OpMode {
@@ -25,12 +25,12 @@ public class OldBlueAuto extends OpMode {
     private int pathState;
     private PathChain pathPreScore, pathRow3Line, pathRow3Grab, pathRow3Score, pathRow2Line, pathRow2Grab, pathRow2Score, pathRow1Line, pathRow1Grab, pathRow1Score, pathPark;
 
-    private FeedBackShootSystem shooter;
+    private ControlSystem shooter;
     private final ElapsedTime shootTimer = new ElapsedTime(), beltTimer = new ElapsedTime();
 
     @Override
     public void init() {
-        shooter = new FeedBackShootSystem(hardwareMap, telemetry);
+        shooter = new ControlSystem(hardwareMap, telemetry);
         fol = Constants.createFollower(hardwareMap);
         fol.setStartingPose(startPose);
         buildPaths();
@@ -141,16 +141,16 @@ public class OldBlueAuto extends OpMode {
         shooter.Shoot();
 
         if (shootTimer.milliseconds() > 900)
-            shooter.feeder.setPosition(FeedBackShootSystem.closePos);
+            shooter.feeder.setPosition(ControlSystem.closePos);
         else
-            shooter.feeder.setPosition(FeedBackShootSystem.openPos);
+            shooter.feeder.setPosition(ControlSystem.openPos);
 
         if (shootTimer.milliseconds() > 500 && (Math.abs(shooter.shootVel - shooter.flywheel.getVelocity()) < 50 || shootTimer.milliseconds() > 700))
             shooter.RunBelt(beltPower);
 
         if (shootTimer.milliseconds() > duration) {
             shooter.StopMotors();
-            shooter.feeder.setPosition(FeedBackShootSystem.openPos);
+            shooter.feeder.setPosition(ControlSystem.openPos);
             pathState = nextState;
         }
     }

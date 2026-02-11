@@ -1,8 +1,8 @@
 package org.firstinspires.ftc.teamcode.opmode.teleop;
 
-import static org.firstinspires.ftc.teamcode.config.subsystems.FeedBackShootSystem.IDLE_VELO;
-import static org.firstinspires.ftc.teamcode.config.subsystems.FeedBackShootSystem.closePos;
-import static org.firstinspires.ftc.teamcode.config.subsystems.FeedBackShootSystem.openPos;
+import static org.firstinspires.ftc.teamcode.config.subsystems.ControlSystem.IDLE_VELO;
+import static org.firstinspires.ftc.teamcode.config.subsystems.ControlSystem.closePos;
+import static org.firstinspires.ftc.teamcode.config.subsystems.ControlSystem.openPos;
 
 import com.bylazar.configurables.annotations.Configurable;
 import com.pedropathing.follower.Follower;
@@ -11,10 +11,9 @@ import com.qualcomm.hardware.limelightvision.LLResultTypes;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
-import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.config.pedroPathing.Constants;
-import org.firstinspires.ftc.teamcode.config.subsystems.FeedBackShootSystem;
+import org.firstinspires.ftc.teamcode.config.subsystems.ControlSystem;
 
 
 ///  BLEUAFEHATGSWF why do we have so many teleop modeeasdssdsd
@@ -22,7 +21,7 @@ import org.firstinspires.ftc.teamcode.config.subsystems.FeedBackShootSystem;
 @Configurable
 @TeleOp(name = "Tele V2 Leif")
 public class TeleV2Leif extends OpMode {
-    FeedBackShootSystem shooter;
+    ControlSystem shooter;
 
     private Follower fol;
     private final Pose startingPose = new Pose(72, 72, Math.toRadians(0));
@@ -35,7 +34,7 @@ public class TeleV2Leif extends OpMode {
 
     @Override
     public void init() {
-        shooter = new FeedBackShootSystem(hardwareMap, telemetry);
+        shooter = new ControlSystem(hardwareMap, telemetry);
 
         lb = hardwareMap.get(DcMotorEx.class, "lb");
         rb = hardwareMap.get(DcMotorEx.class, "rb");
@@ -94,6 +93,7 @@ public class TeleV2Leif extends OpMode {
         telemetry.addData("Servo Position", shooter.anglePos);
         telemetry.addData("True Angle", shooter.ServoPosToRadians(shooter.anglePos));
         telemetry.addData("Velocity", shooter.rawVelocity);
+        telemetry.addData("Flywheel TPS", shooter.shootVel);
         telemetry.update();
     }
 

@@ -9,16 +9,17 @@ import com.pedropathing.paths.PathChain;
 public class FarBluePaths {
 
 
-    final Pose startPose = new Pose(27, 131.8, Math.toRadians(143));
+    public final Pose startPose = new Pose(27, 131.8, Math.toRadians(143));
     final Pose preScorePose = new Pose(50, 115, Math.toRadians(146));
     final Pose row1Line = new Pose(48, 84, Math.toRadians(180)), row1Grab = new Pose(17, 84, Math.toRadians(180)), row1Score = new Pose(39.5, 102, Math.toRadians(135));
     final Pose row2Line = new Pose(50, 60, Math.toRadians(180)), row2Grab = new Pose(8, 60, Math.toRadians(180)), row2ScoreCP = new Pose(53, 58), row2Score = new Pose(50, 93, Math.toRadians(135));
     final Pose row3Line = new Pose(50, 35.5, Math.toRadians(180)), row3Grab = new Pose(8, 35.5, Math.toRadians(180)), row3Score = new Pose(48, 107, Math.toRadians(138));
     final Pose park = new Pose(45, 72, Math.toRadians(138));
 
-    private PathChain pathPreScore, pathRow3Line, pathRow3Grab, pathRow3Score, pathRow2Line, pathRow2Grab, pathRow2Score, pathRow1Line, pathRow1Grab, pathRow1Score, pathPark;
+    public PathChain pathPreScore, pathRow3Line, pathRow3Grab, pathRow3Score, pathRow2Line, pathRow2Grab, pathRow2Score, pathRow1Line, pathRow1Grab, pathRow1Score, pathPark;
 
     public FarBluePaths(Follower fol){
+
         pathPreScore = fol.pathBuilder()
                 .addPath(new BezierLine(startPose, preScorePose))
                 .setLinearHeadingInterpolation(startPose.getHeading(), preScorePose.getHeading())

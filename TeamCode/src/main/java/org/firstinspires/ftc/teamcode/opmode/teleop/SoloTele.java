@@ -1,8 +1,6 @@
 package org.firstinspires.ftc.teamcode.opmode.teleop;
 
-import static org.firstinspires.ftc.teamcode.config.subsystems.FeedBackShootSystem.IDLE_VELO;
-import static org.firstinspires.ftc.teamcode.config.subsystems.FeedBackShootSystem.closePos;
-import static org.firstinspires.ftc.teamcode.config.subsystems.FeedBackShootSystem.openPos;
+
 
 import com.bylazar.configurables.annotations.Configurable;
 import com.pedropathing.follower.Follower;
@@ -14,17 +12,15 @@ import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.config.pedroPathing.Constants;
-import org.firstinspires.ftc.teamcode.config.subsystems.FeedBackShootSystem;
+import org.firstinspires.ftc.teamcode.config.subsystems.ControlSystem;
+import org.firstinspires.ftc.teamcode.config.subsystems.ShootSystem;
 
 @Configurable
 @TeleOp(name = "Solo Tele")
 public class SoloTele extends OpMode {
 
-    FeedBackShootSystem shooter;
+    ShootSystem shooter;
 
-    private enum ShootState { IDLE, SPIN_UP, FIRING }
-    private final ShootState currentShootState = ShootState.IDLE;
-    private final ElapsedTime shootStateTimer = new ElapsedTime();
 
     private Follower fol;
     private final Pose startingPose = new Pose(72, 72, Math.toRadians(0));
@@ -39,7 +35,7 @@ public class SoloTele extends OpMode {
 
     @Override
     public void init() {
-        shooter = new FeedBackShootSystem(hardwareMap, telemetry);
+        shooter = new ShootSystem(hardwareMap, telemetry);
 
         lb = hardwareMap.get(DcMotorEx.class, "lb");
         rb = hardwareMap.get(DcMotorEx.class, "rb");
@@ -87,9 +83,12 @@ public class SoloTele extends OpMode {
             shooter.flywheel.setVelocity(-IDLE_VELO);
         }
 
-        if (gamepad1.x) shooter.RunBelt(1);
-        else if (gamepad1.b) shooter.RunBelt(-1);
-        else shooter.RunBelt(0);
+        if (gamepad1.x)
+            shooter.RunBelt(1);
+        else if (gamepad1.b)
+            shooter.RunBelt(-1);
+        else
+            shooter.RunBelt(0);
 
         if (gamepad1.y) shooter.feeder.setPosition(closePos);
         else shooter.feeder.setPosition(openPos);

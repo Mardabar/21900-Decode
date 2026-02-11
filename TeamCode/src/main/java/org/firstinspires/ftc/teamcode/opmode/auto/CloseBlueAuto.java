@@ -3,12 +3,10 @@ package org.firstinspires.ftc.teamcode.opmode.auto;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import org.firstinspires.ftc.teamcode.config.paths.CloseBluePaths;
 import org.firstinspires.ftc.teamcode.config.pedroPathing.Constants;
-import org.firstinspires.ftc.teamcode.config.subsystems.Shooter;
+import org.firstinspires.ftc.teamcode.config.subsystems.ShootSystem;
 
 import dev.nextftc.core.commands.CommandManager;
-import dev.nextftc.core.commands.groups.ParallelGroup;
 import dev.nextftc.core.commands.groups.SequentialGroup;
-import dev.nextftc.core.commands.delays.Delay;
 import dev.nextftc.core.commands.utility.InstantCommand;
 import dev.nextftc.extensions.pedro.FollowPath;
 import dev.nextftc.extensions.pedro.PedroComponent;
@@ -19,7 +17,7 @@ import dev.nextftc.ftc.NextFTCOpMode;
 @Autonomous(name = "Close Blue")
 public class CloseBlueAuto extends NextFTCOpMode {
 
-    Shooter shooter;
+    ShootSystem shootSystem;
     CloseBluePaths paths;
 
     public CloseBlueAuto() {
@@ -28,7 +26,7 @@ public class CloseBlueAuto extends NextFTCOpMode {
 
 
     private SequentialGroup autonomousRoutine() {
-        shooter = new Shooter(hardwareMap, telemetry);
+        shootSystem = new ShootSystem(hardwareMap, telemetry);
         paths = new CloseBluePaths(PedroComponent.follower());
 
         PedroComponent.follower().setStartingPose(paths.startPose);
@@ -37,48 +35,46 @@ public class CloseBlueAuto extends NextFTCOpMode {
 
                 new InstantCommand(() -> PedroComponent.follower().setMaxPower(0.65)),
                 new FollowPath(paths.pathPreScore),
-                shooter.shootCommand(0.8, 1500),
+
+                shootSystem.shootCommand(0.8, 1500),
 
                 new FollowPath(paths.pathRow1Line),
 
-
-
                 new FollowPath(paths.pathRow1Grab)
-                        .asDeadline(shooter.runBeltCommand(0.3)),
+                        .asDeadline(shootSystem.runBeltCommand(0.3)),
 
-
-                shooter.stopBeltCommand(),
+                shootSystem.stopBeltCommand(),
                 new InstantCommand(() -> PedroComponent.follower().setMaxPower(1.0)),
 
                 new FollowPath(paths.pathRow1Score),
-                shooter.shootCommand(0.8, 1700),
+                shootSystem.shootCommand(0.8, 1700),
 
                 new FollowPath(paths.pathRow2Line),
                 new InstantCommand(() -> PedroComponent.follower().setMaxPower(0.65)),
 
                 new FollowPath(paths.pathRow2Grab)
-                        .asDeadline(shooter.runBeltCommand(0.3)),
+                        .asDeadline(shootSystem.runBeltCommand(0.3)),
 
                 new InstantCommand(() -> PedroComponent.follower().setMaxPower(1.0)),
-                shooter.stopBeltCommand(),
+                shootSystem.stopBeltCommand(),
 
                 new FollowPath(paths.pathRow2Score),
-                shooter.shootCommand(0.8, 1700),
+                shootSystem.shootCommand(0.8, 1700),
 
                 new FollowPath(paths.pathRow3Line),
                 new InstantCommand(() -> PedroComponent.follower().setMaxPower(0.65)),
 
                 new FollowPath(paths.pathRow3Grab)
-                        .asDeadline(shooter.runBeltCommand(0.3)),
+                        .asDeadline(shootSystem.runBeltCommand(0.3)),
 
                 new InstantCommand(() -> PedroComponent.follower().setMaxPower(1.0)),
-                shooter.stopBeltCommand(),
+                shootSystem.stopBeltCommand(),
 
                 new FollowPath(paths.pathRow3Score),
-                shooter.shootCommand(0.8, 1700),
+                shootSystem.shootCommand(0.8, 1700),
 
                 new FollowPath(paths.pathPark),
-                new InstantCommand(shooter::StopMotors)
+                new InstantCommand(shootSystem::StopMotors)
         );
     }
 
