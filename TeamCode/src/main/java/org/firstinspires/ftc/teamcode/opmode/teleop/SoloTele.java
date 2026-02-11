@@ -2,6 +2,10 @@ package org.firstinspires.ftc.teamcode.opmode.teleop;
 
 
 
+import static org.firstinspires.ftc.teamcode.config.subsystems.ControlSystem.IDLE_VELO;
+import static org.firstinspires.ftc.teamcode.config.subsystems.ControlSystem.closePos;
+import static org.firstinspires.ftc.teamcode.config.subsystems.ControlSystem.openPos;
+
 import com.bylazar.configurables.annotations.Configurable;
 import com.pedropathing.follower.Follower;
 import com.pedropathing.geometry.Pose;
