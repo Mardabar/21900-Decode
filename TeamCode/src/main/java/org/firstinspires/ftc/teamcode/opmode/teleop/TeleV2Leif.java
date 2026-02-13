@@ -11,7 +11,9 @@ import com.qualcomm.hardware.limelightvision.LLResultTypes;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.DistanceSensor;
 
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.teamcode.config.pedroPathing.Constants;
 import org.firstinspires.ftc.teamcode.config.subsystems.ControlSystem;
 
@@ -27,6 +29,7 @@ public class TeleV2Leif extends OpMode {
     private final Pose startingPose = new Pose(72, 72, Math.toRadians(0));
 
     private DcMotorEx lb, rb, lf, rf;
+    private DistanceSensor stockCheck;
 
     private final double p = 0.03, d = 0.00011;
     private double lastError;
@@ -41,12 +44,12 @@ public class TeleV2Leif extends OpMode {
         lf = hardwareMap.get(DcMotorEx.class, "lf");
         rf = hardwareMap.get(DcMotorEx.class, "rf");
 
+        //stockCheck = hardwareMap.get(DistanceSensor.class, "stockCheck");
+
         fol = Constants.createFollower(hardwareMap);
         fol.setStartingPose(startingPose);
         fol.update();
         fol.startTeleOpDrive();
-
-        shooter.beltSpeed = 0.8;
     }
 
     @Override
@@ -64,19 +67,22 @@ public class TeleV2Leif extends OpMode {
         if (gamepad2.a) {
             isShooting = true;
             shooter.Shoot();
-        } else {
+        } else if (!gamepad2.b) {
             isShooting = false;
             shooter.StopMotors();
             shooter.beltSpeed = 0.8;
-        }
+        } /*else if (stockCheck.getDistance(DistanceUnit.CM) < 0.8 && !gamepad2)
+            shooter.Shoot();*/
 
         if(gamepad1.dpad_left || gamepad2.dpad_left)
             shooter.flywheel.setVelocity(-IDLE_VELO);
 
         if (gamepad2.x)
             shooter.RunBelt(shooter.beltSpeed);
-        else if (gamepad2.b)
+        else if (gamepad2.b) {
             shooter.RunBelt(-shooter.beltSpeed);
+            shooter.SpitFlywheel();
+        }
         else
             shooter.RunBelt(0);
 

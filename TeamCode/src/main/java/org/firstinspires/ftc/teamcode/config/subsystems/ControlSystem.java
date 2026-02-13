@@ -20,10 +20,11 @@ public class ControlSystem {
     // Quadratic Drag Vars
     private static final double BALL_MASS = 0.0748;
     private static final double GRAVITY = 9.8;
-    private static final double DRAG_COEFF = 0.15;
+    private static final double DRAG_COEFF = 0.26;
 
     // Sensor Vars
     private final VoltageSensor battery;
+    private LimeLightSubsystem camSystem;
     public final Limelight3A cam;
 
     // Motor and Servo Vars
@@ -33,6 +34,7 @@ public class ControlSystem {
     // Servo Angle Stuff
     private final TreeMap<Double, Double> angleMap = new TreeMap<>();
     public double anglePos = 0.5, shootVel, beltSpeed = 1, manualServoPos = 0.15;
+    private final double MAX_HEIGHT = 1.4;
     public double rawVelocity;
     public double tagDistance;
 
@@ -92,12 +94,10 @@ public class ControlSystem {
         angleAdjuster.setPosition(anglePos);
     }
 
-
-
     private void updateVars(LLResult result) {
         for (LLResultTypes.FiducialResult res : result.getFiducialResults())
             if (res.getFiducialId() == 20 || res.getFiducialId() == 24) {
-                double angle = res.getTargetYDegrees();
+                double angle = 25.2 + res.getTargetYDegrees();
                 double limeDist = (0.646 / Math.tan(Math.toRadians(angle))) + 0.2;
 
                 beltSpeed = (limeDist < 2.6) ? 0.65 : 0.3;
@@ -106,36 +106,39 @@ public class ControlSystem {
     }
 
     private void setShootPos(double dist) {
-        double distMult = dist * 1;
-        double veloMult = 1;
+        double distMult = dist * 1.2;
+        double veloMult = 2.21 + (distMult * 0.15);
         tagDistance = dist;
 
-        /*double targetAngle = Math.toDegrees(Math.atan(54.88 / (9.8 * distMult)));
-        double rawVel = Math.sqrt((MAX_HEIGHT * 19.6) / Math.pow(Math.sin(Math.toRadians(targetAngle)), 2)) * veloMult;*/
-
-        double terminalVel = (BALL_MASS * GRAVITY) / DRAG_COEFF;
-        double rawVel = (distMult * GRAVITY) / (terminalVel * Math.cos(ServoPosToRadians(interpolateAngle(distMult))));
+        double targetAngle = Math.toDegrees(Math.atan(54.88 / (9.8 * distMult)));
+        double rawVel = Math.sqrt((MAX_HEIGHT * 19.6) / Math.pow(Math.sin(Math.toRadians(targetAngle)), 2)) * veloMult;
         rawVelocity = rawVel;
+
+        //double terminalVel = (BALL_MASS * GRAVITY) / DRAG_COEFF;
+        //double rawVel = (distMult * GRAVITY) / (terminalVel * Math.cos(ServoPosToRadians(interpolateAngle(distMult))));
+
+        interpolateAngle(distMult);
         shootVel = ((rawVel * veloMult) / (9.6 * Math.PI)) * 2800; // Vel to TPS
     }
 
     // LERP (we love lerp) boutta lerp you
-    private double interpolateAngle(double distance) {
+    private void interpolateAngle(double distance) {
         Map.Entry<Double, Double> low = angleMap.floorEntry(distance);
         Map.Entry<Double, Double> high = angleMap.ceilingEntry(distance);
 
-        if (low == null && high == null) return 0;
+        if (low == null && high == null) return;
         if (low == null) anglePos = high.getValue();
         else if (high == null) anglePos = low.getValue();
         else
             anglePos = low.getValue() + (distance - low.getKey()) * ((high.getValue() - low.getValue()) / (high.getKey() - low.getKey()));
         anglePos = Math.max(0, Math.min(1, anglePos));
-        return anglePos;
     }
 
     public double ServoPosToRadians(double pos) { return Math.toRadians(90 - (pos * 300)); }
 
     public void RunBelt(double speed) { belt.setPower(speed); }
+
+    public void SpitFlywheel() { flywheel.setPower(-0.05); }
 
     public void stopBelt() { belt.setPower(0); }
 
