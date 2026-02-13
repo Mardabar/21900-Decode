@@ -90,6 +90,7 @@ public class TeleV2Leif extends OpMode {
         telemetry.addData("Target TPS", shooter.shootVel);
         telemetry.addData("Actual TPS", shooter.flywheel.getVelocity());
         telemetry.addLine();
+        telemetry.addData("Distance", shooter.tagDistance);
         telemetry.addData("Servo Position", shooter.anglePos);
         telemetry.addData("True Angle", shooter.ServoPosToRadians(shooter.anglePos));
         telemetry.addData("Velocity", shooter.rawVelocity);

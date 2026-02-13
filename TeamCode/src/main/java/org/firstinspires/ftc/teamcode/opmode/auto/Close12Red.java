@@ -1,7 +1,8 @@
 package org.firstinspires.ftc.teamcode.opmode.auto;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import org.firstinspires.ftc.teamcode.config.paths.CloseBluePaths;
+
+import org.firstinspires.ftc.teamcode.config.paths.CloseRedPaths;
 import org.firstinspires.ftc.teamcode.config.pedroPathing.Constants;
 import org.firstinspires.ftc.teamcode.config.subsystems.ShootSystem;
 
@@ -14,20 +15,20 @@ import dev.nextftc.ftc.NextFTCOpMode;
 
 
 
-@Autonomous(name = "Close Blue")
-public class CloseBlueAuto extends NextFTCOpMode {
+@Autonomous(name = "Close Red")
+public class Close12Red extends NextFTCOpMode {
 
     ShootSystem shootSystem;
-    CloseBluePaths paths;
+    CloseRedPaths paths;
 
-    public CloseBlueAuto() {
+    public Close12Red() {
         addComponents(new PedroComponent(Constants::createFollower));
     }
 
 
     private SequentialGroup autonomousRoutine() {
         shootSystem = new ShootSystem(hardwareMap, telemetry);
-        paths = new CloseBluePaths(PedroComponent.follower());
+        paths = new CloseRedPaths(PedroComponent.follower());
 
         PedroComponent.follower().setStartingPose(paths.startPose);
 
@@ -35,13 +36,15 @@ public class CloseBlueAuto extends NextFTCOpMode {
 
                 new InstantCommand(() -> PedroComponent.follower().setMaxPower(0.65)),
                 new FollowPath(paths.pathPreScore),
-
                 shootSystem.shootCommand(0.8, 1500),
 
                 new FollowPath(paths.pathRow1Line),
 
+
+
                 new FollowPath(paths.pathRow1Grab)
                         .asDeadline(shootSystem.runBeltCommand(0.3)),
+
 
                 shootSystem.stopBeltCommand(),
                 new InstantCommand(() -> PedroComponent.follower().setMaxPower(1.0)),

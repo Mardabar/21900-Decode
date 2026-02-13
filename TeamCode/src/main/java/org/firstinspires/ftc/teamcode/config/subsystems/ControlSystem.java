@@ -20,7 +20,7 @@ public class ControlSystem {
     // Quadratic Drag Vars
     private static final double BALL_MASS = 0.0748;
     private static final double GRAVITY = 9.8;
-    private static final double DRAG_COEFF = 0.3;
+    private static final double DRAG_COEFF = 0.15;
 
     // Sensor Vars
     private final VoltageSensor battery;
@@ -34,6 +34,7 @@ public class ControlSystem {
     private final TreeMap<Double, Double> angleMap = new TreeMap<>();
     public double anglePos = 0.5, shootVel, beltSpeed = 1, manualServoPos = 0.15;
     public double rawVelocity;
+    public double tagDistance;
 
     public ControlSystem(HardwareMap hardwareMap, Telemetry telemetry) {
         belt = hardwareMap.get(DcMotorEx.class, "belt");
@@ -107,6 +108,7 @@ public class ControlSystem {
     private void setShootPos(double dist) {
         double distMult = dist * 1;
         double veloMult = 1;
+        tagDistance = dist;
 
         /*double targetAngle = Math.toDegrees(Math.atan(54.88 / (9.8 * distMult)));
         double rawVel = Math.sqrt((MAX_HEIGHT * 19.6) / Math.pow(Math.sin(Math.toRadians(targetAngle)), 2)) * veloMult;*/

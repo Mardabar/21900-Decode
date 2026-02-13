@@ -79,7 +79,6 @@ public class SoloTele extends OpMode {
         } else {
             isShooting = false;
             shooter.StopMotors();
-            shooter.beltSpeed = 0.8;
             iSum = 0;
         }
 

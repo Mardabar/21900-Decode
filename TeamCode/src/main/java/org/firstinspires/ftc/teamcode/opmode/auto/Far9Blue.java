@@ -14,13 +14,13 @@ import dev.nextftc.extensions.pedro.PedroComponent;
 import dev.nextftc.ftc.NextFTCOpMode;
 
 @Autonomous(name = "FarBlue")
-public class FarAutoBlue extends NextFTCOpMode{
+public class Far9Blue extends NextFTCOpMode{
 
     ShootSystem shootSystem;
 
     FarBluePaths paths;
 
-    public FarAutoBlue(){
+    public Far9Blue(){
         addComponents(new PedroComponent(Constants::createFollower));
     }
 
