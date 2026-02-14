@@ -6,7 +6,7 @@ import com.pedropathing.geometry.BezierLine;
 import com.pedropathing.geometry.Pose;
 import com.pedropathing.paths.PathChain;
 
-public class FarBluePaths {
+public class OldFarBluePaths {
 
 
     public final Pose startPose = new Pose(27, 131.8, Math.toRadians(143));
@@ -18,7 +18,7 @@ public class FarBluePaths {
 
     public PathChain pathPreScore, pathRow3Line, pathRow3Grab, pathRow3Score, pathRow2Line, pathRow2Grab, pathRow2Score, pathRow1Line, pathRow1Grab, pathRow1Score, pathPark;
 
-    public FarBluePaths(Follower fol){
+    public OldFarBluePaths(Follower fol){
 
         pathPreScore = fol.pathBuilder()
                 .addPath(new BezierLine(startPose, preScorePose))

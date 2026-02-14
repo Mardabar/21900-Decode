@@ -2,11 +2,12 @@ package org.firstinspires.ftc.teamcode.opmode.auto;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
-import org.firstinspires.ftc.teamcode.config.paths.DuckPaths;
+import org.firstinspires.ftc.teamcode.config.paths.CloseBluePaths;
 import org.firstinspires.ftc.teamcode.config.pedroPathing.Constants;
 import org.firstinspires.ftc.teamcode.config.subsystems.ShootSystem;
 
 import dev.nextftc.core.commands.CommandManager;
+import dev.nextftc.core.commands.delays.Delay;
 import dev.nextftc.core.commands.groups.SequentialGroup;
 import dev.nextftc.core.commands.utility.InstantCommand;
 import dev.nextftc.extensions.pedro.FollowPath;
@@ -14,34 +15,44 @@ import dev.nextftc.extensions.pedro.PedroComponent;
 import dev.nextftc.ftc.NextFTCOpMode;
 
 
-
-@Autonomous(name = "Duck")
-public class DUCK extends NextFTCOpMode {
-
+@Autonomous(name = "Close Gate Blue")
+public class CloseBlue extends NextFTCOpMode{
+    
     ShootSystem shootSystem;
-    DuckPaths paths;
-
-    public DUCK() {
+    CloseBluePaths paths;
+    
+    public CloseBlue(){
         addComponents(new PedroComponent(Constants::createFollower));
     }
-
-
-    private SequentialGroup autonomousRoutine() {
+    
+    private SequentialGroup autonomousRoutine(){
         shootSystem = new ShootSystem(hardwareMap, telemetry);
-        paths = new DuckPaths(PedroComponent.follower());
+        paths = new CloseBluePaths(PedroComponent.follower());
 
+        PedroComponent.follower().setMaxPower(1.0);
         PedroComponent.follower().setStartingPose(paths.startPose);
-
+        
+        
         return new SequentialGroup(
 
-                new InstantCommand(() -> PedroComponent.follower().setMaxPower(1)),
-                //new FollowPath(paths.path1),
-                //new FollowPath(paths.path2),
-                new FollowPath(paths.path3),
-                new FollowPath(paths.path4)
+                new FollowPath(paths.pathPreScore),
 
-        );
+                shootSystem.shootCommand(0.8, 1500),
+
+                new FollowPath(paths.pathRow2Grab)
+                        .asDeadline(shootSystem.runBeltCommand(0.3)),
+
+                shootSystem.stopBeltCommand(),
+
+                new FollowPath(paths.pathRow2OpenGate),
+
+                new Delay(.5),
+
+                new FollowPath(paths.pathRow2Score),
+                shootSystem.shootCommand(0.8, 1700)
+                );
     }
+
 
     @Override
     public void onStartButtonPressed(){
@@ -53,5 +64,6 @@ public class DUCK extends NextFTCOpMode {
         CommandManager.INSTANCE.run();
 
     }
-
+    
+    
 }

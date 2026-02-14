@@ -2,7 +2,7 @@ package org.firstinspires.ftc.teamcode.opmode.auto;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
-import org.firstinspires.ftc.teamcode.config.paths.FarBluePaths;
+import org.firstinspires.ftc.teamcode.config.paths.OldFarBluePaths;
 import org.firstinspires.ftc.teamcode.config.pedroPathing.Constants;
 import org.firstinspires.ftc.teamcode.config.subsystems.ShootSystem;
 
@@ -14,19 +14,19 @@ import dev.nextftc.extensions.pedro.PedroComponent;
 import dev.nextftc.ftc.NextFTCOpMode;
 
 @Autonomous(name = "FarBlue")
-public class Far9Blue extends NextFTCOpMode{
+public class OldFarBlue extends NextFTCOpMode{
 
     ShootSystem shootSystem;
 
-    FarBluePaths paths;
+    OldFarBluePaths paths;
 
-    public Far9Blue(){
+    public OldFarBlue(){
         addComponents(new PedroComponent(Constants::createFollower));
     }
 
     private SequentialGroup autonomousRoutine() {
         shootSystem = new ShootSystem(hardwareMap, telemetry);
-        paths = new FarBluePaths(PedroComponent.follower());
+        paths = new OldFarBluePaths(PedroComponent.follower());
 
         PedroComponent.follower().setStartingPose(paths.startPose);
 

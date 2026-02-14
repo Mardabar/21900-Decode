@@ -6,19 +6,28 @@ import com.pedropathing.geometry.Pose;
 import com.pedropathing.geometry.BezierLine;
 import com.pedropathing.paths.PathChain;
 
-public class CloseRedPaths {
+public class OldCloseBluePaths {
 
 
     /// BOT WIDTH 15.375
     /// BOT LENGTH 15.75
+//    /// START POSE
+//    public final Pose startPose = new Pose(27, 131.8, Math.toRadians(143));
+//    public final Pose preScorePose = new Pose(50, 115, Math.toRadians(146));
+//    public final Pose row1Line = new Pose(51, 84, Math.toRadians(180)), row1Grab = new Pose(17, 84, Math.toRadians(180)), row1Score = new Pose(39.5, 102, Math.toRadians(135));
+//    public final Pose row2Line = new Pose(51, 60, Math.toRadians(180)), row2Grab = new Pose(14, 60, Math.toRadians(180)), row2ScoreCP = new Pose(53, 58), row2Score = new Pose(50, 93, Math.toRadians(135));
+//    public final Pose row3Line = new Pose(51, 35, Math.toRadians(180)), row3Grab = new Pose(14, 35, Math.toRadians(180)), row3Score = new Pose(48, 107, Math.toRadians(138));
+//
+//    final Pose row3ParkClose = new Pose(45, 72, Math.toRadians(138));
 
-    /// START POSE
-    public final Pose startPose = new Pose(27, 131.8, Math.toRadians(143)).mirror();
-    final Pose preScorePose = new Pose(50, 115, Math.toRadians(146)).mirror();
-    final Pose row1Line = new Pose(51, 84, Math.toRadians(180)).mirror(), row1Grab = new Pose(18, 84, Math.toRadians(180)).mirror(), row1Score = new Pose(39.5, 102, Math.toRadians(135)).mirror();
-    final Pose row2Line = new Pose(51, 60, Math.toRadians(180)).mirror(), row2Grab = new Pose(13, 60, Math.toRadians(180)).mirror(), row2ScoreCP = new Pose(53, 58), row2Score = new Pose(50, 93, Math.toRadians(135)).mirror();
-    final Pose row3Line = new Pose(51, 35, Math.toRadians(180)).mirror(), row3Grab = new Pose(13, 35, Math.toRadians(180)).mirror(), row3Score = new Pose(48, 107, Math.toRadians(138)).mirror();
-    final Pose row3ParkClose = new Pose(45, 72, Math.toRadians(138)).mirror();
+    public final Pose startPose = new Pose(27, 131.8, Math.toRadians(143));
+    final Pose preScorePose = new Pose(50, 115, Math.toRadians(146));
+    final Pose row1Line = new Pose(51, 84, Math.toRadians(180)), row1Grab = new Pose(23, 84, Math.toRadians(180)), row1Score = new Pose(39.5, 102, Math.toRadians(135));
+    final Pose row2Line = new Pose(51, 60, Math.toRadians(180)), row2Grab = new Pose(15, 60, Math.toRadians(180)), row2ScoreCP = new Pose(53, 58), row2Score = new Pose(50, 93, Math.toRadians(135));
+    final Pose row3Line = new Pose(51, 35, Math.toRadians(180)), row3Grab = new Pose(15, 35, Math.toRadians(180)), row3Score = new Pose(48, 107, Math.toRadians(138));
+    final Pose row3ParkClose = new Pose(45, 72, Math.toRadians(138));
+    
+
 
 
     public PathChain pathPreScore, pathRow1Line, pathRow1Grab, pathRow1Score, pathRow2Line, pathRow2Grab, pathRow2Score, pathRow3Line, pathRow3Grab,  pathRow3Score, pathPark;
@@ -29,7 +38,8 @@ public class CloseRedPaths {
 
 
 
-    public CloseRedPaths(Follower fol){
+    public OldCloseBluePaths(Follower fol){
+
 
         pathPreScore = fol.pathBuilder()
                 .addPath(new BezierLine(startPose, preScorePose))
@@ -86,8 +96,9 @@ public class CloseRedPaths {
                 .setLinearHeadingInterpolation(row3Score.getHeading(), row3ParkClose.getHeading())
                 .build();
 
-
     }
 
 
 }
+
+

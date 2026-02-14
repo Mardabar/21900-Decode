@@ -23,17 +23,16 @@ dependencies {
 
     //implementation 'com.pedropathing:ftc:2.0.6'
     implementation 'com.pedropathing:telemetry:1.0.0'
-    implementation 'com.rowanmcalpin.nextftc:core:0.5.6-beta'
-    implementation 'com.pedropathing:telemetry:1.0.0'
     implementation 'com.pedropathing:ftc:2.1.0-SNAPSHOT'
 
 
     // panels
     implementation 'com.bylazar:fullpanels:1.0.12'
     implementation 'com.rowanmcalpin.nextftc:ftc:0.5.6-beta'
+    implementation 'com.acmerobotics.dashboard:dashboard:0.4.16'
 
     // next ftc
-    implementation 'com.acmerobotics.dashboard:dashboard:0.4.16'
+    implementation 'com.rowanmcalpin.nextftc:core:0.5.6-beta'
 
 
     implementation 'androidx.appcompat:appcompat:1.7.1'
