@@ -13,7 +13,7 @@ import dev.nextftc.extensions.pedro.FollowPath;
 import dev.nextftc.extensions.pedro.PedroComponent;
 import dev.nextftc.ftc.NextFTCOpMode;
 
-@Autonomous(name = "FarBlue")
+@Autonomous(name = "Old Far Blue")
 public class OldFarBlue extends NextFTCOpMode{
 
     ShootSystem shootSystem;

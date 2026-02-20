@@ -13,20 +13,27 @@ import com.qualcomm.hardware.limelightvision.LLResultTypes;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.config.pedroPathing.Constants;
+import org.firstinspires.ftc.teamcode.config.subsystems.ControlSystem;
+import org.firstinspires.ftc.teamcode.config.subsystems.MathUtilities;
 import org.firstinspires.ftc.teamcode.config.subsystems.ShootSystem;
 
+import java.util.Arrays;
+
 @Configurable
-@TeleOp(name = "Solo Tele")
-public class SoloTele extends OpMode {
+@TeleOp(name = "Test Tele")
+public class TestTele extends OpMode {
 
     ShootSystem shooter;
 
 
     private Follower fol;
-    private final Pose startingPose = new Pose(72, 72, Math.toRadians(0));
+    // 72, 72 is middle, 27, 131.8, Math.toRadians(143) is blue auto starting
+    private final Pose startingPose = new Pose(72, 72, Math.toRadians(180));
 
+    private final Pose blueGoalPose = new Pose(11, 36);
     private DcMotorEx lb, rb, lf, rf;
 
     private final double p = 0.03, d = 0.00011;
@@ -45,7 +52,7 @@ public class SoloTele extends OpMode {
         rf = hardwareMap.get(DcMotorEx.class, "rf");
 
         fol = Constants.createFollower(hardwareMap);
-        fol.setStartingPose(startingPose);
+        fol.setPose(startingPose);
         fol.startTeleOpDrive();
 
         shooter.beltSpeed = 0.8;
@@ -72,42 +79,38 @@ public class SoloTele extends OpMode {
         }
 
         if (gamepad1.a) {
-            isShooting = true;
-            shooter.Shoot();
+            shooter.TestShoot();
         } else {
-            isShooting = false;
             shooter.StopMotors();
-            iSum = 0;
         }
 
-        if (gamepad1.dpad_down) {
+        if (gamepad1.dpad_left || gamepad2.dpad_left) {
             shooter.flywheel.setVelocity(-IDLE_VELO);
         }
 
-        if (gamepad1.x)
-            if(isShooting)
-                shooter.RunBelt(shooter.beltSpeed);
-        else
-                shooter.RunBelt(.8);
+        shooter.adjustServoManual(gamepad1.dpad_up, gamepad1.dpad_down);
 
-        else if (gamepad1.b) {
-            shooter.RunBelt(-shooter.beltSpeed);
-        }
+
+        if (gamepad1.x)
+            shooter.RunBelt(1);
+        else if (gamepad1.b)
+            shooter.RunBelt(-1);
         else
             shooter.RunBelt(0);
-
-
 
         if (gamepad1.y) shooter.feeder.setPosition(closePos);
         else shooter.feeder.setPosition(openPos);
 
-        telemetry.addData("Cam Dist", shooter.getDistance());
-        telemetry.addData("Belt speed", shooter.beltSpeed);
         telemetry.addData("Target TPS", shooter.shootVel);
         telemetry.addData("Actual TPS", shooter.flywheel.getVelocity());
-        //telemetry.addData("Servo Pos", shooter.angleAdjuster.getPosition());
+        telemetry.addData("Servo Pos", shooter.angleAdjuster.getPosition());
+        telemetry.addData("X pose", fol.getPose().getX());
+        telemetry.addData("Y pose", fol.getPose().getY());
+        telemetry.addData("Distance from Pos", MathUtilities.calculateDistance(fol.getPose(), blueGoalPose));
         telemetry.update();
+
     }
+
 
     private void PIDAdjusting(LLResultTypes.FiducialResult res) {
         double error = res.getTargetXDegrees();

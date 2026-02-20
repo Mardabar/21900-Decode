@@ -38,7 +38,7 @@ public class ShootSystem {
     private static final double MAX_HEIGHT = 1.4;
 
     private final VoltageSensor battery;
-    private final Follower fol;
+    public final Follower fol;
     public final Limelight3A cam;
     private final Telemetry telemetry;
     private final TreeMap<Double, Double> angleMap = new TreeMap<>();
@@ -70,6 +70,8 @@ public class ShootSystem {
 
     private void initDistances() {
         // linear interpolation table (dist in meters to servo pos)
+//        /** OLD LERP DATA
+
         angleMap.put(0.9144, 0.122);
         angleMap.put(1.0922, 0.132);
         angleMap.put(1.1938, 0.130);
@@ -78,6 +80,31 @@ public class ShootSystem {
         angleMap.put(1.6256, 0.237);
         angleMap.put(2.0574, 0.248);
         angleMap.put(3.0734, 0.19);
+
+        // New LERP data
+//        angleMap.put(0.489712, 0.129);
+//        angleMap.put(0.633476, 0.129);
+//        angleMap.put(0.7726934, 0.166);
+//        angleMap.put(0.8993826, 0.166);
+//        angleMap.put(1.016, 0.17);
+//        angleMap.put(1.1684, 0.18);
+//        angleMap.put(1.2790424, 0.194);
+//        angleMap.put(1.4224, 0.21);
+//        angleMap.put(2.9718, .23);
+
+
+
+        /* new lerp table in inches blyat
+        19.28, 0.129   0.489712
+        24.94, 0.129   0.633476
+        30.421, 0.166  0.7726934
+        35.19, 0.166   0.8993826
+        40, 0.17       1.016
+        46, 0.18       1.1684
+        50.356, 0.194  1.2790424
+        56, .21        1.4224
+        117, .23       2.9718
+         */
     }
 
     private void updateControls(Gamepad gamepad){
@@ -116,6 +143,15 @@ public class ShootSystem {
 
     }
 
+    public void TestShoot() {
+        LLResult result = cam.getLatestResult();
+        if (result != null && result.isValid()) {
+            updateVars(result);
+        }
+
+        updateFlywheelControl(shootVel);
+    }
+
     public double getDistance() {
         LLResult result = cam.getLatestResult();
         if (result != null && result.isValid()) {
@@ -135,7 +171,18 @@ public class ShootSystem {
                 double angle = 25.2 + res.getTargetYDegrees();
                 double limeDist = (0.646 / Math.tan(Math.toRadians(angle))) + 0.2;
 
-                beltSpeed = (limeDist < 2.6) ? 0.65 : 0.3;
+//                beltSpeed = (limeDist < 2.6) ? 0.65 : 0.3;
+                if (limeDist < .5)
+                    beltSpeed = 1;
+//                else if (limeDist < 1)
+//                    beltSpeed = .8;
+//                else if (limeDist < 1.5)
+//                    beltSpeed = .7;
+                else if(limeDist < 2.2)
+                    beltSpeed = .8;
+                else if (limeDist < 2.8)
+                    beltSpeed = .45;
+
                 setShootPos(limeDist);
             }
         }
