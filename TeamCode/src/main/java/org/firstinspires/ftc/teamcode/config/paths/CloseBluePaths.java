@@ -15,12 +15,13 @@ public class CloseBluePaths {
     public final Pose startPose = new Pose(28, 131.5, Math.toRadians(143));
     final Pose preScorePose = new Pose(50, 115, Math.toRadians(143));
     final Pose row1Line = new Pose(52, 84, Math.toRadians(180)), row1Grab = new Pose(20, 84, Math.toRadians(180)), row1Score = new Pose(40, 102, Math.toRadians(135));
-    final Pose row2Line = new Pose(52, 60, Math.toRadians(180)), row2Grab = new Pose(13, 60, Math.toRadians(180)), row2ScoreCP = new Pose(53, 58), row2Score = new Pose(50, 93, Math.toRadians(135));
-    final Pose row3Line = new Pose(52, 35, Math.toRadians(180)), row3Grab = new Pose(13, 35, Math.toRadians(180)), row3Score = new Pose(48, 107, Math.toRadians(138));
+    final Pose row2Line = new Pose(52, 60, Math.toRadians(180)), row2Grab = new Pose(14.5, 60, Math.toRadians(180)), row2ScoreCP = new Pose(53, 58), row2Score = new Pose(50, 93, Math.toRadians(135));
+    final Pose openGate = new Pose(17.5, 70, Math.toRadians(180)), openGateCP = new Pose(38, 60);
+    final Pose row3Line = new Pose(52, 35, Math.toRadians(180)), row3Grab = new Pose(14.5, 35, Math.toRadians(180)), row3Score = new Pose(48, 107, Math.toRadians(138));
     final Pose row3ParkClose = new Pose(45, 72, Math.toRadians(138));
 
 
-    public PathChain pathPreScore, pathRow1Line, pathRow1Grab, pathRow1Score, pathRow2Line, pathRow2Grab, pathRow2Score, pathRow3Line, pathRow3Grab,  pathRow3Score, pathPark;
+    public PathChain pathPreScore, pathRow1Line, pathRow1Grab, pathRow1Score, pathRow2Line, pathRow2Grab, pathOpenGate, pathRow2Score, pathRow3Line, pathRow3Grab,  pathRow3Score, pathPark;
 
     public CloseBluePaths(Follower fol){
 
@@ -54,9 +55,14 @@ public class CloseBluePaths {
                 .setLinearHeadingInterpolation(row2Line.getHeading(), row2Grab.getHeading())
                 .build();
 
+        pathOpenGate = fol.pathBuilder()
+                .addPath(new BezierCurve(row2Grab, openGateCP, openGate))
+                .setLinearHeadingInterpolation(row2Grab.getHeading(), openGate.getHeading())
+                .build();
+
         pathRow2Score = fol.pathBuilder()
-                .addPath(new BezierCurve(row2Grab, row2ScoreCP, row2Score))
-                .setLinearHeadingInterpolation(row2Grab.getHeading(), row2Score.getHeading())
+                .addPath(new BezierCurve(openGate, row2ScoreCP, row2Score))
+                .setLinearHeadingInterpolation(openGate.getHeading(), row2Score.getHeading())
                 .build();
 
         pathRow3Line = fol.pathBuilder()

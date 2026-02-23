@@ -29,6 +29,7 @@ public class SoloTele extends OpMode {
 
     private DcMotorEx lb, rb, lf, rf;
 
+    private int dpad = 0;
     private final double p = 0.03, d = 0.00011;
     private double lastError;
     private double iSum;
@@ -97,9 +98,18 @@ public class SoloTele extends OpMode {
             shooter.RunBelt(0);
 
 
+        if(gamepad1.dpad_left ){
+            shooter.blockIn();
+        } else if (gamepad1.dpad_right){
+            shooter.blockOut();
+        }
 
-        if (gamepad1.y) shooter.feeder.setPosition(closePos);
-        else shooter.feeder.setPosition(openPos);
+
+
+        if (gamepad1.y)
+            shooter.feederUp();
+        else
+            shooter.feederDown();
 
         telemetry.addData("Cam Dist", shooter.getDistance());
         telemetry.addData("Belt speed", shooter.beltSpeed);
@@ -113,7 +123,6 @@ public class SoloTele extends OpMode {
         double error = res.getTargetXDegrees();
         iSum += error;
         double derError = lastError - error;
-
         double power = (error * p) + (derError * d);
         lb.setPower(power);
         rb.setPower(-power);

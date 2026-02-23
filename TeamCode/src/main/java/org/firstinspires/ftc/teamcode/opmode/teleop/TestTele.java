@@ -84,11 +84,11 @@ public class TestTele extends OpMode {
             shooter.StopMotors();
         }
 
-        if (gamepad1.dpad_left || gamepad2.dpad_left) {
-            shooter.flywheel.setVelocity(-IDLE_VELO);
-        }
+//        if (gamepad1.dpad_down || gamepad2.dpad_down) {
+//            shooter.flywheel.setVelocity(-IDLE_VELO);
+//        }
 
-        shooter.adjustServoManual(gamepad1.dpad_up, gamepad1.dpad_down);
+        //shooter.adjustBlockerManual(gamepad1.dpad_up, gamepad1.dpad_down);
 
 
         if (gamepad1.x)
@@ -98,12 +98,20 @@ public class TestTele extends OpMode {
         else
             shooter.RunBelt(0);
 
+
+        if(gamepad1.right_bumper){
+            shooter.blockOut();
+        } else if (gamepad1.left_bumper){
+            shooter.blockIn();
+        }
+
         if (gamepad1.y) shooter.feeder.setPosition(closePos);
         else shooter.feeder.setPosition(openPos);
 
         telemetry.addData("Target TPS", shooter.shootVel);
         telemetry.addData("Actual TPS", shooter.flywheel.getVelocity());
-        telemetry.addData("Servo Pos", shooter.angleAdjuster.getPosition());
+        telemetry.addData("Blocker Pos", shooter.blocker.getPosition());
+
         telemetry.addData("X pose", fol.getPose().getX());
         telemetry.addData("Y pose", fol.getPose().getY());
         telemetry.addData("Distance from Pos", MathUtilities.calculateDistance(fol.getPose(), blueGoalPose));

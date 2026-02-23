@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.config.subsystems;
 
 
 import static org.firstinspires.ftc.teamcode.config.pedroPathing.Tuning.follower;
+import static org.firstinspires.ftc.teamcode.config.subsystems.ControlSystem.IDLE_VELO;
 
 
 import com.pedropathing.follower.Follower;
@@ -30,47 +31,58 @@ import java.util.TreeMap;
 
 public class ShootSystem {
 
-    public final Servo angleAdjuster, feeder;
+    public final Servo angleAdjuster, feeder, blocker;
     public final DcMotorEx belt, flywheel;
 
-    public static double kP = 0.007, kS = 0.02, kV = 0.00045;
-    public final double openPos = .35, closePos = 0;
-    private static final double MAX_HEIGHT = 1.4;
-
-    private final VoltageSensor battery;
+    private final TreeMap<Double, Double> angleMap = new TreeMap<>();
+    public final VoltageSensor battery;
     public final Follower fol;
     public final Limelight3A cam;
-    private final Telemetry telemetry;
-    private final TreeMap<Double, Double> angleMap = new TreeMap<>();
-    public double anglePos = 0.5, shootVel, beltSpeed = 1, manualServoPos = 0.15;
+    public final Telemetry telemetry;
+
+    public double anglePos = 0.5, shootVel, beltSpeed = 1, manualServoPos = 0.15, manualBlockerPos = 0.1;
+    public static double kP = 0.007, kS = 0.02, kV = 0.00045;
+    public final double downPos = .35, upPos = 0, inPos = 0.1, outPos = 1;
+    public static final double MAX_HEIGHT = 1.4;
+
+    // Equation: y = ax^2 + bx + c
+    public static double hoodA = 0;
+    public static double hoodB = 0;
+    public static double hoodC = 0;
 
 
     public ShootSystem(HardwareMap hardwareMap, Telemetry telemetry){
         this.fol = follower;
         this.telemetry = telemetry;
 
+        // Motors
         belt = hardwareMap.get(DcMotorEx.class, "belt");
         flywheel = hardwareMap.get(DcMotorEx.class, "cannon");
+
+        // Servos
         angleAdjuster = hardwareMap.get(Servo.class, "angleServo");
         feeder = hardwareMap.get(Servo.class, "feeder");
-        battery = hardwareMap.voltageSensor.iterator().next();
-        cam = hardwareMap.get(Limelight3A.class, "limelight");
+        blocker = hardwareMap.get(Servo.class, "blocker");
 
-        // Motor init
+        // Extra
+        cam = hardwareMap.get(Limelight3A.class, "limelight");
+        battery = hardwareMap.voltageSensor.iterator().next();
+
+        // Init
         flywheel.setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
         flywheel.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
         flywheel.setDirection(DcMotorEx.Direction.REVERSE);
         belt.setDirection(DcMotorEx.Direction.REVERSE);
         belt.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
-
+        blocker.setDirection(Servo.Direction.REVERSE);
         initDistances();
+        blocker.setPosition(.1);
         cam.pipelineSwitch(0);
         cam.start();
     }
 
     private void initDistances() {
         // linear interpolation table (dist in meters to servo pos)
-//        /** OLD LERP DATA
 
         angleMap.put(0.9144, 0.122);
         angleMap.put(1.0922, 0.132);
@@ -81,47 +93,27 @@ public class ShootSystem {
         angleMap.put(2.0574, 0.248);
         angleMap.put(3.0734, 0.19);
 
-        // New LERP data
-//        angleMap.put(0.489712, 0.129);
-//        angleMap.put(0.633476, 0.129);
-//        angleMap.put(0.7726934, 0.166);
-//        angleMap.put(0.8993826, 0.166);
-//        angleMap.put(1.016, 0.17);
-//        angleMap.put(1.1684, 0.18);
-//        angleMap.put(1.2790424, 0.194);
-//        angleMap.put(1.4224, 0.21);
-//        angleMap.put(2.9718, .23);
-
-
-
-        /* new lerp table in inches blyat
-        19.28, 0.129   0.489712
-        24.94, 0.129   0.633476
-        30.421, 0.166  0.7726934
-        35.19, 0.166   0.8993826
-        40, 0.17       1.016
-        46, 0.18       1.1684
-        50.356, 0.194  1.2790424
-        56, .21        1.4224
-        117, .23       2.9718
-         */
-    }
-
-    private void updateControls(Gamepad gamepad){
-
-        // Shooting
-        if(gamepad.a)
-            Shoot();
-        else
-            StopMotors();
-
-        if(gamepad.y)
-            blockerUp();
-        else
-            blockerDown();
-
+         /*New LERP data
+        angleMap.put(0.489712, 0.129);
+        angleMap.put(0.633476, 0.129);
+        angleMap.put(0.7726934, 0.166);
+        angleMap.put(0.8993826, 0.166);
+        angleMap.put(1.016, 0.17);
+        angleMap.put(1.1684, 0.18);
+        angleMap.put(1.2790424, 0.194);
+        angleMap.put(1.4224, 0.21);
+        angleMap.put(2.9718, .23); */
 
     }
+
+    private void calcHoodPos(double distance) {
+        // Impl the quadratic formula y = ax^2 + bx + c
+        anglePos = (hoodA * Math.pow(distance, 2)) + (hoodB * distance) + hoodC;
+
+        anglePos = Math.max(0.12, Math.min(0.25, anglePos));
+    }
+
+
 
     public void updateFlywheelControl(double targetTPS) {
         double currentTPS = flywheel.getVelocity();
@@ -141,6 +133,12 @@ public class ShootSystem {
         updateFlywheelControl(shootVel);
         angleAdjuster.setPosition(anglePos);
 
+        if (Math.abs(shootVel - flywheel.getVelocity()) < 100) {
+            blockIn();
+        } else {
+            blockOut();
+        }
+
     }
 
     public void TestShoot() {
@@ -148,9 +146,9 @@ public class ShootSystem {
         if (result != null && result.isValid()) {
             updateVars(result);
         }
-
         updateFlywheelControl(shootVel);
     }
+
 
     public double getDistance() {
         LLResult result = cam.getLatestResult();
@@ -171,7 +169,6 @@ public class ShootSystem {
                 double angle = 25.2 + res.getTargetYDegrees();
                 double limeDist = (0.646 / Math.tan(Math.toRadians(angle))) + 0.2;
 
-//                beltSpeed = (limeDist < 2.6) ? 0.65 : 0.3;
                 if (limeDist < .5)
                     beltSpeed = 1;
 //                else if (limeDist < 1)
@@ -183,21 +180,31 @@ public class ShootSystem {
                 else if (limeDist < 2.8)
                     beltSpeed = .45;
 
-                setShootPos(limeDist);
+                oldSetShootPos(limeDist);
             }
         }
     }
 
-    private void setShootPos(double dist) {
+    private void oldSetShootPos(double dist) {
         double distMult = dist * 1.2;
         double veloMult = 2.21 + (distMult * 0.15);
-
 
         double targetAngle = Math.toDegrees(Math.atan(54.88 / (9.8 * distMult)));
         double rawVel = Math.sqrt((MAX_HEIGHT * 19.6) / Math.pow(Math.sin(Math.toRadians(targetAngle)), 2)) * veloMult;
 
         shootVel = (rawVel / (9.6 * Math.PI)) * 2800; // Vel to TPS
         interpolateAngle(distMult);
+    }
+
+
+    private void setShootPos(double dist) {
+        double effectiveDist = dist * 1.2;
+        double veloMult = 2.21 + (effectiveDist * 0.15);
+
+        double targetAngle = Math.toDegrees(Math.atan(54.88 / (9.8 * effectiveDist)));
+        double rawVel = Math.sqrt((MAX_HEIGHT * 19.6) / Math.pow(Math.sin(Math.toRadians(targetAngle)), 2)) * veloMult;
+        shootVel = (rawVel / (9.6 * Math.PI)) * 2800;
+        calcHoodPos(effectiveDist);
     }
 
     // LERP
@@ -222,21 +229,45 @@ public class ShootSystem {
         flywheel.setPower(0);
         stopBelt();
     }
-
-    public void blockerUp(){
-        feeder.setPosition(closePos);
+    
+    public void StopWheel() {
+        flywheel.setPower(0);
     }
 
-    public void blockerDown(){
-        feeder.setPosition(openPos);
+    public void reverseWheel() {
+        flywheel.setVelocity(-IDLE_VELO);
     }
+
+    public void feederUp(){
+        feeder.setPosition(upPos);
+    }
+    public void feederDown(){
+        feeder.setPosition(downPos);
+    }
+    
+    public void blockOut(){
+        blocker.setPosition(outPos);
+    }
+
+    public void blockIn(){
+        blocker.setPosition(inPos);
+    }
+
     public void adjustServoManual(boolean up, boolean down) {
         double increment = 0.001;
         if (up) {manualServoPos += increment;}
         else if (down) { manualServoPos -= increment;}
         manualServoPos = Math.clamp(manualServoPos, 0, 1); angleAdjuster.setPosition(manualServoPos);
-
     }
+
+    public void adjustBlockerManual(boolean up, boolean down) {
+        double increment = 0.01;
+        if (up) {manualBlockerPos += increment;}
+        else if (down) { manualBlockerPos -= increment;}
+        manualBlockerPos = Math.clamp(manualBlockerPos, 0, 1); blocker.setPosition(manualBlockerPos);
+    }
+    
+    // Commands
 
     public Command runBeltCommand(double speed) {
         return new InstantCommand(() -> RunBelt(speed));
@@ -246,15 +277,35 @@ public class ShootSystem {
         return new InstantCommand(this::stopBelt);
     }
 
-    public Command shootCommand(double beltPower, double durationMs) {
+    public Command stopFlyWheel(){
+        return new InstantCommand(this::StopWheel);
+    }
+
+    public Command reverseFlyWheel(){
+        return new InstantCommand(this::reverseWheel);
+    }
+
+    public Command blockerIn(){
+        return new InstantCommand(this::blockIn);
+    }
+
+    public Command blockerOut(){
+        return new InstantCommand(this::blockOut);
+    }
+ 
+
+
+    public Command shootClose(double beltPower, double durationMs) {
         ElapsedTime timer = new ElapsedTime();
         return new LambdaCommand("shootCommand")
                 .setStart(timer::reset)
                 .setUpdate(() -> {
                     this.Shoot();
 
-                    if (timer.milliseconds() > 900) feeder.setPosition(closePos);
-                    else feeder.setPosition(openPos);
+                    if (timer.milliseconds() > durationMs - 550)
+                        feederUp();
+                    else
+                        feederDown();
 
                     if (timer.milliseconds() > 500 && (Math.abs(shootVel - flywheel.getVelocity()) < 50 || timer.milliseconds() > 700)) {
                         RunBelt(beltPower);
@@ -262,10 +313,46 @@ public class ShootSystem {
                 })
                 .setStop(interrupted -> {
                     StopMotors();
-                    feeder.setPosition(openPos);
+                    feederDown();
                 })
                 .setIsDone(() -> timer.milliseconds() > durationMs);
     }
+
+    public Command shootFar(double beltPower, double durationMs) {
+        ElapsedTime timer = new ElapsedTime();
+        return new LambdaCommand("shootCommand")
+                .setStart(timer::reset)
+                .setUpdate(() -> {
+                    this.Shoot();
+
+                    if (timer.milliseconds() > durationMs - 550)
+                        feederUp();
+                    else
+                        feederDown();
+
+                    if (timer.milliseconds() > 500 && (Math.abs(shootVel - flywheel.getVelocity()) < 50 || timer.milliseconds() > 700)) {
+                        RunBelt(beltPower);
+                    }
+                })
+                .setStop(interrupted -> {
+                    StopMotors();
+                    feederDown();
+                })
+                .setIsDone(() -> timer.milliseconds() > durationMs);
+    }
+
+    public Command runBeltForTime(double speed, double durationMs) {
+        ElapsedTime timer = new ElapsedTime();
+        return new LambdaCommand("runBeltForTime")
+                .setStart(() -> {
+                    timer.reset();
+                    RunBelt(speed);
+                })
+                .setIsDone(() -> timer.milliseconds() > durationMs)
+                .setStop(interrupted -> stopBelt());
+    }
+
+
 
 
 

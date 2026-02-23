@@ -10,9 +10,9 @@ public class FarBluePaths {
 
 
     public final Pose startPose = new Pose(56, 8, Math.toRadians(90));
-    final Pose preScorePose = new Pose(58, 17, Math.toRadians(120));
-    final Pose cornerBallLine = new Pose(14, 17, Math.toRadians(190)), cornerBallGrab = new Pose(10, 10, Math.toRadians(199)), cornerBallScore = new Pose(57, 16, Math.toRadians(112));
-    final Pose cornerBallGrabCP1 = new Pose(10, 16.7), cornerBallGrabCP2 = new Pose(12.5, 10.2);
+    final Pose preScorePose = new Pose(58, 17, Math.toRadians(113));
+    final Pose cornerBallLine = new Pose(16, 18, Math.toRadians(-160)), cornerBallGrab = new Pose(14, 11, Math.toRadians(-150)), cornerBallScore = new Pose(57, 16, Math.toRadians(112));
+    final Pose cornerBallGrabCP1 = new Pose(16.6, 14), cornerBallGrabCP2 = new Pose(12.5, 10.2); // was 10, 16.7
     final Pose row3Line = new Pose(50, 35.5, Math.toRadians(180)), row3Grab = new Pose(12, 35.5, Math.toRadians(180)), row3Score = new Pose(53, 18, Math.toRadians(112));
     final Pose park = new Pose(56, 31, Math.toRadians(112));
 
@@ -31,7 +31,7 @@ public class FarBluePaths {
                 .build();
 
         pathCornerBallGrab = fol.pathBuilder()
-                .addPath(new BezierCurve(cornerBallLine, cornerBallGrabCP1, cornerBallGrabCP2, cornerBallGrab))
+                .addPath(new BezierLine(cornerBallLine, cornerBallGrab))
                 .setLinearHeadingInterpolation(cornerBallLine.getHeading(), cornerBallGrab.getHeading())
                 .build();
 

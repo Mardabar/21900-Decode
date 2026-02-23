@@ -36,7 +36,7 @@ public class CloseGateBlue extends NextFTCOpMode{
 
                 new FollowPath(paths.pathPreScore),
 
-                shootSystem.shootCommand(0.8, 1500),
+                shootSystem.shootClose(0.8, 1500),
 
                 new FollowPath(paths.pathRow2Grab)
                         .asDeadline(shootSystem.runBeltCommand(0.5)),
@@ -48,7 +48,7 @@ public class CloseGateBlue extends NextFTCOpMode{
                 new Delay(.5),
 
                 new FollowPath(paths.pathRow2Score),
-                shootSystem.shootCommand(0.8, 1700),
+                shootSystem.shootClose(0.8, 1700),
 
                 new FollowPath(paths.pathRow1Line),
 
@@ -56,7 +56,7 @@ public class CloseGateBlue extends NextFTCOpMode{
                         .asDeadline(shootSystem.runBeltCommand(.5)),
 
                 new FollowPath(paths.pathRow1Score),
-                shootSystem.shootCommand(0.8, 1700)
+                shootSystem.shootClose(0.8, 1700)
                 );
     }
 
