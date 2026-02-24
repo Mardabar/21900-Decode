@@ -50,9 +50,10 @@ public class ShootSystem {
     public static final double MAX_HEIGHT = 1.4;
 
     // Equation: y = ax^2 + bx + c
-    public static double hoodA = 0;
-    public static double hoodB = 0;
-    public static double hoodC = 0;
+    //y=-0.0454854x^{2}+0.217006x-0.023787
+    public static double hoodA = -0.0454854;
+    public static double hoodB = 0.217006;
+    public static double hoodC = -0.023787;
 
 
     public ShootSystem(HardwareMap hardwareMap, Telemetry telemetry){
@@ -79,7 +80,7 @@ public class ShootSystem {
         belt.setDirection(DcMotorEx.Direction.REVERSE);
         belt.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
         blocker.setDirection(Servo.Direction.REVERSE);
-        initDistances();
+        //initDistances();
         blocker.setPosition(.1);
         cam.pipelineSwitch(0);
         cam.start();
@@ -137,7 +138,7 @@ public class ShootSystem {
         updateFlywheelControl(shootVel);
         angleAdjuster.setPosition(anglePos);
 
-        if (Math.abs(shootVel - flywheel.getVelocity()) < 100) {
+        if (Math.abs(shootVel - flywheel.getVelocity()) < 300) {
             blockIn();
         } else {
             blockOut();
@@ -197,7 +198,7 @@ public class ShootSystem {
                 else if (limeDist < 2.8)
                     beltSpeed = .45;
 
-                oldSetShootPos(limeDist);
+                setShootPos(limeDist);
             }
         }
     }
@@ -271,7 +272,7 @@ public class ShootSystem {
     }
 
     public void adjustServoManual(boolean up, boolean down) {
-        double increment = 0.001;
+        double increment = 0.005;
         if (up) {manualServoPos += increment;}
         else if (down) { manualServoPos -= increment;}
         manualServoPos = Math.clamp(manualServoPos, 0, 1); angleAdjuster.setPosition(manualServoPos);

@@ -88,7 +88,7 @@ public class TestTele extends OpMode {
 //            shooter.flywheel.setVelocity(-IDLE_VELO);
 //        }
 
-        //shooter.adjustBlockerManual(gamepad1.dpad_up, gamepad1.dpad_down);
+        shooter.adjustServoManual(gamepad1.dpad_up, gamepad1.dpad_down);
 
 
         if (gamepad1.x)
@@ -105,10 +105,10 @@ public class TestTele extends OpMode {
 //            shooter.blockOut();
 //        }
 
-        if(shooter.flywheel.getVelocity() > 600)
-            shooter.blockOut();
-        else
-            shooter.blockOut();
+//        if(shooter.flywheel.getVelocity() > 600)
+//            shooter.blockOut();
+//        else
+//            shooter.blockOut();
 
 
         if (gamepad1.y) shooter.feeder.setPosition(closePos);
@@ -116,11 +116,9 @@ public class TestTele extends OpMode {
 
         telemetry.addData("Target TPS", shooter.shootVel);
         telemetry.addData("Actual TPS", shooter.flywheel.getVelocity());
-        telemetry.addData("Blocker Pos", shooter.blocker.getPosition());
+        telemetry.addData("Angle Pos", shooter.angleAdjuster.getPosition());
 
-        telemetry.addData("X pose", fol.getPose().getX());
-        telemetry.addData("Y pose", fol.getPose().getY());
-        telemetry.addData("Distance from Pos", MathUtilities.calculateDistance(fol.getPose(), blueGoalPose));
+        telemetry.addData("Cam Dist", shooter.getDistance());
         telemetry.update();
 
     }

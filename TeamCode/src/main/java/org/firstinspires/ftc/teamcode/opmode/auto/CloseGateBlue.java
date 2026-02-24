@@ -39,7 +39,7 @@ public class CloseGateBlue extends NextFTCOpMode{
 
                 new FollowPath(paths.pathPreScore),
 
-                shootSystem.shootClose(0.6, 1450),
+                shootSystem.shootClose(0.6, 1500),
 
 
                 new ParallelGroup(
@@ -78,7 +78,7 @@ public class CloseGateBlue extends NextFTCOpMode{
                 ),
 
 
-                shootSystem.runBeltForTime(.8, 1),
+                shootSystem.runBeltForTime(.8, 1.5),
                 shootSystem.stopBeltCommand(),
 
                 new ParallelGroup(
@@ -91,12 +91,12 @@ public class CloseGateBlue extends NextFTCOpMode{
 
 
                 new ParallelGroup(
-                        new FollowPath(paths.pathFarmGate),
+                        new FollowPath(paths.pathFarmGate2),
                         shootSystem.blockerOut()
                 ),
 
 
-                shootSystem.runBeltForTime(.8, 1),
+                shootSystem.runBeltForTime(.8, 1.5),
                 shootSystem.stopBeltCommand(),
 
                 new ParallelGroup(

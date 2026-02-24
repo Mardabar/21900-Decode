@@ -17,7 +17,7 @@ public class CloseBluePaths {
     final Pose row1Line = new Pose(52, 84, Math.toRadians(180)), row1Grab = new Pose(20, 84, Math.toRadians(180)), row1Score = new Pose(40, 102, Math.toRadians(135));
     final Pose row2Line = new Pose(52, 60, Math.toRadians(180)), row2Grab = new Pose(14.5, 60, Math.toRadians(180)), row2ScoreCP = new Pose(53, 58), row2Score = new Pose(50, 93, Math.toRadians(135));
     final Pose openGate = new Pose(18, 64, Math.toRadians(180)), openGateCP = new Pose(36, 65);
-    final Pose row3Line = new Pose(52, 35, Math.toRadians(180)), row3Grab = new Pose(14.5, 35, Math.toRadians(180)), row3Score = new Pose(48, 107, Math.toRadians(138)), row3ScoreCP = new Pose(47.5, 73);
+    final Pose row3Line = new Pose(52, 35, Math.toRadians(180)), row3Grab = new Pose(13, 35, Math.toRadians(180)), row3Score = new Pose(48, 107, Math.toRadians(138)), row3ScoreCP = new Pose(47.5, 73);
     final Pose row3ParkClose = new Pose(45, 72, Math.toRadians(138));
 
 

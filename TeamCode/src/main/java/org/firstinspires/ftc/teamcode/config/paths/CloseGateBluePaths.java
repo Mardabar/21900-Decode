@@ -10,11 +10,12 @@ import com.pedropathing.paths.PathChain;
 
 public class CloseGateBluePaths {
 
-    public final Pose startPose = new Pose(28, 131.5, Math.toRadians(143));
+    public final Pose startPose = new Pose(28, 132, Math.toRadians(143));
     final Pose preScorePose = new Pose(52, 115, Math.toRadians(146));
     final Pose row1Line = new Pose(52, 84, Math.toRadians(180)), row1Grab = new Pose(20, 84, Math.toRadians(180)), row1Score = new Pose(40, 102, Math.toRadians(135));
     final Pose row2Line = new Pose(52, 60, Math.toRadians(180)), row2Grab = new Pose(14.5, 60, Math.toRadians(180)), row2ScoreCP = new Pose(53, 58), row2Score = new Pose(50, 93, Math.toRadians(135));
-    final Pose farmGate = new Pose(15, 61, Math.toRadians(155)), farmGateCP = new Pose(29, 60); // waas 18, 64 180;   36, 65
+    final Pose farmGate = new Pose(15, 62, Math.toRadians(155)), farmGateCP = new Pose(29, 60); // waas 18, 64 180;   36, 65
+    final Pose farmGate2  = new Pose(15, 62, Math.toRadians(155)), farmGateCP2 = new Pose(66, 55);
 
     //final Pose farmGate = new Pose(19, 64, Math.toRadians(160)), farmGateCP = new Pose(35, 60); // waas 18, 64 180;   36, 65
     final Pose openGate = new Pose(18, 64, Math.toRadians(180)), openGateCP = new Pose(36, 65);
@@ -25,7 +26,7 @@ public class CloseGateBluePaths {
 
 
 
-    public PathChain pathPreScore, pathRow2Line, pathRow2Grab, pathRow2Score, pathRow1Line, pathRow1Grab, pathRow1Score, pathFarmGate, pathOpenGate, pathRow3Line, pathRow3Grab, pathRow3Score, pathPark;
+    public PathChain pathPreScore, pathRow2Line, pathRow2Grab, pathRow2Score, pathRow1Line, pathRow1Grab, pathRow1Score, pathFarmGate, pathFarmGate2, pathOpenGate, pathRow3Line, pathRow3Grab, pathRow3Score, pathPark;
 
     public CloseGateBluePaths(Follower fol){
 
@@ -61,6 +62,11 @@ public class CloseGateBluePaths {
 
         pathFarmGate = fol.pathBuilder()
                 .addPath(new BezierCurve(row2Score, farmGateCP, farmGate))
+                .setLinearHeadingInterpolation(row2Score.getHeading(), farmGate.getHeading())
+                .build();
+
+        pathFarmGate2 = fol.pathBuilder()
+                .addPath(new BezierCurve(row2Score, farmGateCP2, farmGate))
                 .setLinearHeadingInterpolation(row2Score.getHeading(), farmGate.getHeading())
                 .build();
 

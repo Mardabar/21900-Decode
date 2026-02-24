@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.opmode.auto;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import org.firstinspires.ftc.teamcode.config.paths.CloseBluePaths;
+import org.firstinspires.ftc.teamcode.config.paths.CloseGateBluePaths;
 import org.firstinspires.ftc.teamcode.config.pedroPathing.Constants;
 import org.firstinspires.ftc.teamcode.config.subsystems.ShootSystem;
 
@@ -34,72 +35,80 @@ public class CloseBlue extends NextFTCOpMode {
 
 
         PedroComponent.follower().setStartingPose(paths.startPose);
+        PedroComponent.follower().setMaxPower(1.0);
 
         return new SequentialGroup(
 
                 new FollowPath(paths.pathPreScore),
 
-                shootSystem.shootClose(0.6, 1700),
+                shootSystem.shootClose(0.6, 1600),
 
-                new FollowPath(paths.pathRow1Line),
 
-                shootSystem.blockerOut(),
+                new ParallelGroup(
+                        new FollowPath(paths.pathRow1Line),
+                        shootSystem.blockerOut()
+                ),
 
 
                 new FollowPath(paths.pathRow1Grab)
                         .asDeadline(shootSystem.runBeltCommand(0.8)),
-
                 shootSystem.stopBeltCommand(),
+
+//                new ParallelGroup(
+//                        new FollowPath(paths.pathRow1Grab),
+//                        shootSystem.runBeltCommand(1)
+//                ),
+
+
+
+
 
 
                 new ParallelGroup(
                         new FollowPath(paths.pathRow1Score),
                         shootSystem.blockerIn()
                 ),
-
-                shootSystem.shootClose(0.8, 1700),
-
-                new FollowPath(paths.pathRow2Line),
-
-                shootSystem.blockerOut(),
-
-                //new InstantCommand(() -> PedroComponent.follower().setMaxPower(0.8)),
+                shootSystem.shootClose(1, 1600),
 
 
-//                new ParallelGroup(
-//                        new FollowPath(paths.pathRow2Grab),
-//                        shootSystem.runBeltForTime(0.5, 2000)),
+
+                new ParallelGroup(
+                        new FollowPath(paths.pathRow2Line),
+
+                        shootSystem.blockerOut()
+                ),
+
+
+
 
                 new FollowPath(paths.pathRow2Grab)
                         .asDeadline(shootSystem.runBeltCommand(0.8)),
+
                 shootSystem.stopBeltCommand(),
 
-
-                new InstantCommand(() -> PedroComponent.follower().setMaxPower(.5)),
-
                 new FollowPath(paths.pathOpenGate),
+                shootSystem.stopBeltCommand(),
 
                 new Delay(.4),
-
-
-                new InstantCommand(() -> PedroComponent.follower().setMaxPower(1.0)),
 
 
                 new ParallelGroup(
                         new FollowPath(paths.pathRow2Score),
                         shootSystem.blockerIn()
-                ),                shootSystem.shootClose(0.8, 1600),
+                ),
+
+                shootSystem.shootClose(0.8, 1600),
+
+
 
                 new ParallelGroup(
                         new FollowPath(paths.pathRow3Line),
                         shootSystem.blockerOut()),
 
 
-                //new InstantCommand(() -> PedroComponent.follower().setMaxPower(0.8)),
 
                 new FollowPath(paths.pathRow3Grab)
-                        .asDeadline(shootSystem.runBeltCommand(0.5)),
-//                shootSystem.runBeltForTime(0.5, 600),
+                        .asDeadline(shootSystem.runBeltCommand(0.8)),
 
 
                 new InstantCommand(() -> PedroComponent.follower().setMaxPower(1.0)),
