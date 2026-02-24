@@ -2,7 +2,6 @@ package org.firstinspires.ftc.teamcode.config.subsystems;
 
 
 import static org.firstinspires.ftc.teamcode.config.pedroPathing.Tuning.follower;
-import static org.firstinspires.ftc.teamcode.config.subsystems.ControlSystem.IDLE_VELO;
 
 
 import com.pedropathing.follower.Follower;
@@ -45,6 +44,8 @@ public class ShootSystem {
     public final Telemetry telemetry;
 
     public double anglePos = 0.5, shootVel, beltSpeed = 1, manualServoPos = 0.15, manualBlockerPos = 0.1;
+    public static final double IDLE_VELO = 700;
+
     public static double kP = 0.007, kS = 0.02, kV = 0.00045;
     public final double downPos = .35, upPos = 0, inPos = 0.1, outPos = 1;
     public static final double MAX_HEIGHT = 1.4;
@@ -256,6 +257,10 @@ public class ShootSystem {
         flywheel.setVelocity(-IDLE_VELO);
     }
 
+    public void spinUp() {
+        flywheel.setVelocity(IDLE_VELO);
+    }
+
     public void feederUp(){
         feeder.setPosition(upPos);
     }
@@ -302,6 +307,11 @@ public class ShootSystem {
     public Command reverseFlyWheel(){
         return new InstantCommand(this::reverseWheel);
     }
+
+    public Command spinUpCommand(){
+        return new InstantCommand(this::spinUp);
+    }
+
 
     public Command blockerIn(){
         return new InstantCommand(this::blockIn);

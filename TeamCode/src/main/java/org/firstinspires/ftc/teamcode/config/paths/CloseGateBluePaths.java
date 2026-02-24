@@ -10,19 +10,21 @@ import com.pedropathing.paths.PathChain;
 
 public class CloseGateBluePaths {
 
-    public final Pose startPose = new Pose(28, 132, Math.toRadians(143));
+
+    public final Pose startPose = new Pose(27, 131.5, Math.toRadians(139));
     final Pose preScorePose = new Pose(52, 115, Math.toRadians(146));
-    final Pose row1Line = new Pose(52, 84, Math.toRadians(180)), row1Grab = new Pose(20, 84, Math.toRadians(180)), row1Score = new Pose(40, 102, Math.toRadians(135));
-    final Pose row2Line = new Pose(52, 60, Math.toRadians(180)), row2Grab = new Pose(14.5, 60, Math.toRadians(180)), row2ScoreCP = new Pose(53, 58), row2Score = new Pose(50, 93, Math.toRadians(135));
+    final Pose row1Line = new Pose(52, 84, Math.toRadians(180)), row1Grab = new Pose(20, 84, Math.toRadians(180)), row1Score = new Pose(40, 102, Math.toRadians(135)), row1ScoreCP = new Pose(47, 67);
+    final Pose row2Line = new Pose(52, 60, Math.toRadians(180)), row2Grab = new Pose(14.5, 60, Math.toRadians(180)), row2ScoreCP = new Pose(60, 70), row2Score = new Pose(50, 93, Math.toRadians(135));
+    final Pose openGate = new Pose(13.5, 60, Math.toRadians(180)), openGateCP = new Pose(36, 65);
+
+    final Pose row3Line = new Pose(52, 36, Math.toRadians(180)), row3Grab = new Pose(12, 36, Math.toRadians(180)), row3Score = new Pose(48, 107, Math.toRadians(138)), row3ScoreCP = new Pose(47.5, 73);
+    final Pose row3ParkClose = new Pose(45, 72, Math.toRadians(138));
+
     final Pose farmGate = new Pose(15, 62, Math.toRadians(155)), farmGateCP = new Pose(29, 60);
     final Pose farmGateCP2 = new Pose(66, 55);
-    final Pose slapOpenGate = new Pose(15, 62, Math.toRadians(155)), slapOpenGateCP = new Pose(30, 60);
-    final Pose grabFromGate = new Pose(12, 53, Math.toRadians(140)), grabFromGateCP = new Pose(17, 56);
+    final Pose slapOpenGate = new Pose(12.5, 62, Math.toRadians(155)), slapOpenGateCP = new Pose(30, 60);
+    final Pose grabFromGate = new Pose(12, 53, Math.toRadians(144)), grabFromGateCP = new Pose(17, 56);
 
-    final Pose openGate = new Pose(18, 64, Math.toRadians(180)), openGateCP = new Pose(36, 65);
-
-    final Pose row3Line = new Pose(52, 35, Math.toRadians(180)), row3Grab = new Pose(14.5, 35, Math.toRadians(180)), row3Score = new Pose(48, 107, Math.toRadians(138)), row3ScoreCP = new Pose(47.5, 73);
-    final Pose row3ParkClose = new Pose(45, 72, Math.toRadians(138));
 
 
 
@@ -62,7 +64,7 @@ public class CloseGateBluePaths {
                 .build();
 
         pathFarmGate = fol.pathBuilder()
-                .addPath(new BezierCurve(row2Score, farmGateCP, farmGate))
+                .addPath(new BezierCurve(row2Score, farmGate, farmGate))
                 .setLinearHeadingInterpolation(row2Score.getHeading(), farmGate.getHeading())
                 .build();
 
@@ -89,8 +91,10 @@ public class CloseGateBluePaths {
 
         pathGrabFromGate = fol.pathBuilder()
                 .addPath(new BezierCurve(slapOpenGate, grabFromGateCP, grabFromGate))
-                .setLinearHeadingInterpolation(slapOpenGate.getHeading(), grabFromGateCP.getHeading())
+                .setLinearHeadingInterpolation(slapOpenGate.getHeading(), grabFromGate.getHeading())
                 .build();
+
+
 
         pathRow3Line = fol.pathBuilder()
                 .addPath(new BezierLine(row2Score, row3Line))

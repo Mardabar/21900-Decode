@@ -117,6 +117,7 @@ public class TestTele extends OpMode {
         telemetry.addData("Target TPS", shooter.shootVel);
         telemetry.addData("Actual TPS", shooter.flywheel.getVelocity());
         telemetry.addData("Angle Pos", shooter.angleAdjuster.getPosition());
+        telemetry.addData("Heading", fol.getHeading());
 
         telemetry.addData("Cam Dist", shooter.getDistance());
         telemetry.update();

@@ -37,6 +37,8 @@ public class CloseGateBlue extends NextFTCOpMode{
 
         return new SequentialGroup(
 
+                shootSystem.spinUpCommand(),
+
                 new FollowPath(paths.pathPreScore),
 
                 shootSystem.shootClose(0.6, 1500),
@@ -63,6 +65,8 @@ public class CloseGateBlue extends NextFTCOpMode{
 
                 new Delay(.4),
 
+                shootSystem.spinUpCommand(),
+
                 new ParallelGroup(
                         new FollowPath(paths.pathRow2Score),
                         shootSystem.blockerIn()
@@ -71,15 +75,19 @@ public class CloseGateBlue extends NextFTCOpMode{
 
 
                 //new InstantCommand(() -> PedroComponent.follower().setMaxPower(.85)),
-
                 new ParallelGroup(
                         new FollowPath(paths.pathFarmGate),
                         shootSystem.blockerOut()
                 ),
 
+//                new FollowPath(paths.pathGrabFromGate),
 
-                shootSystem.runBeltForTime(.8, 1.5),
+
+                shootSystem.runBeltForTime(1, 1.25),
                 shootSystem.stopBeltCommand(),
+
+                shootSystem.spinUpCommand(),
+
 
                 new ParallelGroup(
                         new FollowPath(paths.pathRow2Score),
@@ -91,13 +99,18 @@ public class CloseGateBlue extends NextFTCOpMode{
 
 
                 new ParallelGroup(
-                        new FollowPath(paths.pathFarmGate2),
+                        new FollowPath(paths.pathFarmGate),
                         shootSystem.blockerOut()
                 ),
 
+//                new FollowPath(paths.pathGrabFromGate),
 
-                shootSystem.runBeltForTime(.8, 1.5),
+
+                shootSystem.runBeltForTime(1, 1.25),
                 shootSystem.stopBeltCommand(),
+
+                shootSystem.spinUpCommand(),
+
 
                 new ParallelGroup(
                         new FollowPath(paths.pathRow2Score),
