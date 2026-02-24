@@ -17,19 +17,16 @@ public class ControlSystem {
     public static double kP = 0.007, kS = 0.02, kV = 0.00045;
     public static final double openPos = .35, closePos = 0, IDLE_VELO = 300;
 
-    // Quadratic Drag Vars
-    private static final double BALL_MASS = 0.0748;
-    private static final double GRAVITY = 9.8;
-    private static final double DRAG_COEFF = 0.26;
-
     // Sensor Vars
     private final VoltageSensor battery;
-    private LimeLightSubsystem camSystem;
     public final Limelight3A cam;
 
     // Motor and Servo Vars
-    public final Servo angleAdjuster, feeder;
+    public final Servo angleAdjuster, feeder, blocker;
     public final DcMotorEx belt, flywheel;
+
+    private final double extendPos = 1;
+    private final double retractPos = 0.1;
 
     // Servo Angle Stuff
     private final TreeMap<Double, Double> angleMap = new TreeMap<>();
@@ -43,6 +40,7 @@ public class ControlSystem {
         flywheel = hardwareMap.get(DcMotorEx.class, "cannon");
         angleAdjuster = hardwareMap.get(Servo.class, "angleServo");
         feeder = hardwareMap.get(Servo.class, "feeder");
+        blocker = hardwareMap.get(Servo.class, "blocker");
         battery = hardwareMap.voltageSensor.iterator().next();
         cam = hardwareMap.get(Limelight3A.class, "limelight");
 
@@ -53,6 +51,7 @@ public class ControlSystem {
         belt.setDirection(DcMotorEx.Direction.REVERSE);
         belt.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
 
+        blocker.setPosition(extendPos);
         initDistances();
         cam.pipelineSwitch(0);
         cam.start();
@@ -100,7 +99,7 @@ public class ControlSystem {
                 double angle = 25.2 + res.getTargetYDegrees();
                 double limeDist = (0.646 / Math.tan(Math.toRadians(angle))) + 0.2;
 
-                beltSpeed = (limeDist < 2.6) ? 0.65 : 0.3;
+                beltSpeed = (limeDist < 2.2) ? 0.8 : 0.45;
                 setShootPos(limeDist);
             }
     }
@@ -113,9 +112,6 @@ public class ControlSystem {
         double targetAngle = Math.toDegrees(Math.atan(54.88 / (9.8 * distMult)));
         double rawVel = Math.sqrt((MAX_HEIGHT * 19.6) / Math.pow(Math.sin(Math.toRadians(targetAngle)), 2)) * veloMult;
         rawVelocity = rawVel;
-
-        //double terminalVel = (BALL_MASS * GRAVITY) / DRAG_COEFF;
-        //double rawVel = (distMult * GRAVITY) / (terminalVel * Math.cos(ServoPosToRadians(interpolateAngle(distMult))));
 
         interpolateAngle(distMult);
         shootVel = ((rawVel * veloMult) / (9.6 * Math.PI)) * 2800; // Vel to TPS
@@ -139,6 +135,10 @@ public class ControlSystem {
     public void RunBelt(double speed) { belt.setPower(speed); }
 
     public void SpitFlywheel() { flywheel.setPower(-0.05); }
+
+    public void ExtendBlocker() { blocker.setPosition(extendPos); }
+
+    public void RetractBlocker() { blocker.setPosition(retractPos); }
 
     public void stopBelt() { belt.setPower(0); }
 
