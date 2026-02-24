@@ -11,43 +11,27 @@ import com.pedropathing.paths.PathChain;
 public class CloseGateBluePaths {
 
     public final Pose startPose = new Pose(28, 131.5, Math.toRadians(143));
+    final Pose preScorePose = new Pose(52, 115, Math.toRadians(146));
+    final Pose row1Line = new Pose(52, 84, Math.toRadians(180)), row1Grab = new Pose(20, 84, Math.toRadians(180)), row1Score = new Pose(40, 102, Math.toRadians(135));
+    final Pose row2Line = new Pose(52, 60, Math.toRadians(180)), row2Grab = new Pose(14.5, 60, Math.toRadians(180)), row2ScoreCP = new Pose(53, 58), row2Score = new Pose(50, 93, Math.toRadians(135));
+    final Pose farmGate = new Pose(15, 61, Math.toRadians(155)), farmGateCP = new Pose(29, 60); // waas 18, 64 180;   36, 65
 
-    final Pose preScorePose = new Pose(50, 115, Math.toRadians(146));
-    final Pose row2Line = new Pose(50, 60, Math.toRadians(180)), row2Grab = new Pose(14, 60, Math.toRadians(180)), row2Score = new Pose(50, 93, Math.toRadians(135)), row2ScoreCP = new Pose(53, 58);
-    final Pose row2OpenGate = new Pose(17.8, 70, Math.toRadians(150)), row2OpenGateCP = new Pose(32, 65);
-    final Pose row1Line = new Pose(50, 84, Math.toRadians(180)), row1Grab = new Pose(23, 84, Math.toRadians(180)), row1Score = new Pose(40, 102, Math.toRadians(135));
-    final Pose row3OpenGate = new Pose(16, 70, Math.toRadians(180));
-    final Pose row3Line = new Pose(51, 35, Math.toRadians(180)), row3Grab = new Pose(15, 35, Math.toRadians(180)), row3Score = new Pose(48, 107, Math.toRadians(138));
+    //final Pose farmGate = new Pose(19, 64, Math.toRadians(160)), farmGateCP = new Pose(35, 60); // waas 18, 64 180;   36, 65
+    final Pose openGate = new Pose(18, 64, Math.toRadians(180)), openGateCP = new Pose(36, 65);
+
+    final Pose row3Line = new Pose(52, 35, Math.toRadians(180)), row3Grab = new Pose(14.5, 35, Math.toRadians(180)), row3Score = new Pose(48, 107, Math.toRadians(138)), row3ScoreCP = new Pose(47.5, 73);
+    final Pose row3ParkClose = new Pose(45, 72, Math.toRadians(138));
 
 
 
-    public PathChain pathPreScore, pathRow2Line, pathRow2Grab, pathRow2OpenGate, pathRow2Score, pathRow1Line, pathRow1Grab, pathRow1Score, pathRow3OpenGate, pathRow3Line, pathRow3Grab, pathRow3Score;
+
+    public PathChain pathPreScore, pathRow2Line, pathRow2Grab, pathRow2Score, pathRow1Line, pathRow1Grab, pathRow1Score, pathFarmGate, pathOpenGate, pathRow3Line, pathRow3Grab, pathRow3Score, pathPark;
 
     public CloseGateBluePaths(Follower fol){
 
         pathPreScore = fol.pathBuilder()
                 .addPath(new BezierLine(startPose, preScorePose))
                 .setLinearHeadingInterpolation(startPose.getHeading(), preScorePose.getHeading())
-                .build();
-
-        pathRow2Line = fol.pathBuilder()
-                .addPath(new BezierLine(preScorePose, row2Line))
-                .setLinearHeadingInterpolation(preScorePose.getHeading(), row2Line.getHeading())
-                .build();
-
-        pathRow2Grab = fol.pathBuilder()
-                .addPath(new BezierLine(row2Line, row2Grab))
-                .setLinearHeadingInterpolation(row2Line.getHeading(), row2Grab.getHeading())
-                .build();
-
-        pathRow2OpenGate = fol.pathBuilder()
-                .addPath(new BezierCurve(row2Grab, row2OpenGateCP, row2OpenGate))
-                .setLinearHeadingInterpolation(row2Grab.getHeading(), row2OpenGate.getHeading())
-                .build();
-
-        pathRow2Score = fol.pathBuilder()
-                .addPath(new BezierCurve(row2OpenGate, row2ScoreCP, row2Score))
-                .setLinearHeadingInterpolation(row2OpenGate.getHeading(), row2Score.getHeading())
                 .build();
 
         pathRow1Line = fol.pathBuilder()
@@ -64,6 +48,52 @@ public class CloseGateBluePaths {
                 .addPath(new BezierLine(row1Grab, row1Score))
                 .setLinearHeadingInterpolation(row1Grab.getHeading(), row1Score.getHeading())
                 .build();
+
+        pathRow2Line = fol.pathBuilder()
+                .addPath(new BezierLine(preScorePose, row2Line))
+                .setLinearHeadingInterpolation(preScorePose.getHeading(), row2Line.getHeading())
+                .build();
+
+        pathRow2Grab = fol.pathBuilder()
+                .addPath(new BezierLine(row2Line, row2Grab))
+                .setLinearHeadingInterpolation(row2Line.getHeading(), row2Grab.getHeading())
+                .build();
+
+        pathFarmGate = fol.pathBuilder()
+                .addPath(new BezierCurve(row2Score, farmGateCP, farmGate))
+                .setLinearHeadingInterpolation(row2Score.getHeading(), farmGate.getHeading())
+                .build();
+
+        pathOpenGate = fol.pathBuilder()
+                .addPath(new BezierCurve(row2Grab, openGateCP, openGate))
+                .setLinearHeadingInterpolation(row2Grab.getHeading(), openGate.getHeading())
+                .build();
+
+        pathRow2Score = fol.pathBuilder()
+                .addPath(new BezierCurve(farmGate, row2ScoreCP, row2Score))
+                .setLinearHeadingInterpolation(farmGate.getHeading(), row2Score.getHeading())
+                .build();
+
+        pathRow3Line = fol.pathBuilder()
+                .addPath(new BezierLine(row2Score, row3Line))
+                .setLinearHeadingInterpolation(row2Score.getHeading(), row3Line.getHeading())
+                .build();
+
+        pathRow3Grab = fol.pathBuilder()
+                .addPath(new BezierLine(row3Line, row3Grab))
+                .setLinearHeadingInterpolation(row3Line.getHeading(), row3Grab.getHeading())
+                .build();
+
+        pathRow3Score = fol.pathBuilder()
+                .addPath(new BezierCurve(row3Grab,row3ScoreCP, row3Score))
+                .setLinearHeadingInterpolation(row3Grab.getHeading(), row3Score.getHeading())
+                .build();
+
+        pathPark = fol.pathBuilder()
+                .addPath(new BezierLine(row3Score, row3ParkClose))
+                .setLinearHeadingInterpolation(row3Score.getHeading(), row3ParkClose.getHeading())
+                .build();
+
 
     }
 }

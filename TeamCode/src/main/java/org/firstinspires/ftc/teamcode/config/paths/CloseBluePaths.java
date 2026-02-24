@@ -13,11 +13,11 @@ public class CloseBluePaths {
     /// BOT LENGTH 15.75
 
     public final Pose startPose = new Pose(28, 131.5, Math.toRadians(143));
-    final Pose preScorePose = new Pose(50, 115, Math.toRadians(143));
+    final Pose preScorePose = new Pose(52, 115, Math.toRadians(143));
     final Pose row1Line = new Pose(52, 84, Math.toRadians(180)), row1Grab = new Pose(20, 84, Math.toRadians(180)), row1Score = new Pose(40, 102, Math.toRadians(135));
     final Pose row2Line = new Pose(52, 60, Math.toRadians(180)), row2Grab = new Pose(14.5, 60, Math.toRadians(180)), row2ScoreCP = new Pose(53, 58), row2Score = new Pose(50, 93, Math.toRadians(135));
-    final Pose openGate = new Pose(17.5, 70, Math.toRadians(180)), openGateCP = new Pose(38, 60);
-    final Pose row3Line = new Pose(52, 35, Math.toRadians(180)), row3Grab = new Pose(14.5, 35, Math.toRadians(180)), row3Score = new Pose(48, 107, Math.toRadians(138));
+    final Pose openGate = new Pose(18, 64, Math.toRadians(180)), openGateCP = new Pose(36, 65);
+    final Pose row3Line = new Pose(52, 35, Math.toRadians(180)), row3Grab = new Pose(14.5, 35, Math.toRadians(180)), row3Score = new Pose(48, 107, Math.toRadians(138)), row3ScoreCP = new Pose(47.5, 73);
     final Pose row3ParkClose = new Pose(45, 72, Math.toRadians(138));
 
 
@@ -76,7 +76,7 @@ public class CloseBluePaths {
                 .build();
 
         pathRow3Score = fol.pathBuilder()
-                .addPath(new BezierLine(row3Grab, row3Score))
+                .addPath(new BezierCurve(row3Grab,row3ScoreCP, row3Score))
                 .setLinearHeadingInterpolation(row3Grab.getHeading(), row3Score.getHeading())
                 .build();
 

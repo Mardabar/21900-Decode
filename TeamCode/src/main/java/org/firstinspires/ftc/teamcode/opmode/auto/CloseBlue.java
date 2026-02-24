@@ -32,25 +32,24 @@ public class CloseBlue extends NextFTCOpMode {
         shootSystem = new ShootSystem(hardwareMap, telemetry);
         paths = new CloseBluePaths(PedroComponent.follower());
 
+
         PedroComponent.follower().setStartingPose(paths.startPose);
 
         return new SequentialGroup(
 
                 new FollowPath(paths.pathPreScore),
 
-                shootSystem.shootClose(0.6, 1600),
+                shootSystem.shootClose(0.6, 1700),
 
                 new FollowPath(paths.pathRow1Line),
 
                 shootSystem.blockerOut(),
 
-                new InstantCommand(() -> PedroComponent.follower().setMaxPower(.8)),
 
                 new FollowPath(paths.pathRow1Grab)
                         .asDeadline(shootSystem.runBeltCommand(0.8)),
 
                 shootSystem.stopBeltCommand(),
-                new InstantCommand(() -> PedroComponent.follower().setMaxPower(1.0)),
 
 
                 new ParallelGroup(
@@ -58,13 +57,13 @@ public class CloseBlue extends NextFTCOpMode {
                         shootSystem.blockerIn()
                 ),
 
-                shootSystem.shootClose(0.8, 1600),
+                shootSystem.shootClose(0.8, 1700),
 
                 new FollowPath(paths.pathRow2Line),
 
                 shootSystem.blockerOut(),
 
-                new InstantCommand(() -> PedroComponent.follower().setMaxPower(0.8)),
+                //new InstantCommand(() -> PedroComponent.follower().setMaxPower(0.8)),
 
 
 //                new ParallelGroup(
@@ -73,20 +72,30 @@ public class CloseBlue extends NextFTCOpMode {
 
                 new FollowPath(paths.pathRow2Grab)
                         .asDeadline(shootSystem.runBeltCommand(0.8)),
+                shootSystem.stopBeltCommand(),
 
+
+                new InstantCommand(() -> PedroComponent.follower().setMaxPower(.5)),
 
                 new FollowPath(paths.pathOpenGate),
-                new Delay(.7),
+
+                new Delay(.4),
 
 
                 new InstantCommand(() -> PedroComponent.follower().setMaxPower(1.0)),
-                shootSystem.stopBeltCommand(),
 
-                new FollowPath(paths.pathRow2Score),
-                shootSystem.shootClose(0.8, 1600),
 
-                new FollowPath(paths.pathRow3Line),
-                new InstantCommand(() -> PedroComponent.follower().setMaxPower(0.8)),
+                new ParallelGroup(
+                        new FollowPath(paths.pathRow2Score),
+                        shootSystem.blockerIn()
+                ),                shootSystem.shootClose(0.8, 1600),
+
+                new ParallelGroup(
+                        new FollowPath(paths.pathRow3Line),
+                        shootSystem.blockerOut()),
+
+
+                //new InstantCommand(() -> PedroComponent.follower().setMaxPower(0.8)),
 
                 new FollowPath(paths.pathRow3Grab)
                         .asDeadline(shootSystem.runBeltCommand(0.5)),
@@ -96,7 +105,10 @@ public class CloseBlue extends NextFTCOpMode {
                 new InstantCommand(() -> PedroComponent.follower().setMaxPower(1.0)),
                 shootSystem.stopBeltCommand(),
 
-                new FollowPath(paths.pathRow3Score),
+                new ParallelGroup(
+                        new FollowPath(paths.pathRow3Score),
+                        shootSystem.blockerIn()
+                ),
                 shootSystem.shootClose(0.8, 1600),
 
                 new FollowPath(paths.pathPark),

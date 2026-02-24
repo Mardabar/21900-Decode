@@ -99,11 +99,17 @@ public class TestTele extends OpMode {
             shooter.RunBelt(0);
 
 
-        if(gamepad1.right_bumper){
+//        if(gamepad1.dpad_left){
+//            shooter.blockIn();
+//        } else if (gamepad1.dpad_right){
+//            shooter.blockOut();
+//        }
+
+        if(shooter.flywheel.getVelocity() > 600)
             shooter.blockOut();
-        } else if (gamepad1.left_bumper){
-            shooter.blockIn();
-        }
+        else
+            shooter.blockOut();
+
 
         if (gamepad1.y) shooter.feeder.setPosition(closePos);
         else shooter.feeder.setPosition(openPos);

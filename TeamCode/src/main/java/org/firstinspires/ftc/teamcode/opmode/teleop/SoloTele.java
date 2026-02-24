@@ -98,11 +98,15 @@ public class SoloTele extends OpMode {
             shooter.RunBelt(0);
 
 
-        if(gamepad1.dpad_left ){
-            shooter.blockIn();
-        } else if (gamepad1.dpad_right){
+
+
+        if(gamepad1.right_bumper){
             shooter.blockOut();
+        } else if (gamepad1.left_bumper){
+            shooter.blockIn();
         }
+
+
 
 
 

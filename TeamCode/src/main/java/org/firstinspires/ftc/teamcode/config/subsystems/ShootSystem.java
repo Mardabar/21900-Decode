@@ -20,6 +20,10 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 
 import dev.nextftc.core.commands.Command;
+import dev.nextftc.core.commands.delays.Delay;
+import dev.nextftc.core.commands.delays.WaitUntil;
+import dev.nextftc.core.commands.groups.SequentialGroup;
+
 import dev.nextftc.core.commands.utility.InstantCommand;
 import dev.nextftc.core.commands.utility.LambdaCommand;
 
@@ -138,6 +142,19 @@ public class ShootSystem {
         } else {
             blockOut();
         }
+
+    }
+
+    public void AutoShoot() {
+        LLResult result = cam.getLatestResult();
+        if (result != null && result.isValid()) {
+            updateVars(result);
+        }
+
+        updateFlywheelControl(shootVel);
+        angleAdjuster.setPosition(anglePos);
+
+
 
     }
 
@@ -300,9 +317,9 @@ public class ShootSystem {
         return new LambdaCommand("shootCommand")
                 .setStart(timer::reset)
                 .setUpdate(() -> {
-                    this.Shoot();
+                    this.AutoShoot();
 
-                    if (timer.milliseconds() > durationMs - 550)
+                    if (timer.milliseconds() > durationMs - 400)
                         feederUp();
                     else
                         feederDown();
@@ -323,7 +340,7 @@ public class ShootSystem {
         return new LambdaCommand("shootCommand")
                 .setStart(timer::reset)
                 .setUpdate(() -> {
-                    this.Shoot();
+                    this.AutoShoot();
 
                     if (timer.milliseconds() > durationMs - 550)
                         feederUp();
@@ -341,17 +358,24 @@ public class ShootSystem {
                 .setIsDone(() -> timer.milliseconds() > durationMs);
     }
 
-    public Command runBeltForTime(double speed, double durationMs) {
-        ElapsedTime timer = new ElapsedTime();
-        return new LambdaCommand("runBeltForTime")
-                .setStart(() -> {
-                    timer.reset();
-                    RunBelt(speed);
-                })
-                .setIsDone(() -> timer.milliseconds() > durationMs)
-                .setStop(interrupted -> stopBelt());
+    public Command runBeltForTime(double speed, double durationSec) {
+        return new SequentialGroup(
+                runBeltCommand(speed),
+                new Delay(durationSec),
+                stopBeltCommand()
+        );
     }
 
+
+    public Command runBeltActive(double speed){
+        return new LambdaCommand("runBeltActive")
+                .setStart(() -> RunBelt(speed))
+                .setIsDone(() -> false)
+                .setStop(interrupted -> stopBelt());
+    }
+    public Command runBeltWithDelay(double speed, double durationSeconds) {
+        return runBeltActive(speed).endAfter(durationSeconds);
+    }
 
 
 

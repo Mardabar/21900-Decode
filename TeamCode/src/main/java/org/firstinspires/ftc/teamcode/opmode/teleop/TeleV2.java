@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.opmode.teleop;
 
+
+
 import static org.firstinspires.ftc.teamcode.config.subsystems.ControlSystem.IDLE_VELO;
 import static org.firstinspires.ftc.teamcode.config.subsystems.ControlSystem.closePos;
 import static org.firstinspires.ftc.teamcode.config.subsystems.ControlSystem.openPos;
@@ -11,111 +13,119 @@ import com.qualcomm.hardware.limelightvision.LLResultTypes;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
-import com.qualcomm.robotcore.hardware.DistanceSensor;
 
-import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.teamcode.config.pedroPathing.Constants;
-import org.firstinspires.ftc.teamcode.config.subsystems.ControlSystem;
+import org.firstinspires.ftc.teamcode.config.subsystems.ShootSystem;
 
-
-///  BLEUAFEHATGSWF why do we have so many teleop modeeasdssdsd
-///
 @Configurable
-@TeleOp(name = "Tele V2 Leif")
-public class TeleV2Leif extends OpMode {
-    ControlSystem shooter;
+@TeleOp(name = "Tele V2")
+public class TeleV2 extends OpMode {
+
+    ShootSystem shooter;
+
 
     private Follower fol;
     private final Pose startingPose = new Pose(72, 72, Math.toRadians(0));
 
     private DcMotorEx lb, rb, lf, rf;
-    private DistanceSensor stockCheck;
 
     private final double p = 0.03, d = 0.00011;
     private double lastError;
+    private double iSum;
     private boolean isShooting;
+    private boolean isDriving = true;
 
     @Override
     public void init() {
-        shooter = new ControlSystem(hardwareMap, telemetry);
+        shooter = new ShootSystem(hardwareMap, telemetry);
 
         lb = hardwareMap.get(DcMotorEx.class, "lb");
         rb = hardwareMap.get(DcMotorEx.class, "rb");
         lf = hardwareMap.get(DcMotorEx.class, "lf");
         rf = hardwareMap.get(DcMotorEx.class, "rf");
 
-        //stockCheck = hardwareMap.get(DistanceSensor.class, "stockCheck");
-
         fol = Constants.createFollower(hardwareMap);
         fol.setStartingPose(startingPose);
-        fol.update();
         fol.startTeleOpDrive();
+
+        shooter.beltSpeed = 0.8;
     }
 
     @Override
     public void loop() {
         fol.update();
 
-        if (Math.abs(gamepad1.left_stick_x + gamepad1.left_stick_y + gamepad1.right_stick_x) > 0.1)
+        if (!isShooting) {
             fol.setTeleOpDrive(-gamepad1.left_stick_y, -gamepad1.left_stick_x, -gamepad1.right_stick_x, true);
-        else {
-            fol.setTeleOpDrive(0, 0, 0, true);
-            if (isShooting)
-                AdjustAngle();
+        }
+
+        if (Math.abs(gamepad1.left_stick_x + gamepad1.left_stick_y + gamepad1.right_stick_x) > 0.1 && isShooting) {
+            isDriving = true;
+            fol.setTeleOpDrive(-gamepad1.left_stick_y, -gamepad1.left_stick_x, -gamepad1.right_stick_x, true);
+        } else if (isDriving || isShooting) {
+            for (LLResultTypes.FiducialResult res : shooter.cam.getLatestResult().getFiducialResults()) {
+                int id = res.getFiducialId();
+                if ((id == 20 || id == 24) && !isDriving)
+                    PIDAdjusting(res);
+            }
+            isDriving = false;
         }
 
         if (gamepad2.a) {
             isShooting = true;
             shooter.Shoot();
-        } else if (!gamepad2.b) {
+        } else {
             isShooting = false;
             shooter.StopMotors();
-            shooter.beltSpeed = 0.8;
-        } /*else if (stockCheck.getDistance(DistanceUnit.CM) < 0.8 && !gamepad2)
-            shooter.Shoot();*/
+            iSum = 0;
+        }
 
-        if(gamepad1.dpad_left || gamepad2.dpad_left)
+        if (gamepad1.dpad_down || gamepad2.dpad_down) {
             shooter.flywheel.setVelocity(-IDLE_VELO);
+        }
 
         if (gamepad2.x)
-            shooter.RunBelt(shooter.beltSpeed);
+            if(isShooting)
+                shooter.RunBelt(shooter.beltSpeed);
+            else
+                shooter.RunBelt(.8);
+
         else if (gamepad2.b) {
             shooter.RunBelt(-shooter.beltSpeed);
-            shooter.SpitFlywheel();
         }
         else
             shooter.RunBelt(0);
 
-        if (gamepad2.y)
-            shooter.feeder.setPosition(closePos);
-        else
-            shooter.feeder.setPosition(openPos);
 
-        // prints data
-        telemetry.addData("TUNING - Servo Pos", "%.4f", shooter.manualServoPos);
+
+
+        if(gamepad2.right_bumper){
+            shooter.blockOut();
+        } else if (gamepad2.left_bumper){
+            shooter.blockIn();
+        }
+
+
+
+
+
+        if (gamepad2.y)
+            shooter.feederUp();
+        else
+            shooter.feederDown();
+
+        telemetry.addData("Cam Dist", shooter.getDistance());
+        telemetry.addData("Belt speed", shooter.beltSpeed);
         telemetry.addData("Target TPS", shooter.shootVel);
         telemetry.addData("Actual TPS", shooter.flywheel.getVelocity());
-        telemetry.addLine();
-        telemetry.addData("Distance", shooter.tagDistance);
-        telemetry.addData("Servo Position", shooter.anglePos);
-        telemetry.addData("True Angle", shooter.ServoPosToRadians(shooter.anglePos));
-        telemetry.addData("Velocity", shooter.rawVelocity);
-        telemetry.addData("Flywheel TPS", shooter.shootVel);
+        //telemetry.addData("Servo Pos", shooter.angleAdjuster.getPosition());
         telemetry.update();
-    }
-
-    private void AdjustAngle(){
-        for (LLResultTypes.FiducialResult res : shooter.cam.getLatestResult().getFiducialResults()) {
-            int id = res.getFiducialId();
-            if ((id == 20 || id == 24))
-                PIDAdjusting(res);
-        }
     }
 
     private void PIDAdjusting(LLResultTypes.FiducialResult res) {
         double error = res.getTargetXDegrees();
+        iSum += error;
         double derError = lastError - error;
-
         double power = (error * p) + (derError * d);
         lb.setPower(power);
         rb.setPower(-power);
