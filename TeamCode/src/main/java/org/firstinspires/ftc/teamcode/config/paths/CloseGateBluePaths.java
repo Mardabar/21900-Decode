@@ -14,10 +14,11 @@ public class CloseGateBluePaths {
     final Pose preScorePose = new Pose(52, 115, Math.toRadians(146));
     final Pose row1Line = new Pose(52, 84, Math.toRadians(180)), row1Grab = new Pose(20, 84, Math.toRadians(180)), row1Score = new Pose(40, 102, Math.toRadians(135));
     final Pose row2Line = new Pose(52, 60, Math.toRadians(180)), row2Grab = new Pose(14.5, 60, Math.toRadians(180)), row2ScoreCP = new Pose(53, 58), row2Score = new Pose(50, 93, Math.toRadians(135));
-    final Pose farmGate = new Pose(15, 62, Math.toRadians(155)), farmGateCP = new Pose(29, 60); // waas 18, 64 180;   36, 65
-    final Pose farmGate2  = new Pose(15, 62, Math.toRadians(155)), farmGateCP2 = new Pose(66, 55);
+    final Pose farmGate = new Pose(15, 62, Math.toRadians(155)), farmGateCP = new Pose(29, 60);
+    final Pose farmGateCP2 = new Pose(66, 55);
+    final Pose slapOpenGate = new Pose(15, 62, Math.toRadians(155)), slapOpenGateCP = new Pose(30, 60);
+    final Pose grabFromGate = new Pose(12, 53, Math.toRadians(140)), grabFromGateCP = new Pose(17, 56);
 
-    //final Pose farmGate = new Pose(19, 64, Math.toRadians(160)), farmGateCP = new Pose(35, 60); // waas 18, 64 180;   36, 65
     final Pose openGate = new Pose(18, 64, Math.toRadians(180)), openGateCP = new Pose(36, 65);
 
     final Pose row3Line = new Pose(52, 35, Math.toRadians(180)), row3Grab = new Pose(14.5, 35, Math.toRadians(180)), row3Score = new Pose(48, 107, Math.toRadians(138)), row3ScoreCP = new Pose(47.5, 73);
@@ -26,7 +27,7 @@ public class CloseGateBluePaths {
 
 
 
-    public PathChain pathPreScore, pathRow2Line, pathRow2Grab, pathRow2Score, pathRow1Line, pathRow1Grab, pathRow1Score, pathFarmGate, pathFarmGate2, pathOpenGate, pathRow3Line, pathRow3Grab, pathRow3Score, pathPark;
+    public PathChain pathPreScore, pathRow2Line, pathRow2Grab, pathRow2Score, pathRow1Line, pathRow1Grab, pathRow1Score, pathFarmGate, pathFarmGate2, pathOpenGate, pathSlapOpenGate, pathGrabFromGate, pathRow3Line, pathRow3Grab, pathRow3Score, pathPark;
 
     public CloseGateBluePaths(Follower fol){
 
@@ -78,6 +79,17 @@ public class CloseGateBluePaths {
         pathRow2Score = fol.pathBuilder()
                 .addPath(new BezierCurve(farmGate, row2ScoreCP, row2Score))
                 .setLinearHeadingInterpolation(farmGate.getHeading(), row2Score.getHeading())
+                .build();
+
+
+        pathSlapOpenGate = fol.pathBuilder()
+                .addPath(new BezierCurve(row2Score, slapOpenGateCP, slapOpenGate))
+                .setLinearHeadingInterpolation(row2Score.getHeading(), slapOpenGate.getHeading())
+                .build();
+
+        pathGrabFromGate = fol.pathBuilder()
+                .addPath(new BezierCurve(slapOpenGate, grabFromGateCP, grabFromGate))
+                .setLinearHeadingInterpolation(slapOpenGate.getHeading(), grabFromGateCP.getHeading())
                 .build();
 
         pathRow3Line = fol.pathBuilder()
