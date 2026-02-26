@@ -3,8 +3,6 @@ package org.firstinspires.ftc.teamcode.opmode.teleop;
 
 
 import static org.firstinspires.ftc.teamcode.config.subsystems.ControlSystem.IDLE_VELO;
-import static org.firstinspires.ftc.teamcode.config.subsystems.ControlSystem.closePos;
-import static org.firstinspires.ftc.teamcode.config.subsystems.ControlSystem.openPos;
 
 import com.bylazar.configurables.annotations.Configurable;
 import com.pedropathing.follower.Follower;
@@ -74,7 +72,7 @@ public class SoloTele extends OpMode {
 
         if (gamepad1.a) {
             isShooting = true;
-            shooter.Shoot();
+            shooter.Shoot(false);
         } else {
             isShooting = false;
             shooter.StopMotors();

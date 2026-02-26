@@ -1,6 +1,4 @@
 package org.firstinspires.ftc.teamcode.config.subsystems;
-
-
 import static org.firstinspires.ftc.teamcode.config.pedroPathing.Tuning.follower;
 
 
@@ -10,7 +8,6 @@ import com.qualcomm.hardware.limelightvision.LLResultTypes;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
-import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.VoltageSensor;
@@ -20,17 +17,12 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 
 import dev.nextftc.core.commands.Command;
 import dev.nextftc.core.commands.delays.Delay;
-import dev.nextftc.core.commands.delays.WaitUntil;
 import dev.nextftc.core.commands.groups.SequentialGroup;
 
 import dev.nextftc.core.commands.utility.InstantCommand;
 import dev.nextftc.core.commands.utility.LambdaCommand;
 
-
-import java.util.Map;
 import java.util.TreeMap;
-
-
 
 public class ShootSystem {
 
@@ -42,6 +34,9 @@ public class ShootSystem {
     public final Follower fol;
     public final Limelight3A cam;
     public final Telemetry telemetry;
+
+    public double rawVelocity;
+    public double tagDistance;
 
     public double anglePos = 0.5, shootVel, beltSpeed = 1, manualServoPos = 0.15, manualBlockerPos = 0.1;
     public static final double IDLE_VELO = 700;
@@ -112,11 +107,10 @@ public class ShootSystem {
 
     }
 
-    private void calcHoodPos(double distance) {
+    public static double calcHoodPos(double distance) {
         // Impl the quadratic formula y = ax^2 + bx + c
-        anglePos = (hoodA * Math.pow(distance, 2)) + (hoodB * distance) + hoodC;
-
-        anglePos = Math.max(0.12, Math.min(0.25, anglePos));
+        double newAngle = (hoodA * Math.pow(distance, 2)) + (hoodB * distance) + hoodC;
+        return Math.max(0.12, Math.min(0.25, newAngle));
     }
 
 
@@ -130,104 +124,80 @@ public class ShootSystem {
         flywheel.setPower(Math.max(-1.0, Math.min(1.0, power)));
     }
 
-    public void Shoot() {
+    public void Shoot(boolean isAuto) {
         LLResult result = cam.getLatestResult();
-        if (result != null && result.isValid()) {
+        if (result != null && result.isValid())
             updateVars(result);
-        }
 
         updateFlywheelControl(shootVel);
         angleAdjuster.setPosition(anglePos);
 
-        if (Math.abs(shootVel - flywheel.getVelocity()) < 300) {
-            blockIn();
-        } else {
-            blockOut();
-        }
-
+        if (!isAuto)
+            BlockerSequence();
     }
 
-    public void AutoShoot() {
-        LLResult result = cam.getLatestResult();
-        if (result != null && result.isValid()) {
-            updateVars(result);
-        }
-
-        updateFlywheelControl(shootVel);
-        angleAdjuster.setPosition(anglePos);
-
-
-
+    private void BlockerSequence(){
+        if (Math.abs(shootVel - flywheel.getVelocity()) < 300)
+            blockIn();
+        else
+            blockOut();
     }
 
     public void TestShoot() {
         LLResult result = cam.getLatestResult();
-        if (result != null && result.isValid()) {
+        if (result != null && result.isValid())
             updateVars(result);
-        }
+
         updateFlywheelControl(shootVel);
     }
 
 
     public double getDistance() {
         LLResult result = cam.getLatestResult();
-        if (result != null && result.isValid()) {
-            for (LLResultTypes.FiducialResult res : result.getFiducialResults()) {
+        if (result != null && result.isValid())
+            for (LLResultTypes.FiducialResult res : result.getFiducialResults())
                 if (res.getFiducialId() == 20 || res.getFiducialId() == 24) {
                     double angle = 25.2 + res.getTargetYDegrees();
                     return (0.646 / Math.tan(Math.toRadians(angle))) + 0.2;
                 }
-            }
-        }
         return 1.5;
     }
 
     private void updateVars(LLResult result) {
-        for (LLResultTypes.FiducialResult res : result.getFiducialResults()) {
-            if (res.getFiducialId() == 20 || res.getFiducialId() == 24) {
-                double angle = 25.2 + res.getTargetYDegrees();
-                double limeDist = (0.646 / Math.tan(Math.toRadians(angle))) + 0.2;
-
-                if (limeDist < .5)
-                    beltSpeed = 1;
-//                else if (limeDist < 1)
-//                    beltSpeed = .8;
-//                else if (limeDist < 1.5)
-//                    beltSpeed = .7;
-                else if(limeDist < 2.2)
-                    beltSpeed = .8;
-                else if (limeDist < 2.8)
-                    beltSpeed = .45;
-
-                setShootPos(limeDist);
-            }
-        }
+        for (LLResultTypes.FiducialResult res : result.getFiducialResults())
+            if (res.getFiducialId() == 20 || res.getFiducialId() == 24)
+                SetVars(res);
     }
 
-    private void oldSetShootPos(double dist) {
-        double distMult = dist * 1.2;
-        double veloMult = 2.21 + (distMult * 0.15);
+    private void SetVars(LLResultTypes.FiducialResult res){
+        double angle = 25.2 + res.getTargetYDegrees();
+        double limeDist = (0.646 / Math.tan(Math.toRadians(angle))) + 0.2;
 
-        double targetAngle = Math.toDegrees(Math.atan(54.88 / (9.8 * distMult)));
-        double rawVel = Math.sqrt((MAX_HEIGHT * 19.6) / Math.pow(Math.sin(Math.toRadians(targetAngle)), 2)) * veloMult;
+        if (limeDist < .5)
+            beltSpeed = 1;
+        else if(limeDist < 2.2)
+            beltSpeed = .8;
+        else if (limeDist < 2.8)
+            beltSpeed = .45;
 
-        shootVel = (rawVel / (9.6 * Math.PI)) * 2800; // Vel to TPS
-        interpolateAngle(distMult);
+        setShootPos(limeDist);
     }
-
 
     private void setShootPos(double dist) {
+
         double effectiveDist = dist * 1.2;
         double veloMult = 2.21 + (effectiveDist * 0.15);
+        tagDistance = dist;
 
         double targetAngle = Math.toDegrees(Math.atan(54.88 / (9.8 * effectiveDist)));
-        double rawVel = Math.sqrt((MAX_HEIGHT * 19.6) / Math.pow(Math.sin(Math.toRadians(targetAngle)), 2)) * veloMult;
-        shootVel = (rawVel / (9.6 * Math.PI)) * 2800;
-        calcHoodPos(effectiveDist);
+        double rawVel = Math.sqrt((MAX_HEIGHT * 19.6) / Math.pow(Math.sin(Math.toRadians(targetAngle)), 2));
+        rawVelocity = rawVel;
+
+        anglePos = ShootSystem.calcHoodPos(effectiveDist);
+        shootVel = ((rawVel * veloMult) / (9.6 * Math.PI)) * 2800; // Vel to TPS
     }
 
-    // LERP
-    public void interpolateAngle(double distance) {
+    /*public void interpolateAngle(double distance) {
         Map.Entry<Double, Double> low = angleMap.floorEntry(distance);
         Map.Entry<Double, Double> high = angleMap.ceilingEntry(distance);
 
@@ -238,7 +208,7 @@ public class ShootSystem {
             anglePos = low.getValue() + (distance - low.getKey()) * ((high.getValue() - low.getValue()) / (high.getKey() - low.getKey()));
         }
         anglePos = Math.max(0, Math.min(1, anglePos));
-    }
+    }*/
 
     public void RunBelt(double speed) { belt.setPower(speed); }
 
@@ -289,7 +259,9 @@ public class ShootSystem {
         else if (down) { manualBlockerPos -= increment;}
         manualBlockerPos = Math.clamp(manualBlockerPos, 0, 1); blocker.setPosition(manualBlockerPos);
     }
-    
+
+    public double ServoPosToRadians(double pos) { return Math.toRadians(90 - (pos * 300)); }
+
     // Commands
 
     public Command runBeltCommand(double speed) {
@@ -320,15 +292,13 @@ public class ShootSystem {
     public Command blockerOut(){
         return new InstantCommand(this::blockOut);
     }
- 
-
 
     public Command shootClose(double beltPower, double durationMs) {
         ElapsedTime timer = new ElapsedTime();
         return new LambdaCommand("shootCommand")
                 .setStart(timer::reset)
                 .setUpdate(() -> {
-                    this.AutoShoot();
+                    this.Shoot(true);
 
                     if (timer.milliseconds() > durationMs - 400)
                         feederUp();
@@ -351,7 +321,7 @@ public class ShootSystem {
         return new LambdaCommand("shootCommand")
                 .setStart(timer::reset)
                 .setUpdate(() -> {
-                    this.AutoShoot();
+                    this.Shoot(true);
 
                     if (timer.milliseconds() > durationMs - 550)
                         feederUp();
@@ -377,7 +347,6 @@ public class ShootSystem {
         );
     }
 
-
     public Command runBeltActive(double speed){
         return new LambdaCommand("runBeltActive")
                 .setStart(() -> RunBelt(speed))
@@ -387,8 +356,4 @@ public class ShootSystem {
     public Command runBeltWithDelay(double speed, double durationSeconds) {
         return runBeltActive(speed).endAfter(durationSeconds);
     }
-
-
-
-
 }

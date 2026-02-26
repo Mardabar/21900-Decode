@@ -15,7 +15,8 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 public class ControlSystem {
     // Flywheel PID and Servo Positions
     public static double kP = 0.007, kS = 0.02, kV = 0.00045;
-    public static final double openPos = .35, closePos = 0, IDLE_VELO = 300;
+    public static final double downPos = .35, upPos = 0, extendPos = 1, retractPos = 0.1;
+    public static final double IDLE_VELO = 700;
 
     // Sensor Vars
     private final VoltageSensor battery;
@@ -24,9 +25,6 @@ public class ControlSystem {
     // Motor and Servo Vars
     public final Servo angleAdjuster, feeder, blocker;
     public final DcMotorEx belt, flywheel;
-
-    private final double extendPos = 1;
-    private final double retractPos = 0.1;
 
     // Servo Angle Stuff
     private final TreeMap<Double, Double> angleMap = new TreeMap<>();
@@ -52,21 +50,8 @@ public class ControlSystem {
         belt.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
 
         blocker.setPosition(extendPos);
-        initDistances();
         cam.pipelineSwitch(0);
         cam.start();
-    }
-
-    private void initDistances() {
-        // linear interpolation table (dist in meters to servo pos)
-        angleMap.put(0.9144, 0.122);
-        angleMap.put(1.0922, 0.132);
-        angleMap.put(1.1938, 0.130);
-        angleMap.put(1.2954, 0.135);
-        angleMap.put(1.5240, 0.150);
-        angleMap.put(1.6256, 0.237);
-        angleMap.put(2.0574, 0.248);
-        angleMap.put(3.0734, 0.19);
     }
 
 
@@ -105,29 +90,16 @@ public class ControlSystem {
     }
 
     private void setShootPos(double dist) {
-        double distMult = dist * 1.2;
-        double veloMult = 2.21 + (distMult * 0.15);
+        double effectiveDist = dist * 1.2;
+        double veloMult = 2.21 + (effectiveDist * 0.15);
         tagDistance = dist;
 
-        double targetAngle = Math.toDegrees(Math.atan(54.88 / (9.8 * distMult)));
-        double rawVel = Math.sqrt((MAX_HEIGHT * 19.6) / Math.pow(Math.sin(Math.toRadians(targetAngle)), 2)) * veloMult;
+        double targetAngle = Math.toDegrees(Math.atan(54.88 / (9.8 * effectiveDist)));
+        double rawVel = Math.sqrt((MAX_HEIGHT * 19.6) / Math.pow(Math.sin(Math.toRadians(targetAngle)), 2));
         rawVelocity = rawVel;
 
-        interpolateAngle(distMult);
+        anglePos = ShootSystem.calcHoodPos(effectiveDist);
         shootVel = ((rawVel * veloMult) / (9.6 * Math.PI)) * 2800; // Vel to TPS
-    }
-
-    // LERP (we love lerp) boutta lerp you
-    private void interpolateAngle(double distance) {
-        Map.Entry<Double, Double> low = angleMap.floorEntry(distance);
-        Map.Entry<Double, Double> high = angleMap.ceilingEntry(distance);
-
-        if (low == null && high == null) return;
-        if (low == null) anglePos = high.getValue();
-        else if (high == null) anglePos = low.getValue();
-        else
-            anglePos = low.getValue() + (distance - low.getKey()) * ((high.getValue() - low.getValue()) / (high.getKey() - low.getKey()));
-        anglePos = Math.max(0, Math.min(1, anglePos));
     }
 
     public double ServoPosToRadians(double pos) { return Math.toRadians(90 - (pos * 300)); }
@@ -145,12 +117,5 @@ public class ControlSystem {
     public void StopMotors() {
         flywheel.setPower(0);
         stopBelt();
-    }
-
-    public void adjustServoManual(boolean up, boolean down) {
-        double increment = 0.001;
-        if (up) manualServoPos += increment;
-        else if (down) manualServoPos -= increment;
-        manualServoPos = Math.clamp(manualServoPos, 0, 1); angleAdjuster.setPosition(manualServoPos);
     }
 }
