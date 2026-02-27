@@ -27,6 +27,7 @@ public class TeleV2 extends OpMode {
     private final double p = 0.03, d = 0.00011;
     private double lastError;
     private double odoToLimeError = 5;
+    private boolean odoOff;
     private static final Pose BLUE_GOAL = new Pose(0, 144);
     private static final Pose RED_GOAL = new Pose(144, 144);
     public static boolean isRed;
@@ -80,6 +81,10 @@ public class TeleV2 extends OpMode {
             gamepad2.stopRumble();
         }
 
+        if (gamepad2.left_bumper)
+            odoOff = true;
+        else if (gamepad2.right_bumper)
+            odoOff = false;
 
         if (gamepad1.dpad_down || gamepad2.dpad_down)
             shooter.flywheel.setVelocity(-IDLE_VELO);
@@ -117,6 +122,8 @@ public class TeleV2 extends OpMode {
         telemetry.addLine();
         telemetry.addData("Velocity", shooter.rawVelocity);
         telemetry.addData("Flywheel TPS", shooter.shootVel);
+        telemetry.addLine();
+        telemetry.addData("Odometry Status", !odoOff);
         telemetry.update();
     }
 
@@ -160,6 +167,6 @@ public class TeleV2 extends OpMode {
 
         if (Math.abs(limeError + headingError) < odoToLimeError)
             return limeError;
-        return -headingError;
+        return !odoOff ? -headingError : limeError;
     }
 }
