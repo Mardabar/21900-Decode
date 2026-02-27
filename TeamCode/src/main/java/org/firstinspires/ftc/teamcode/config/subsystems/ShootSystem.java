@@ -37,6 +37,7 @@ public class ShootSystem {
 
     public double rawVelocity;
     public double tagDistance;
+    public boolean shotReady;
 
     public double anglePos = 0.5, shootVel, beltSpeed = 1, manualServoPos = 0.15, manualBlockerPos = 0.1;
     public static final double IDLE_VELO = 700;
@@ -113,8 +114,6 @@ public class ShootSystem {
         return Math.max(0.12, Math.min(0.25, newAngle));
     }
 
-
-
     public void updateFlywheelControl(double targetTPS) {
         double currentTPS = flywheel.getVelocity();
         double ff = (kV * targetTPS) + (kS * Math.signum(targetTPS));
@@ -137,10 +136,13 @@ public class ShootSystem {
     }
 
     private void BlockerSequence(){
-        if (Math.abs(shootVel - flywheel.getVelocity()) < 300)
+        if (Math.abs(shootVel - flywheel.getVelocity()) < 300) {
             blockIn();
-        else
+            shotReady = true;
+        }
+        else if (!shotReady) {
             blockOut();
+        }
     }
 
     public void TestShoot() {

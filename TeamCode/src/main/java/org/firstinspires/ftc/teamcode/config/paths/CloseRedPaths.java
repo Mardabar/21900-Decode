@@ -6,6 +6,8 @@ import com.pedropathing.geometry.Pose;
 import com.pedropathing.geometry.BezierLine;
 import com.pedropathing.paths.PathChain;
 
+import org.firstinspires.ftc.teamcode.config.subsystems.PoseHolder;
+
 public class CloseRedPaths {
 
 
@@ -27,7 +29,7 @@ public class CloseRedPaths {
     public PathChain pathPreScore, pathRow1Line, pathRow1Grab, pathRow1Score, pathRow2Line, pathRow2Grab, pathOpenGate, pathR2OpenGate, pathR1OpenGate, pathRow2Score, pathRow3Line, pathRow3Grab,  pathRow3Score, pathPark;
 
     public CloseRedPaths(Follower fol){
-
+        PoseHolder.GlobalStartPose = row3ParkClose;
         pathPreScore = fol.pathBuilder()
                 .addPath(new BezierLine(startPose, preScorePose))
                 .setLinearHeadingInterpolation(startPose.getHeading(), preScorePose.getHeading())

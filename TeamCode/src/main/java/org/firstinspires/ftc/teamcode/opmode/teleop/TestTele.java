@@ -3,8 +3,6 @@ package org.firstinspires.ftc.teamcode.opmode.teleop;
 
 
 import static org.firstinspires.ftc.teamcode.config.subsystems.ControlSystem.IDLE_VELO;
-import static org.firstinspires.ftc.teamcode.config.subsystems.ControlSystem.closePos;
-import static org.firstinspires.ftc.teamcode.config.subsystems.ControlSystem.openPos;
 
 import com.bylazar.configurables.annotations.Configurable;
 import com.pedropathing.follower.Follower;
@@ -111,8 +109,6 @@ public class TestTele extends OpMode {
 //            shooter.blockOut();
 
 
-        if (gamepad1.y) shooter.feeder.setPosition(closePos);
-        else shooter.feeder.setPosition(openPos);
 
         telemetry.addData("Target TPS", shooter.shootVel);
         telemetry.addData("Actual TPS", shooter.flywheel.getVelocity());

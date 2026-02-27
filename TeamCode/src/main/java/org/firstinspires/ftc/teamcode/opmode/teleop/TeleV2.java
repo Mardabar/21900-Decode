@@ -1,6 +1,8 @@
 package org.firstinspires.ftc.teamcode.opmode.teleop;
 
 import static org.firstinspires.ftc.teamcode.config.subsystems.ControlSystem.IDLE_VELO;
+
+import org.firstinspires.ftc.teamcode.config.subsystems.PoseHolder;
 import org.firstinspires.ftc.teamcode.config.subsystems.ShootSystem;
 
 import com.bylazar.configurables.annotations.Configurable;
@@ -17,15 +19,14 @@ import org.firstinspires.ftc.teamcode.config.pedroPathing.Constants;
 @TeleOp(name = "Tele V2")
 public class TeleV2 extends OpMode {
     private ShootSystem shooter;
-
     private Follower fol;
-    private final Pose startingPose = new Pose(72, 72, Math.toRadians(0));
+    private Pose startingPose;
 
     private DcMotorEx lb, rb, lf, rf;
 
     private final double p = 0.03, d = 0.00011;
     private double lastError;
-    private double odoToLimeError = 10;
+    private double odoToLimeError = 5;
     private static final Pose BLUE_GOAL = new Pose(0, 144);
     private static final Pose RED_GOAL = new Pose(144, 144);
     public static boolean isRed;
@@ -35,6 +36,7 @@ public class TeleV2 extends OpMode {
     @Override
     public void init() {
         shooter = new ShootSystem(hardwareMap, telemetry);
+        shooter.blockerOut();
 
         lb = hardwareMap.get(DcMotorEx.class, "lb");
         rb = hardwareMap.get(DcMotorEx.class, "rb");
@@ -42,6 +44,9 @@ public class TeleV2 extends OpMode {
         rf = hardwareMap.get(DcMotorEx.class, "rf");
 
         fol = Constants.createFollower(hardwareMap);
+        startingPose = PoseHolder.GlobalStartPose != null ? PoseHolder.GlobalStartPose
+                : new Pose(117, 131.5, Math.toRadians(41));
+        fol.setStartingPose(startingPose);
         fol.update();
         fol.startTeleOpDrive();
     }
@@ -50,37 +55,39 @@ public class TeleV2 extends OpMode {
     public void loop() {
         fol.update();
 
-        if (gamepad2.dpad_left)
-            isRed = false;
-        else if (gamepad2.dpad_right)
+        if (startingPose.getX() > 72)
             isRed = true;
+        else
+            isRed = false;
 
         if (Math.abs(gamepad1.left_stick_x + gamepad1.left_stick_y + gamepad1.right_stick_x) > 0.1)
             fol.setTeleOpDrive(-gamepad1.left_stick_y, -gamepad1.left_stick_x, -gamepad1.right_stick_x, true);
         else {
             fol.setTeleOpDrive(0, 0, 0, true);
             if (isShooting)
-                AdjustAngle();
+                PIDAdjusting();
         }
 
         if (gamepad2.a) {
             isShooting = true;
-            shooter.blockerIn();
             shooter.Shoot(false);
+            VibrateController(shooter.shotReady);
         } else if (!gamepad2.b) {
             isShooting = false;
-            shooter.blockerOut();
             shooter.StopMotors();
             shooter.beltSpeed = 0.8;
+            shooter.shotReady = false;
+            gamepad2.stopRumble();
         }
+
 
         if (gamepad1.dpad_down || gamepad2.dpad_down)
             shooter.flywheel.setVelocity(-IDLE_VELO);
 
         if (gamepad1.dpad_up || gamepad2.dpad_up)
-            shooter.blockerIn();
+            shooter.blockIn();
         else if (!isShooting)
-            shooter.blockerOut();
+            shooter.blockOut();
 
         if (gamepad2.x)
             shooter.RunBelt(shooter.beltSpeed);
@@ -103,6 +110,7 @@ public class TeleV2 extends OpMode {
         telemetry.addData("Actual TPS", shooter.flywheel.getVelocity());
         telemetry.addLine();
         telemetry.addData("Distance", shooter.tagDistance);
+        telemetry.addData("Angle Error", lastError);
         telemetry.addLine();
         telemetry.addData("Servo Position", shooter.anglePos);
         telemetry.addData("True Angle", shooter.ServoPosToRadians(shooter.anglePos));
@@ -112,16 +120,26 @@ public class TeleV2 extends OpMode {
         telemetry.update();
     }
 
-    private void AdjustAngle(){
-        for (LLResultTypes.FiducialResult res : shooter.cam.getLatestResult().getFiducialResults()) {
-            int id = res.getFiducialId();
-            if ((id == 20 || id == 24))
-                PIDAdjusting(res);
-        }
+    private void VibrateController(boolean ready){
+        if (ready)
+            gamepad2.rumble(500);
+        else
+            gamepad2.stopRumble();
     }
 
-    private void PIDAdjusting(LLResultTypes.FiducialResult res) {
-        double error = GetError(res);
+    private LLResultTypes.FiducialResult AdjustAngle(){
+        for (LLResultTypes.FiducialResult res : shooter.cam.getLatestResult().getFiducialResults()) {
+            int id = res.getFiducialId();
+            if (id == 20 && !isRed)
+                return res;
+            else if (id == 24 && isRed)
+                return res;
+        }
+        return null;
+    }
+
+    private void PIDAdjusting() {
+        double error = GetError(AdjustAngle());
         double derError = lastError - error;
 
         double power = (error * p) + (derError * d);
@@ -136,11 +154,12 @@ public class TeleV2 extends OpMode {
     private double GetError(LLResultTypes.FiducialResult res){
         Pose goal = BLUE_GOAL;
         if (isRed) goal = RED_GOAL;
-        double headingError = Math.toDegrees(fol.getHeading() -
-                Math.abs(Math.atan2(goal.getY() - fol.getPose().getY(), goal.getX() - fol.getPose().getX())));
+        double limeError = res != null ? res.getTargetXDegrees() : 0;
+        double headingError = Math.toDegrees(Math.abs(Math.atan2(Math.abs(goal.getY() - fol.getPose().getY()),
+                Math.abs(goal.getX() - fol.getPose().getX()))) - fol.getHeading());
 
-        if (Math.abs(headingError) - Math.abs(res.getTargetXDegrees()) < odoToLimeError)
-            return res.getTargetXDegrees();
-        return headingError;
+        if (Math.abs(limeError + headingError) < odoToLimeError)
+            return limeError;
+        return -headingError;
     }
 }

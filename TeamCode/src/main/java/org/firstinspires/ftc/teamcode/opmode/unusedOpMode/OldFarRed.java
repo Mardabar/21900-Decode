@@ -141,20 +141,6 @@ public class OldFarRed extends OpMode {
 
     private void Shoot(int nextState, double beltPower, double duration) {
         shooter.Shoot();
-
-        if (shootTimer.milliseconds() > 900)
-            shooter.feeder.setPosition(ControlSystem.closePos);
-        else
-            shooter.feeder.setPosition(ControlSystem.openPos);
-
-        if (shootTimer.milliseconds() > 500 && (Math.abs(shooter.shootVel - shooter.flywheel.getVelocity()) < 50 || shootTimer.milliseconds() > 700))
-            shooter.RunBelt(beltPower);
-
-        if (shootTimer.milliseconds() > duration) {
-            shooter.StopMotors();
-            shooter.feeder.setPosition(ControlSystem.openPos);
-            pathState = nextState;
-        }
     }
 
     private void buildPaths() {

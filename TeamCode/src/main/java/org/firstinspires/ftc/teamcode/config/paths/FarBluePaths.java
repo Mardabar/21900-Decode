@@ -6,6 +6,8 @@ import com.pedropathing.geometry.BezierLine;
 import com.pedropathing.geometry.Pose;
 import com.pedropathing.paths.PathChain;
 
+import org.firstinspires.ftc.teamcode.config.subsystems.PoseHolder;
+
 public class FarBluePaths {
 
 
@@ -19,7 +21,7 @@ public class FarBluePaths {
     public PathChain pathPreScore, pathCornerBallLine, pathCornerBallGrab, pathCornerBallScore, pathRow3Line, pathRow3Grab, pathRow3Score, pathPark;
 
     public FarBluePaths(Follower fol){
-
+        PoseHolder.GlobalStartPose = park;
         pathPreScore = fol.pathBuilder()
                 .addPath(new BezierLine(startPose, preScorePose))
                 .setLinearHeadingInterpolation(startPose.getHeading(), preScorePose.getHeading())
