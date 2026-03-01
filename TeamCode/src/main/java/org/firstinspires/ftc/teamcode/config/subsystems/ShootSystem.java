@@ -180,7 +180,7 @@ public class ShootSystem {
         else if(limeDist < 2.2)
             beltSpeed = .8;
         else if (limeDist < 2.8)
-            beltSpeed = .45;
+            beltSpeed = .4;
 
         setShootPos(limeDist);
     }
@@ -325,7 +325,7 @@ public class ShootSystem {
                 .setUpdate(() -> {
                     this.Shoot(true);
 
-                    if (timer.milliseconds() > durationMs - 550)
+                    if (timer.milliseconds() > durationMs - 850)
                         feederUp();
                     else
                         feederDown();

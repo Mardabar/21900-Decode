@@ -8,19 +8,19 @@ import com.pedropathing.paths.PathChain;
 
 import org.firstinspires.ftc.teamcode.config.subsystems.PoseHolder;
 
-public class FarBluePaths {
+public class FarRedPaths {
 
 
-    public final Pose startPose = new Pose(56, 8, Math.toRadians(90));
-    final Pose preScorePose = new Pose(58, 17, Math.toRadians(112));
-    final Pose cornerBallLine = new Pose(14, 18, Math.toRadians(-160)), cornerBallGrab = new Pose(10, 10, Math.toRadians(-168)), cornerBallScore = new Pose(57, 16, Math.toRadians(112));
-    final Pose cornerBallGrabCP1 = new Pose(16.6, 14), cornerBallGrabCP2 = new Pose(12.5, 10.2); // was 10, 16.7
-    final Pose row3Line = new Pose(52, 36, Math.toRadians(180)), row3Grab = new Pose(12, 36, Math.toRadians(180)), row3Score = new Pose(57, 16, Math.toRadians(116)), row3ScoreCP = new Pose(47.5, 73);
-    final Pose park = new Pose(51, 21, Math.toRadians(138));
+    public final Pose startPose = new Pose(56, 8, Math.toRadians(90)).mirror();
+    final Pose preScorePose = new Pose(58, 17, Math.toRadians(111)).mirror();
+    final Pose cornerBallLine = new Pose(14, 18, Math.toRadians(-160)).mirror(), cornerBallGrab = new Pose(10, 10, Math.toRadians(-173)).mirror(), cornerBallScore = new Pose(58, 17, Math.toRadians(111)).mirror();
+    final Pose cornerBallGrabCP1 = new Pose(16.6, 14).mirror(), cornerBallGrabCP2 = new Pose(12.5, 10.2).mirror(); // was 10, 16.7
+    final Pose row3Line = new Pose(52, 36, Math.toRadians(180)).mirror(), row3Grab = new Pose(12, 36, Math.toRadians(180)).mirror(), row3Score = new Pose(58, 17, Math.toRadians(111)).mirror(), row3ScoreCP = new Pose(47.5, 73).mirror();
+    final Pose park = new Pose(35, 9, Math.toRadians(90)).mirror(); // was 51 21
 
     public PathChain pathPreScore, pathCornerBallLine, pathCornerBallGrab, pathCornerBallScore, pathRow3Line, pathRow3Grab, pathRow3Score, pathPark;
 
-    public FarBluePaths(Follower fol){
+    public FarRedPaths(Follower fol){
         PoseHolder.GlobalStartPose = park;
         pathPreScore = fol.pathBuilder()
                 .addPath(new BezierLine(startPose, preScorePose))
@@ -58,8 +58,9 @@ public class FarBluePaths {
                 .build();
 
         pathPark = fol.pathBuilder()
-                .addPath(new BezierLine(row3Score, park))
-                .setTangentHeadingInterpolation().build();
+                .addPath(new BezierLine(startPose, park))
+                .setLinearHeadingInterpolation(startPose.getHeading(), park.getHeading())
+                .build();
     }
 
 }

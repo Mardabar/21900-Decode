@@ -1,3 +1,4 @@
+
 package org.firstinspires.ftc.teamcode.opmode.teleop;
 
 import static org.firstinspires.ftc.teamcode.config.subsystems.ControlSystem.IDLE_VELO;
@@ -46,7 +47,9 @@ public class TeleV2 extends OpMode {
 
         fol = Constants.createFollower(hardwareMap);
         startingPose = PoseHolder.GlobalStartPose != null ? PoseHolder.GlobalStartPose
-                : new Pose(117, 131.5, Math.toRadians(41));
+                : new Pose(45, 72, Math.toRadians(148));
+        // 45, 72, 148 blue
+        // 99, 72, 32 red
         fol.setStartingPose(startingPose);
         fol.update();
         fol.startTeleOpDrive();
@@ -83,8 +86,6 @@ public class TeleV2 extends OpMode {
 
         if (gamepad2.left_bumper)
             odoOff = true;
-        else if (gamepad2.right_bumper)
-            odoOff = false;
 
         if (gamepad1.dpad_down || gamepad2.dpad_down)
             shooter.flywheel.setVelocity(-IDLE_VELO);

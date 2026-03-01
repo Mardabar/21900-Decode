@@ -10,7 +10,7 @@ import com.pedropathing.paths.PathChain;
 import org.firstinspires.ftc.teamcode.config.subsystems.PoseHolder;
 
 
-public class CloseGateBluePaths {
+public class CloseBlue15Paths {
 
 
     public final Pose startPose = new Pose(27, 131.5, Math.toRadians(139));
@@ -33,7 +33,7 @@ public class CloseGateBluePaths {
 
     public PathChain pathPreScore, pathRow2Line, pathRow2Grab, pathRow2Score, pathRow1Line, pathRow1Grab, pathRow1Score, pathFarmGate, pathFarmGate2, pathOpenGate, pathSlapOpenGate, pathGrabFromGate, pathRow3Line, pathRow3Grab, pathRow3Score, pathPark;
 
-    public CloseGateBluePaths(Follower fol){
+    public CloseBlue15Paths(Follower fol){
         PoseHolder.GlobalStartPose = row3ParkClose;
         pathPreScore = fol.pathBuilder()
                 .addPath(new BezierLine(startPose, preScorePose))

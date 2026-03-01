@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.opmode.auto;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
 import org.firstinspires.ftc.teamcode.config.paths.FarBluePaths;
+import org.firstinspires.ftc.teamcode.config.paths.FarRedPaths;
 import org.firstinspires.ftc.teamcode.config.paths.OldFarBluePaths;
 import org.firstinspires.ftc.teamcode.config.pedroPathing.Constants;
 import org.firstinspires.ftc.teamcode.config.subsystems.ShootSystem;
@@ -16,41 +17,41 @@ import dev.nextftc.extensions.pedro.FollowPath;
 import dev.nextftc.extensions.pedro.PedroComponent;
 import dev.nextftc.ftc.NextFTCOpMode;
 
-@Autonomous(name = "Far Blue")
-public class FarBlue extends NextFTCOpMode{
+@Autonomous(name = "Far Red ")
+public class FarRedPark extends NextFTCOpMode{
 
     ShootSystem shootSystem;
 
-    FarBluePaths paths;
+    FarRedPaths paths;
 
-    public FarBlue(){
+    public FarRedPark(){
         addComponents(new PedroComponent(Constants::createFollower));
     }
 
     private SequentialGroup autonomousRoutine() {
         shootSystem = new ShootSystem(hardwareMap, telemetry);
-        paths = new FarBluePaths(PedroComponent.follower());
+        paths = new FarRedPaths(PedroComponent.follower());
 
         PedroComponent.follower().setMaxPower(0.8);
         PedroComponent.follower().setStartingPose(paths.startPose);
 
         return new SequentialGroup(
 
-        new FollowPath(paths.pathPreScore),
-                shootSystem.shootFar(0.45, 3250),
+                new FollowPath(paths.pathPreScore),
+                shootSystem.shootFar(0.45, 4000),
 
                 new ParallelGroup(
-                new FollowPath(paths.pathCornerBallLine)
-                        .asDeadline(shootSystem.runBeltCommand(1)),
+                        new FollowPath(paths.pathCornerBallLine)
+                                .asDeadline(shootSystem.runBeltCommand(1)),
 
-                    shootSystem.blockerOut()
+                        shootSystem.blockerOut()
                 ),
 
                 new FollowPath(paths.pathCornerBallGrab)
                         .asDeadline(shootSystem.runBeltCommand(1)),
 
 
-                        new FollowPath(paths.pathCornerBallScore),
+                new FollowPath(paths.pathCornerBallScore),
 
 
                 shootSystem.stopBeltCommand(),
@@ -58,37 +59,39 @@ public class FarBlue extends NextFTCOpMode{
                 shootSystem.blockerIn(),
 
 
-                shootSystem.shootFar(.45, 3250),
+                shootSystem.shootFar(.45, 4000),
 
-        new ParallelGroup(
-            new FollowPath(paths.pathRow3Line),
-                shootSystem.blockerOut()
-        ),
+                new ParallelGroup(
+                        new FollowPath(paths.pathRow3Line),
+                        shootSystem.blockerOut()
+                ),
 
-        new FollowPath(paths.pathRow3Grab)
+                new FollowPath(paths.pathRow3Grab)
                         .asDeadline(shootSystem.runBeltCommand(1)),
 
 
                 shootSystem.stopBeltCommand(),
-        new ParallelGroup(
-                shootSystem.blockerIn(),
-        new FollowPath(paths.pathRow3Score)),
+                new ParallelGroup(
+                        shootSystem.blockerIn(),
+                        new FollowPath(paths.pathRow3Score)),
 
-                shootSystem.shootFar(.45, 3250),
+                shootSystem.shootFar(.45, 4000),
 
-        new FollowPath(paths.pathPark),
-                new InstantCommand(shootSystem::StopMotors)
+                new FollowPath(paths.pathPark),
+
+                new InstantCommand(shootSystem::StopMotors),
 
 
-//
-//                new FollowPath(paths.pathRow3Line),
-//
-//
-//                new FollowPath(paths.pathRow3Grab)
-//                        .asDeadline(shootSystem.runBeltCommand(0.3)),
-//
-//                shootSystem.stopBeltCommand()
 
+                new FollowPath(paths.pathRow3Line),
+
+
+                new FollowPath(paths.pathRow3Grab)
+                        .asDeadline(shootSystem.runBeltCommand(0.3)),
+
+                shootSystem.stopBeltCommand(),
+
+                new FollowPath(paths.pathPark)
 
 
 

@@ -2,8 +2,7 @@ package org.firstinspires.ftc.teamcode.opmode.auto;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
-import org.firstinspires.ftc.teamcode.config.paths.CloseBluePaths;
-import org.firstinspires.ftc.teamcode.config.paths.CloseGateBluePaths;
+import org.firstinspires.ftc.teamcode.config.paths.CloseBlue15Paths;
 import org.firstinspires.ftc.teamcode.config.pedroPathing.Constants;
 import org.firstinspires.ftc.teamcode.config.subsystems.ShootSystem;
 
@@ -18,18 +17,18 @@ import dev.nextftc.ftc.NextFTCOpMode;
 
 
 @Autonomous(name = "Close Gate Blue")
-public class CloseGateBlue extends NextFTCOpMode{
+public class CloseBlue15 extends NextFTCOpMode{
 
     ShootSystem shootSystem;
-    CloseGateBluePaths paths;
+    CloseBlue15Paths paths;
 
-    public CloseGateBlue(){
+    public CloseBlue15(){
         addComponents(new PedroComponent(Constants::createFollower));
     }
 
     private SequentialGroup autonomousRoutine(){
         shootSystem = new ShootSystem(hardwareMap, telemetry);
-        paths = new CloseGateBluePaths(PedroComponent.follower());
+        paths = new CloseBlue15Paths(PedroComponent.follower());
 
 
         PedroComponent.follower().setStartingPose(paths.startPose);

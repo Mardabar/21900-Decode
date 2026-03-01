@@ -1,0 +1,136 @@
+package org.firstinspires.ftc.teamcode.opmode.teleop;
+
+
+
+import static org.firstinspires.ftc.teamcode.config.subsystems.ControlSystem.IDLE_VELO;
+
+import com.bylazar.configurables.annotations.Configurable;
+import com.pedropathing.follower.Follower;
+import com.pedropathing.geometry.Pose;
+import com.qualcomm.hardware.limelightvision.LLResultTypes;
+import com.qualcomm.robotcore.eventloop.opmode.OpMode;
+import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
+
+import org.firstinspires.ftc.teamcode.config.pedroPathing.Constants;
+import org.firstinspires.ftc.teamcode.config.subsystems.ShootSystem;
+
+@Configurable
+@TeleOp(name = "David Tele")
+public class DavidTele extends OpMode {
+
+    ShootSystem shooter;
+
+
+    private Follower fol;
+    private final Pose startingPose = new Pose(72, 72, Math.toRadians(0));
+
+    private DcMotorEx lb, rb, lf, rf;
+
+    private int dpad = 0;
+    private final double p = 0.03, d = 0.00011;
+    private double lastError;
+    private double iSum;
+    private boolean isShooting;
+    private boolean isDriving = true;
+
+    @Override
+    public void init() {
+        shooter = new ShootSystem(hardwareMap, telemetry);
+
+        lb = hardwareMap.get(DcMotorEx.class, "lb");
+        rb = hardwareMap.get(DcMotorEx.class, "rb");
+        lf = hardwareMap.get(DcMotorEx.class, "lf");
+        rf = hardwareMap.get(DcMotorEx.class, "rf");
+
+        fol = Constants.createFollower(hardwareMap);
+        fol.setStartingPose(startingPose);
+        fol.startTeleOpDrive();
+
+        shooter.beltSpeed = 0.8;
+    }
+
+    @Override
+    public void loop() {
+        fol.update();
+
+        if (!isShooting) {
+            fol.setTeleOpDrive(-gamepad1.left_stick_y, -gamepad1.left_stick_x, -gamepad1.right_stick_x, true);
+        }
+
+        if (Math.abs(gamepad1.left_stick_x + gamepad1.left_stick_y + gamepad1.right_stick_x) > 0.1 && isShooting) {
+            isDriving = true;
+            fol.setTeleOpDrive(-gamepad1.left_stick_y, -gamepad1.left_stick_x, -gamepad1.right_stick_x, true);
+        } else if (isDriving || isShooting) {
+            for (LLResultTypes.FiducialResult res : shooter.cam.getLatestResult().getFiducialResults()) {
+                int id = res.getFiducialId();
+                if ((id == 20 || id == 24) && !isDriving)
+                    PIDAdjusting(res);
+            }
+            isDriving = false;
+        }
+
+        if (gamepad2.a) {
+            isShooting = true;
+            shooter.Shoot(false);
+        } else {
+            isShooting = false;
+            shooter.StopMotors();
+            iSum = 0;
+        }
+
+        if (gamepad2.dpad_down) {
+            shooter.flywheel.setVelocity(-IDLE_VELO);
+        }
+
+        if (gamepad2.x)
+            if(isShooting)
+                shooter.RunBelt(shooter.beltSpeed);
+            else
+                shooter.RunBelt(.8);
+
+        else if (gamepad2.b) {
+            shooter.RunBelt(-shooter.beltSpeed);
+        }
+        else
+            shooter.RunBelt(0);
+
+
+
+
+        if(gamepad2.right_bumper){
+            shooter.blockOut();
+        } else if (gamepad2.left_bumper){
+            shooter.blockIn();
+        }
+
+
+
+
+
+        if (gamepad1.y)
+            shooter.feederUp();
+        else
+            shooter.feederDown();
+
+        telemetry.addData("Cam Dist", shooter.getDistance());
+        telemetry.addData("Belt speed", shooter.beltSpeed);
+        telemetry.addData("Target TPS", shooter.shootVel);
+        telemetry.addData("Actual TPS", shooter.flywheel.getVelocity());
+        //telemetry.addData("Servo Pos", shooter.angleAdjuster.getPosition());
+        telemetry.update();
+    }
+
+    private void PIDAdjusting(LLResultTypes.FiducialResult res) {
+        double error = res.getTargetXDegrees();
+        iSum += error;
+        double derError = lastError - error;
+        double power = (error * p) + (derError * d);
+        lb.setPower(power);
+        rb.setPower(-power);
+        lf.setPower(power);
+        rf.setPower(-power);
+
+        lastError = error;
+    }
+}
