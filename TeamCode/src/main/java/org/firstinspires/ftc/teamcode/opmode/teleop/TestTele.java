@@ -2,8 +2,6 @@ package org.firstinspires.ftc.teamcode.opmode.teleop;
 
 
 
-import static org.firstinspires.ftc.teamcode.config.subsystems.ControlSystem.IDLE_VELO;
-
 import com.bylazar.configurables.annotations.Configurable;
 import com.pedropathing.follower.Follower;
 import com.pedropathing.geometry.Pose;
@@ -11,14 +9,9 @@ import com.qualcomm.hardware.limelightvision.LLResultTypes;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
-import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.config.pedroPathing.Constants;
-import org.firstinspires.ftc.teamcode.config.subsystems.ControlSystem;
-import org.firstinspires.ftc.teamcode.config.subsystems.MathUtilities;
 import org.firstinspires.ftc.teamcode.config.subsystems.ShootSystem;
-
-import java.util.Arrays;
 
 @Configurable
 @TeleOp(name = "Test Tele")

@@ -1,10 +1,9 @@
 package org.firstinspires.ftc.teamcode.opmode.auto;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 
-import org.firstinspires.ftc.teamcode.config.paths.FarBluePaths;
 import org.firstinspires.ftc.teamcode.config.paths.FarRedPaths;
-import org.firstinspires.ftc.teamcode.config.paths.OldFarBluePaths;
 import org.firstinspires.ftc.teamcode.config.pedroPathing.Constants;
 import org.firstinspires.ftc.teamcode.config.subsystems.ShootSystem;
 
@@ -17,14 +16,15 @@ import dev.nextftc.extensions.pedro.FollowPath;
 import dev.nextftc.extensions.pedro.PedroComponent;
 import dev.nextftc.ftc.NextFTCOpMode;
 
+@Disabled
 @Autonomous(name = "Far Red ")
-public class FarRedPark extends NextFTCOpMode{
+public class FarRed extends NextFTCOpMode{
 
     ShootSystem shootSystem;
 
     FarRedPaths paths;
 
-    public FarRedPark(){
+    public FarRed(){
         addComponents(new PedroComponent(Constants::createFollower));
     }
 

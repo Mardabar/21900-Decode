@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.opmode.auto;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 
 import org.firstinspires.ftc.teamcode.config.paths.CloseBlue15Paths;
 import org.firstinspires.ftc.teamcode.config.paths.CloseRed15Paths;
@@ -17,6 +18,7 @@ import dev.nextftc.extensions.pedro.PedroComponent;
 import dev.nextftc.ftc.NextFTCOpMode;
 
 
+@Disabled
 @Autonomous(name = "Close Red 15")
 public class CloseRed15 extends NextFTCOpMode{
 

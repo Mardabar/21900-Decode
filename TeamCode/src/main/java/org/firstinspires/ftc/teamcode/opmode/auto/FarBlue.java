@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.opmode.auto;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 
 import org.firstinspires.ftc.teamcode.config.paths.FarBluePaths;
 import org.firstinspires.ftc.teamcode.config.paths.OldFarBluePaths;
@@ -16,6 +17,8 @@ import dev.nextftc.extensions.pedro.FollowPath;
 import dev.nextftc.extensions.pedro.PedroComponent;
 import dev.nextftc.ftc.NextFTCOpMode;
 
+
+@Disabled
 @Autonomous(name = "Far Blue")
 public class FarBlue extends NextFTCOpMode{
 

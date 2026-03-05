@@ -22,6 +22,7 @@ dependencies {
     // pedro
 
     //implementation 'com.pedropathing:ftc:2.0.6'
+
     implementation 'com.pedropathing:telemetry:1.0.0'
     implementation 'com.pedropathing:ftc:2.1.0-SNAPSHOT'
 
@@ -36,5 +37,8 @@ dependencies {
 
 
     implementation 'androidx.appcompat:appcompat:1.7.1'
+
+    // ivy
+    implementation 'com.pedropathing:ivy:0.0.1'
 
 }
