@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.config.paths;
+package org.firstinspires.ftc.teamcode.paths;
 
 import com.pedropathing.geometry.Pose;
 import com.pedropathing.follower.Follower;
@@ -7,25 +7,25 @@ import com.pedropathing.geometry.BezierCurve;
 import com.pedropathing.geometry.BezierLine;
 import com.pedropathing.paths.PathChain;
 
-import org.firstinspires.ftc.teamcode.config.subsystems.PoseHolder;
+import org.firstinspires.ftc.teamcode.subsystems.PoseHolder;
 
 
-public class CloseBlue15Paths {
+public class CloseRed15Paths {
 
 
-    public final Pose startPose = new Pose(27, 131.5, Math.toRadians(139));
-    final Pose preScorePose = new Pose(52, 115, Math.toRadians(146));
-    final Pose row1Line = new Pose(52, 84, Math.toRadians(180)), row1Grab = new Pose(20, 84, Math.toRadians(180)), row1Score = new Pose(40, 102, Math.toRadians(135)), row1ScoreCP = new Pose(47, 67);
-    final Pose row2Line = new Pose(52, 60, Math.toRadians(180)), row2Grab = new Pose(14.5, 60, Math.toRadians(180)), row2ScoreCP = new Pose(60, 70), row2Score = new Pose(50, 93, Math.toRadians(135));
-    final Pose openGate = new Pose(13.5, 60, Math.toRadians(180)), openGateCP = new Pose(36, 65);
+    public final Pose startPose = new Pose(27, 131.5, Math.toRadians(139)).mirror();
+    final Pose preScorePose = new Pose(52, 115, Math.toRadians(146)).mirror();
+    final Pose row1Line = new Pose(52, 84, Math.toRadians(180)).mirror(), row1Grab = new Pose(20, 84, Math.toRadians(180)).mirror(), row1Score = new Pose(40, 102, Math.toRadians(135)).mirror(), row1ScoreCP = new Pose(47, 67).mirror();
+    final Pose row2Line = new Pose(52, 60, Math.toRadians(180)).mirror(), row2Grab = new Pose(14.5, 60, Math.toRadians(180)).mirror(), row2ScoreCP = new Pose(60, 70).mirror(), row2Score = new Pose(50, 93, Math.toRadians(135)).mirror();
+    final Pose openGate = new Pose(13.5, 60, Math.toRadians(180)).mirror(), openGateCP = new Pose(36, 65).mirror();
 
-    final Pose row3Line = new Pose(52, 36, Math.toRadians(180)), row3Grab = new Pose(12, 36, Math.toRadians(180)), row3Score = new Pose(48, 107, Math.toRadians(138)), row3ScoreCP = new Pose(47.5, 73);
-    final Pose row3ParkClose = new Pose(45, 72, Math.toRadians(138));
+    final Pose row3Line = new Pose(52, 36, Math.toRadians(180)).mirror(), row3Grab = new Pose(12, 36, Math.toRadians(180)).mirror(), row3Score = new Pose(48, 107, Math.toRadians(138)).mirror(), row3ScoreCP = new Pose(47.5, 73).mirror();
+    final Pose row3ParkClose = new Pose(45, 72, Math.toRadians(138)).mirror();
 
-    final Pose farmGate = new Pose(15, 62, Math.toRadians(155)), farmGateCP = new Pose(29, 60);
-    final Pose farmGateCP2 = new Pose(66, 55);
-    final Pose slapOpenGate = new Pose(12.5, 62, Math.toRadians(155)), slapOpenGateCP = new Pose(30, 60);
-    final Pose grabFromGate = new Pose(12, 53, Math.toRadians(144)), grabFromGateCP = new Pose(17, 56);
+    final Pose farmGate = new Pose(15, 62, Math.toRadians(155)).mirror(), farmGateCP = new Pose(29, 60);
+    final Pose farmGateCP2 = new Pose(66, 55).mirror();
+    final Pose slapOpenGate = new Pose(12.5, 62, Math.toRadians(155)).mirror(), slapOpenGateCP = new Pose(30, 60).mirror();
+    final Pose grabFromGate = new Pose(12, 53, Math.toRadians(144)).mirror(), grabFromGateCP = new Pose(17, 56).mirror();
 
 
 
@@ -33,7 +33,7 @@ public class CloseBlue15Paths {
 
     public PathChain pathPreScore, pathRow2Line, pathRow2Grab, pathRow2Score, pathRow1Line, pathRow1Grab, pathRow1Score, pathFarmGate, pathFarmGate2, pathOpenGate, pathSlapOpenGate, pathGrabFromGate, pathRow3Line, pathRow3Grab, pathRow3Score, pathPark;
 
-    public CloseBlue15Paths(Follower fol){
+    public CloseRed15Paths(Follower fol){
         PoseHolder.GlobalStartPose = row3ParkClose;
         pathPreScore = fol.pathBuilder()
                 .addPath(new BezierLine(startPose, preScorePose))

@@ -1,11 +1,11 @@
-package org.firstinspires.ftc.teamcode.config.pedroPathing;
+package org.firstinspires.ftc.teamcode.pedroPathing;
 
-import static org.firstinspires.ftc.teamcode.config.pedroPathing.Tuning.changes;
-import static org.firstinspires.ftc.teamcode.config.pedroPathing.Tuning.drawCurrent;
-import static org.firstinspires.ftc.teamcode.config.pedroPathing.Tuning.drawCurrentAndHistory;
-import static org.firstinspires.ftc.teamcode.config.pedroPathing.Tuning.follower;
-import static org.firstinspires.ftc.teamcode.config.pedroPathing.Tuning.stopRobot;
-import static org.firstinspires.ftc.teamcode.config.pedroPathing.Tuning.telemetryM;
+import static org.firstinspires.ftc.teamcode.pedroPathing.Tuning.changes;
+import static org.firstinspires.ftc.teamcode.pedroPathing.Tuning.drawCurrent;
+import static org.firstinspires.ftc.teamcode.pedroPathing.Tuning.drawCurrentAndHistory;
+import static org.firstinspires.ftc.teamcode.pedroPathing.Tuning.follower;
+import static org.firstinspires.ftc.teamcode.pedroPathing.Tuning.stopRobot;
+import static org.firstinspires.ftc.teamcode.pedroPathing.Tuning.telemetryM;
 
 import com.bylazar.configurables.PanelsConfigurables;
 import com.bylazar.configurables.annotations.Configurable;
@@ -28,8 +28,6 @@ import android.annotation.SuppressLint;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.ElapsedTime;
-
-import org.firstinspires.ftc.teamcode.config.pedroPathing.Constants;
 
 import java.util.ArrayList;
 import java.util.List;

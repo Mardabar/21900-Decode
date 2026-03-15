@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.config.pedroPathing;
+package org.firstinspires.ftc.teamcode.pedroPathing;
 
 import com.bylazar.configurables.annotations.Configurable;
 import com.pedropathing.control.FilteredPIDFCoefficients;

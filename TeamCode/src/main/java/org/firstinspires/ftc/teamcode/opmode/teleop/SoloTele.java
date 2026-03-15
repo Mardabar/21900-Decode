@@ -2,7 +2,7 @@ package org.firstinspires.ftc.teamcode.opmode.teleop;
 
 
 
-import static org.firstinspires.ftc.teamcode.config.subsystems.ControlSystem.IDLE_VELO;
+import static org.firstinspires.ftc.teamcode.subsystems.ControlSystem.IDLE_VELO;
 
 import com.bylazar.configurables.annotations.Configurable;
 import com.pedropathing.follower.Follower;
@@ -12,8 +12,8 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 
-import org.firstinspires.ftc.teamcode.config.pedroPathing.Constants;
-import org.firstinspires.ftc.teamcode.config.subsystems.ShootSystem;
+import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
+import org.firstinspires.ftc.teamcode.subsystems.ShootSystem;
 
 @Configurable
 @TeleOp(name = "Solo Tele")
