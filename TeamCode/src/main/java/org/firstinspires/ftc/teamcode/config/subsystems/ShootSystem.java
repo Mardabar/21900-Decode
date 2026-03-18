@@ -1,5 +1,5 @@
-package org.firstinspires.ftc.teamcode.subsystems;
-import static org.firstinspires.ftc.teamcode.pedroPathing.Tuning.follower;
+package org.firstinspires.ftc.teamcode.config.subsystems;
+import static org.firstinspires.ftc.teamcode.config.pedroPathing.Tuning.follower;
 
 
 import com.pedropathing.follower.Follower;

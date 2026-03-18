@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.subsystems;
+package org.firstinspires.ftc.teamcode.config.subsystems;
 
 import java.util.TreeMap;
 import com.qualcomm.hardware.limelightvision.LLResult;
