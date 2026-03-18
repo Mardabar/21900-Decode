@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.subsystems;
+package org.firstinspires.ftc.teamcode.config.subsystems;
 
 import com.pedropathing.geometry.Pose;
 

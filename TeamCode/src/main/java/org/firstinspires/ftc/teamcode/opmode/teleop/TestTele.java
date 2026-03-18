@@ -10,8 +10,8 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 
-import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
-import org.firstinspires.ftc.teamcode.subsystems.ShootSystem;
+import org.firstinspires.ftc.teamcode.config.pedroPathing.Constants;
+import org.firstinspires.ftc.teamcode.config.subsystems.ShootSystem;
 
 @Configurable
 @TeleOp(name = "Test Tele")

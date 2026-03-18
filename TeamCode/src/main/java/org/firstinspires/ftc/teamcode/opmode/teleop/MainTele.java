@@ -1,10 +1,9 @@
 
 package org.firstinspires.ftc.teamcode.opmode.teleop;
 
-import static org.firstinspires.ftc.teamcode.subsystems.ControlSystem.IDLE_VELO;
 
-import org.firstinspires.ftc.teamcode.subsystems.PoseHolder;
-import org.firstinspires.ftc.teamcode.subsystems.ShootSystem;
+import org.firstinspires.ftc.teamcode.config.subsystems.PoseHolder;
+import org.firstinspires.ftc.teamcode.config.subsystems.ShootSystem;
 
 import com.bylazar.configurables.annotations.Configurable;
 import com.pedropathing.follower.Follower;
@@ -14,11 +13,11 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 
-import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
+import org.firstinspires.ftc.teamcode.config.pedroPathing.Constants;
 
 @Configurable
-@TeleOp(name = "Tele V2")
-public class TeleV2 extends OpMode {
+@TeleOp(name = "MainTele")
+public class MainTele extends OpMode {
     private ShootSystem shooter;
     private Follower fol;
     private Pose startingPose;
@@ -88,7 +87,7 @@ public class TeleV2 extends OpMode {
             odoOff = true;
 
         if (gamepad1.dpad_down || gamepad2.dpad_down)
-            shooter.flywheel.setVelocity(-IDLE_VELO);
+            shooter.flywheel.setVelocity(-400);
 
         if (gamepad1.dpad_up || gamepad2.dpad_up)
             shooter.blockIn();

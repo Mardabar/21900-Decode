@@ -1,5 +1,5 @@
-package org.firstinspires.ftc.teamcode.subsystems;
-import static org.firstinspires.ftc.teamcode.pedroPathing.Tuning.follower;
+package org.firstinspires.ftc.teamcode.config.subsystems;
+import static org.firstinspires.ftc.teamcode.config.pedroPathing.Tuning.follower;
 
 
 import com.pedropathing.follower.Follower;
@@ -81,31 +81,6 @@ public class ShootSystem {
         blocker.setPosition(.1);
         cam.pipelineSwitch(0);
         cam.start();
-    }
-
-    private void initDistances() {
-        // linear interpolation table (dist in meters to servo pos)
-
-        angleMap.put(0.9144, 0.122);
-        angleMap.put(1.0922, 0.132);
-        angleMap.put(1.1938, 0.130);
-        angleMap.put(1.2954, 0.135);
-        angleMap.put(1.5240, 0.150);
-        angleMap.put(1.6256, 0.237);
-        angleMap.put(2.0574, 0.248);
-        angleMap.put(3.0734, 0.19);
-
-         /*New LERP data
-        angleMap.put(0.489712, 0.129);
-        angleMap.put(0.633476, 0.129);
-        angleMap.put(0.7726934, 0.166);
-        angleMap.put(0.8993826, 0.166);
-        angleMap.put(1.016, 0.17);
-        angleMap.put(1.1684, 0.18);
-        angleMap.put(1.2790424, 0.194);
-        angleMap.put(1.4224, 0.21);
-        angleMap.put(2.9718, .23); */
-
     }
 
     public static double calcHoodPos(double distance) {
