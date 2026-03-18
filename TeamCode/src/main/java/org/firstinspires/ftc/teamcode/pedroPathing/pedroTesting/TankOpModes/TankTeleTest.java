@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.opmode.pedroTesting;
+package org.firstinspires.ftc.teamcode.pedroPathing.pedroTesting.TankOpModes;
 
 
 
@@ -6,7 +6,7 @@ import com.pedropathing.follower.Follower;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
-import org.firstinspires.ftc.teamcode.pedroPathing.Tank.TankConfig;
+import org.firstinspires.ftc.teamcode.pedroPathing.pedroTesting.TankConfig.TankConfig;
 
 @TeleOp(name = "Tank Tele Test")
 public class TankTeleTest extends LinearOpMode {

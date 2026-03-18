@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.opmode.pedroTesting;
+package org.firstinspires.ftc.teamcode.pedroPathing.pedroTesting.TankOpModes;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 

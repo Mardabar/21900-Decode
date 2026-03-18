@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.pedroPathing.Tank;
+package org.firstinspires.ftc.teamcode.pedroPathing.pedroTesting.TankConfig;
 
 
 import com.pedropathing.drivetrain.Drivetrain;
