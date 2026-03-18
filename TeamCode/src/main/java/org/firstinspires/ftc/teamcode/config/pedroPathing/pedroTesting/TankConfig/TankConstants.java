@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.pedroPathing.pedroTesting.TankConfig;
+package org.firstinspires.ftc.teamcode.config.pedroPathing.pedroTesting.TankConfig;
 
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 

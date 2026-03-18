@@ -1,12 +1,12 @@
-package org.firstinspires.ftc.teamcode.pedroPathing.pedroTesting.TankOpModes;
+package org.firstinspires.ftc.teamcode.config.pedroPathing.pedroTesting.TankOpModes;
 
 
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
 import org.firstinspires.ftc.teamcode.paths.tankPaths.TankSquarePaths;
-import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
-import org.firstinspires.ftc.teamcode.subsystems.ShootSystem;
+import org.firstinspires.ftc.teamcode.config.pedroPathing.Constants;
+import org.firstinspires.ftc.teamcode.config.subsystems.ShootSystem;
 
 import dev.nextftc.core.commands.CommandManager;
 import dev.nextftc.core.commands.delays.Delay;
